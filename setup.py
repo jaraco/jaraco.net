@@ -5,8 +5,6 @@
 Copyright © 2009 Jason R. Coombs
 """
 
-from ez_setup import use_setuptools
-use_setuptools()
 from setuptools import setup, find_packages
 
 __author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
@@ -39,6 +37,7 @@ setup (name = 'jaraco.net',
 				'udp-echo = jaraco.net.udp:EchoServer',
 				'dns-forward-service = jaraco.net.dns:start_service',
 				'dnsbl-check = jaraco.net.dnsbl:handle_cmdline',
+				'ntp = jaraco.net.ntp:handle_command_line',
 				],
 		},
 		install_requires=[
