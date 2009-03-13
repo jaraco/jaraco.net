@@ -117,6 +117,7 @@ def CheckAuthResponse(conn):
 		if res:
 			log.info('partial result')
 			log.info(repr(res))
+	return 'retry'
 
 def auth_request_server():
 	init_logging()
