@@ -105,9 +105,7 @@ def CheckAuthResponse(conn):
 			conn.send('WWW-Authenticate: Basic realm="fake-auth"\r\n')
 			conn.send('\r\n')
 			conn.send(msg)
-			conn.close()
 			log.info('sent authorization request')
-			return 'retry'
 		else:
 			conn.send('HTTP/1.0 200 OK\r\n')
 			user = matched_header.group(1)
@@ -117,6 +115,8 @@ def CheckAuthResponse(conn):
 		if res:
 			log.info('partial result')
 			log.info(repr(res))
+	finally:
+		conn.close()
 	return 'retry'
 
 def auth_request_server():
