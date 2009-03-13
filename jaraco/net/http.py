@@ -77,8 +77,8 @@ def GetResponse(conn):
 
 
 def start_simple_server():
-	get_args()
 	"A simple web server that sends a simple response"
+	get_args()
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.bind((options.host, options.port))
 	s.listen(1)
@@ -86,6 +86,49 @@ def start_simple_server():
 	print 'Accepted connection from', addr
 	
 	GetResponse(conn)
+
+def init_logging():
+	logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+def CheckAuthResponse(conn):
+	try:
+		conn.settimeout(options.timeout)
+		headers, content = GetHeaders(conn)
+		content = GetContent(conn, headers, content)
+		user_pat = re.compile('^Authorization:\s+(.*)\s*$', re.I|re.MULTILINE)
+		matched_header = user_pat.search(headers)
+		if not matched_header:
+			conn.send('HTTP/1.0 401 Authorization Required\r\n')
+			conn.send('Connection: close\r\n')
+			msg = 'Go get me some credentials'
+			conn.send('Content-Length: %d\r\n' % len(msg))
+			conn.send('WWW-Authenticate: Basic realm="fake-auth"\r\n')
+			conn.send('\r\n')
+			conn.send(msg)
+			conn.close()
+			log.info('sent authorization request')
+			return 'retry'
+		else:
+			conn.send('HTTP/1.0 200 OK\r\n')
+			user = matched_header.group(1)
+			conn.send('\r\nYou are authenticated as %(user)s' % vars())
+	except socket.error, e:
+		log.exception('error in connection')
+		if res:
+			log.info('partial result')
+			log.info(repr(res))
+
+def auth_request_server():
+	init_logging()
+	get_args()
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.bind((options.host, options.port))
+	s.listen(1)
+	while True:
+		conn, addr = s.accept()
+		log.info('Accepted connection from %s', addr)
+		
+		if not CheckAuthResponse(conn) == 'retry': break
 
 class Query(dict):
 	"""HTTP Query takes as an argument an HTTP query request
