@@ -102,6 +102,7 @@ def CheckAuthResponse(conn):
 			conn.send('Connection: close\r\n')
 			msg = 'Go get me some credentials'
 			conn.send('Content-Length: %d\r\n' % len(msg))
+			conn.send('WWW-Authenticate: NTLM\r\n')
 			conn.send('WWW-Authenticate: Basic realm="fake-auth"\r\n')
 			conn.send('\r\n')
 			conn.send(msg)
