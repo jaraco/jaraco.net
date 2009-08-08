@@ -5,13 +5,22 @@
 import sys
 import socket
 
+def reverse_ip(ip):
+	return '.'.join(reversed(ip.split('.')))
+
+blocklist_servers = [
+	'dnsbl.jaraco.com',
+	'zen.spamhaus.org',
+	'ips.backscatterer.org',
+	'bl.spamcop.net',
+	'list.dsbl.org',
+]
+
 def lookup_host(host):
 	ip = socket.gethostbyname(host)
 
-	reversed_ip = '.'.join(reversed(ip.split('.')))
-
-	for bl in ('zen.spamhaus.org', 'ips.backscatterer.org', 'bl.spamcop.net', 'list.dsbl.org'):
-		lookup = '.'.join((reversed_ip, bl))
+	for bl in (blocklist_servers):
+		lookup = '.'.join((reverse_ip(ip), bl))
 		try:
 			res = socket.gethostbyname(lookup)
 			print host, 'listed with', bl, 'as', res

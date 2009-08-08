@@ -71,6 +71,19 @@ def _get_range_host(host_spec, matcher):
 	return addrs
 
 def get_hosts(host_spec):
+	"""
+	Get a list of hosts specified by subnet mask or using a specific range.
+	
+	>>> list(get_hosts('192.168.0.0/30'))
+	['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']
+	
+	>>> list(get_hosts('192.168.0.1-192.168.0.4'))
+	['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']
+
+	If a pattern is not recognized, assume the input is a valid address.
+	>>> list(get_hosts('192.168.0.1'))
+	['192.168.0.1']
+	"""
 	_map = {'([\d\.]+)/(\d+)': ('match', _get_mask_host),
 			'(\d+)-(\d+)': ('search', _get_range_host)}
 	for pattern in _map:
