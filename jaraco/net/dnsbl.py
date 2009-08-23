@@ -19,13 +19,16 @@ blocklist_servers = [
 def lookup_host(host):
 	ip = socket.gethostbyname(host)
 
+	result = False
 	for bl in (blocklist_servers):
 		lookup = '.'.join((reverse_ip(ip), bl))
 		try:
 			res = socket.gethostbyname(lookup)
 			print host, 'listed with', bl, 'as', res
+			result = True
 		except socket.gaierror:
 			pass
+	return result
 
 def handle_cmdline():
 	lookup_host(sys.argv[1])
