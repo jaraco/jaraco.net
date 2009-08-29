@@ -23,10 +23,14 @@ from pyparsing import *
        HT             = <US-ASCII HT, horizontal-tab (9)>
        <">            = <US-ASCII double-quote mark (34)>
 """
-_chars = map(chr, range(128))
-#CHAR = One(_chars)
+
+def One(chars):
+	return Word(chars, max=1)
+
+_chars = ''.join(map(chr, range(128)))
+CHAR = One(_chars)
 _ctl_chars = ''.join(map(chr, range(0,32))+[chr(127)])
-#CTL = One(_ctl_chars)
+CTL = One(_ctl_chars)
 SP = ' '
 HT = '\t'
 
