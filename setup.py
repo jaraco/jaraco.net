@@ -39,6 +39,7 @@ setup (name = 'jaraco.net',
 				'dns-forward-service = jaraco.net.dns:start_service',
 				'dnsbl-check = jaraco.net.dnsbl:handle_cmdline',
 				'ntp = jaraco.net.ntp:handle_command_line',
+				'remove-known-spammers = jaraco.net.email:remove_known_spammers',
 				],
 		},
 		install_requires=[
