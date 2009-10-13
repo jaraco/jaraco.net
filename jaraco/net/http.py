@@ -258,8 +258,10 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 		stat = os.lstat(fname)
 		previous_size = stat.st_size
 		previous_mod_time = datetime.datetime.utcfromtimestamp(stat.st_mtime)
-		log.debug('Local last mod %s', previous_mod_time)
-		log.debug('Local size %d', previous_size)
+		log.debug('Local  last mod %s', previous_mod_time)
+		log.debug('Remote last mod %s', mod_time)
+		log.debug('Local  size %d', previous_size)
+		log.debug('Remote size %d', content_length)
 		if not replace_newer and not touch_older: raise RuntimeError, "%s exists" % fname
 		if replace_newer and previous_mod_time >= mod_time and previous_size == content_length:
 			log.info('File is current')
@@ -277,6 +279,7 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	set_time(fname, mod_time)
 
 def set_time(filename, mod_time):
+	log.debug('Setting modified time to %s', mod_time)
 	mtime = calendar.timegm(mod_time.utctimetuple())
 	atime = os.stat(filename).st_atime
 	os.utime(filename, (atime, mtime))
