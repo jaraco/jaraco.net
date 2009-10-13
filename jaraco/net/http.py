@@ -248,12 +248,11 @@ def get_content_disposition_filename(url):
 def get_url_filename(url):
 	return os.path.basename(urlparse.urlparse(url).path)
 
-def get_url(url, dest=None, replace_newer=False):
+def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	src = urllib2.urlopen(url)
 	log.debug(src.headers)
 	mod_time = datetime.datetime.strptime(src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
 	content_length = int(src.headers['content-length'])
-	log.info('Downloading %s (last mod %s)', url, str(mod_time))
 	fname = dest or get_content_disposition_filename(src) or get_url_filename(url) or 'result.dat'
 	if os.path.exists(fname):
 		stat = os.lstat(fname)
@@ -261,17 +260,26 @@ def get_url(url, dest=None, replace_newer=False):
 		previous_mod_time = datetime.datetime.utcfromtimestamp(stat.st_mtime)
 		log.debug('Local last mod %s', previous_mod_time)
 		log.debug('Local size %d', previous_size)
-		if not replace_newer: raise RuntimeError, "%s exists" % fname
-		if previous_mod_time >= mod_time and previous_size == content_length:
+		if not replace_newer and not touch_older: raise RuntimeError, "%s exists" % fname
+		if replace_newer and previous_mod_time >= mod_time and previous_size == content_length:
 			log.info('File is current')
 			return
+		just_needs_touching = touch_older and previous_mod_time > mod_time and previous_size == content_length
+		if just_needs_touching:
+			log.info('Local file appears newer than remote - updating mod time')
+			set_time(fname, mod_time)
+			return
+	log.info('Downloading %s (last mod %s)', url, str(mod_time))
 	dest = open(fname, 'wb')
 	for line in src:
 		dest.write(line)
 	dest.close()
+	set_time(fname, mod_time)
+
+def set_time(filename, mod_time):
 	mtime = calendar.timegm(mod_time.utctimetuple())
-	atime = os.stat(fname).st_atime
-	os.utime(fname, (atime, mtime))
+	atime = os.stat(filename).st_atime
+	os.utime(filename, (atime, mtime))
 
 def wget():
 	get_url(sys.argv[1])
