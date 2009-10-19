@@ -7,10 +7,10 @@ HTTP scraper for nic servers who only offer whois service via web only.
 Run the script from the command line and it will service port 43 as a whois server,
 passing the query to the appropriate web form and parsing the results into a textual format.
 
-Copyright © 2005-2008 Jason R. Coombs
+Copyright © 2005-2009 Jason R. Coombs
 """
 
-__author__ = 'Jason R. Coombs <jaraco@sandia.gov>'
+__author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
 __version__ = '$Rev$'[6:-2]
 __svnauthor__ = '$Author$'[9:-2]
 __date__ = '$Date$'[7:-2]

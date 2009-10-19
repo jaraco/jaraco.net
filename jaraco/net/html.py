@@ -3,10 +3,10 @@
 """TableParser
 	Objects for parsing an HTML file with tables in it.
 
-Copyright © 2004 Sandia National Laboratories  
+Copyright Â© 2004 Jason R. Coombs
 """
 
-__author__ = 'Jason R. Coombs <jaraco@sandia.gov>'
+__author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
 __version__ = '$Revision$a'[11:-2]
 __svnauthor__ = '$Author$'[9:-2]
 __date__ = '$Date$'[7:-2]
