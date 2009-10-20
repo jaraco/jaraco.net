@@ -28,7 +28,7 @@ setup (name = 'jaraco.net',
 		],
 		entry_points = {
 			'console_scripts': [
-				'whois_bridge = jaraco.net.whois:main',
+				'whois-bridge = jaraco.net.whois:main',
 				'scanner = jaraco.net.scanner:scan',
 				'fake-http = jaraco.net.http:start_simple_server',
 				'fake-http-auth = jaraco.net.http:auth_request_server',
