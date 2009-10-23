@@ -9,6 +9,15 @@ import socket
 port = socket.getservbyname('domain')
 
 class Forwarder(object):
+	"""
+	Windows Server 2008 and Windows Server 2008 R2 DNS Servers do not
+	support listening on tunneled IPv6 addresses.  See
+	http://social.technet.microsoft.com/Forums/en-US/winserverPN/thread/fe12c783-f6b8-4560-9a9a-8ab7c46b80cb
+	for details.
+	
+	This forwarder can be installed as a service and run on any such server,
+	and it will forward DNS requests to the IPv6 localhost address.
+	"""
 	dest_addr = ('::1', port)
 	def __init__(self, listen_address):
 		self.socket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
