@@ -278,11 +278,15 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	dest.close()
 	set_time(fname, mod_time)
 
-def set_time(filename, mod_time):
-	log.debug('Setting modified time to %s', mod_time)
-	mtime = calendar.timegm(mod_time.utctimetuple())
-	atime = os.stat(filename).st_atime
-	os.utime(filename, (atime, mtime))
+try:
+	from jaraco.filesystem import set_time
+except ImportError:
+	# keep a copy here for backward compatibilty
+	def set_time(filename, mod_time):
+		log.debug('Setting modified time to %s', mod_time)
+		mtime = calendar.timegm(mod_time.utctimetuple())
+		atime = os.stat(filename).st_atime
+		os.utime(filename, (atime, mtime))
 
 def wget():
 	get_url(sys.argv[1])
