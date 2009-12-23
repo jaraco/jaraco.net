@@ -5,16 +5,23 @@
 Copyright © 2009 Jason R. Coombs
 """
 
-from setuptools import setup, find_packages
-
 __author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
 __version__ = '$Rev$'[6:-2]
 __svnauthor__ = '$Author$'[9:-2]
 __date__ = '$Date$'[7:-2]
 
+from setuptools import setup, find_packages
+
+try:
+	from jaraco.util.package import read_long_description
+	long_description = read_long_description()
+except:
+	long_description = None
+
 setup (name = 'jaraco.net',
 		version = '1.0',
 		description = 'Networking tools by jaraco',
+		long_description = long_description,
 		author = 'Jason R. Coombs',
 		author_email = 'jaraco@jaraco.com',
 		url = 'http://www.jaraco.com/',
