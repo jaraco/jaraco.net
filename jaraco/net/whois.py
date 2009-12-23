@@ -71,7 +71,7 @@ class WhoisHandler(object):
 		that matches the query."""
 		query = query.lower()
 		handlers = WhoisHandler._leaf_classes
-		matches = filter(None, map(lambda c: c._query_matches_services(query), handlers))
+		matches = [c for c in handlers if c._query_matches_services(query)]
 		if not len(matches) == 1:
 			error = [
 				'Domain for %s is not serviced by this server.',
