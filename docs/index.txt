@@ -21,6 +21,11 @@ You can install it with ``easy_install jaraco.net``, or from the
 Changes
 -------
 
+1.1
+~~~
+
+* Added rss module (migrated from jaraco.util)
+
 1.0
 ~~~
 

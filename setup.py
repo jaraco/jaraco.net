@@ -20,7 +20,7 @@ except:
 
 setup(
 	name = 'jaraco.net',
-	version = '1.0.1',
+	version = '1.1',
 	description = 'Networking tools by jaraco',
 	long_description = long_description,
 	author = 'Jason R. Coombs',
