@@ -61,6 +61,9 @@ def _get_mask_host(host_spec, matcher):
 	return itertools.imap(socket.inet_ntoa, result)
 
 def _get_range_host(host_spec, matcher):
+	"""
+	
+	"""
 	#matcher = matcher.next()
 	rng = map(int, matcher.groups())
 	rng[1] += 1
@@ -70,6 +73,9 @@ def _get_range_host(host_spec, matcher):
 	addrs = itertools.chain(*itertools.imap(lambda n: get_hosts(beg + str(n) + end), rng))
 	return addrs
 
+def _get_ip_range_host(spec, matcher):
+	raise NotImplementedError
+
 def get_hosts(host_spec):
 	"""
 	Get a list of hosts specified by subnet mask or using a specific range.
@@ -77,21 +83,29 @@ def get_hosts(host_spec):
 	>>> list(get_hosts('192.168.0.0/30'))
 	['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']
 	
-	>>> list(get_hosts('192.168.0.1-192.168.0.4'))
-	['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']
+	>>> list(get_hosts('192.168.0.1-4'))
+	['192.168.0.1', '192.168.0.2', '192.168.0.3', '192.168.0.4']
+
+	Eventually, I want to develop this to work
+	>>> list(get_hosts('192.168.0.254-192.168.1.3')) # doctest:+SKIP
+	['192.168.0.254', '192.168.0.255', '192.168.1.1', '192.168.1.2']
 
 	If a pattern is not recognized, assume the input is a valid address.
 	>>> list(get_hosts('192.168.0.1'))
 	['192.168.0.1']
 	"""
-	_map = {'([\d\.]+)/(\d+)': ('match', _get_mask_host),
-			'(\d+)-(\d+)': ('search', _get_range_host)}
+	_map = {
+		r'([\d\.]+)/(\d+)': ('match', _get_mask_host),
+		r'(\d+)-(\d+)$': ('search', _get_range_host),
+		r'(\d+\.){3}\d+$': ('match', lambda spec, match: [spec]),
+		r'((\d+\.){3}\d+)-((\d+\.){3}\d+)$': ('match', _get_ip_range_host),
+		}
 	for pattern in _map:
 		test, func = _map[pattern]
 		matcher = getattr(re, test)(pattern, host_spec)
 		if matcher:
 			return func(host_spec, matcher)
-	return (host_spec,)
+	raise ValueError("Could not recognize host spec %s" % host_spec)
 
 def scan():
 	parser = GetParser()

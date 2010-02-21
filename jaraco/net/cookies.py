@@ -14,7 +14,8 @@ __date__ = '$Date$'[7:-2]
 
 import os, copy, urllib, httplib
 # import case-insensitive string & dictionary
-from jaraco.util import ciString, ciDict
+from jaraco.util.string import FoldedCase
+from jaraco.util.dictlib import FoldedCaseKeyedDict
 import itertools
 import string, re
 
@@ -73,7 +74,7 @@ def isNotCookieDelimiter(s):
 class cookie(object):
 	"""cookie class parses cookie information from HTTP Responses and outputs
 	for HTTP Requests"""
-	parameterNames = tuple(map(ciString, ('expires', 'path', 'domain', 'secure')))
+	parameterNames = tuple(map(FoldedCase, ('expires', 'path', 'domain', 'secure')))
 	def __init__(self, source = None):
 		if isinstance(source, basestring):
 			self.readFromSetHeader(source)
@@ -87,7 +88,7 @@ class cookie(object):
 		fields = re.split(';\s*', header)
 		splitEquals = lambda x: x.split('=', 1)
 		fieldPairs = map(splitEquals, fields)
-		self.__parameters = ciDict(fieldPairs)
+		self.__parameters = FoldedCaseKeyedDict(fieldPairs)
 		self.__findName()
 
 	def __findName(self):
