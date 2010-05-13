@@ -59,6 +59,7 @@ setup(
 			'dnsbl-check = jaraco.net.dnsbl:handle_cmdline',
 			'ntp = jaraco.net.ntp:handle_command_line',
 			'remove-known-spammers = jaraco.net.email:remove_known_spammers',
+			'tcp-test-connect = jaraco.net.tcp:test_connect',
 			],
 	},
 	install_requires=[
