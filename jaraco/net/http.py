@@ -251,10 +251,13 @@ def get_url_filename(url):
 def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	src = urllib2.urlopen(url)
 	log.debug(src.headers)
-	mod_time = datetime.datetime.strptime(src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
+	if 'last-modified' in src.headers:
+		mod_time = datetime.datetime.strptime(src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
+	else:
+		mod_time = None
 	content_length = int(src.headers['content-length'])
 	fname = dest or get_content_disposition_filename(src) or get_url_filename(url) or 'result.dat'
-	if os.path.exists(fname):
+	if mod_time and os.path.exists(fname):
 		stat = os.lstat(fname)
 		previous_size = stat.st_size
 		previous_mod_time = datetime.datetime.utcfromtimestamp(stat.st_mtime)
@@ -276,7 +279,8 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	for line in src:
 		dest.write(line)
 	dest.close()
-	set_time(fname, mod_time)
+	if mod_time:
+		set_time(fname, mod_time)
 
 try:
 	from jaraco.filesystem import set_time

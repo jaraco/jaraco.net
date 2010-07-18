@@ -31,7 +31,7 @@ except:
 
 setup(
 	name = 'jaraco.net',
-	version = '1.1',
+	version = '1.2',
 	description = 'Networking tools by jaraco',
 	long_description = long_description,
 	author = 'Jason R. Coombs',
