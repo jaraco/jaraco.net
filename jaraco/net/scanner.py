@@ -13,7 +13,7 @@ import re, struct, socket, itertools
 from optparse import OptionParser
 
 import inet
-from jaraco.util import TimestampFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
 import logging
 log = logging.getLogger('port scanner')
@@ -39,8 +39,11 @@ def setupLogger(output_level):
 	outputHandler = logging.StreamHandler(sys.stdout)
 	outputHandler.level = getattr(logging, output_level.upper())
 	logging.root.handlers.append(outputHandler)
-	logbase = os.path.join(os.environ['SystemRoot'], 'system32', 'logfiles', 'portscan', 'scan.log')
-	logfilehandler = TimestampFileHandler(logbase)
+	logdir = os.path.join(os.environ['SystemRoot'], 'system32', 'logfiles', 'portscan')
+	logbase = os.path.join(logdir, 'scan.log')
+	if not os.path.isdir(logdir):
+		os.makedirs(logdir)
+	logfilehandler = TimedRotatingFileHandler(logbase, when='d')
 	logfilehandler.level = logging.INFO
 	handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] %(message)s'
 	formatter = logging.Formatter(handlerFormat)
@@ -76,6 +79,11 @@ def _get_range_host(host_spec, matcher):
 def _get_ip_range_host(spec, matcher):
 	raise NotImplementedError
 
+def _get_named_host(spec, matcher):
+	infos = iter(socket.getaddrinfo(spec, None))
+	family, socktype, proto, canonname, sockaddr = next(infos)
+	return sockaddr[0]
+
 def get_hosts(host_spec):
 	"""
 	Get a list of hosts specified by subnet mask or using a specific range.
@@ -95,6 +103,7 @@ def get_hosts(host_spec):
 	['192.168.0.1']
 	"""
 	_map = {
+		r'[\w.]+': ('match', _get_named_host),
 		r'([\d\.]+)/(\d+)': ('match', _get_mask_host),
 		r'(\d+)-(\d+)$': ('search', _get_range_host),
 		r'(\d+\.){3}\d+$': ('match', lambda spec, match: [spec]),
