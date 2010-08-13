@@ -1,10 +1,10 @@
 #!python
 
-# $Id$
-
 import os
 import sys
 import socket
+from functools import partial
+import _winreg as winreg
 
 port = socket.getservbyname('domain')
 
@@ -51,6 +51,45 @@ import win32serviceutil
 import win32service
 from win32com.client import constants
 
+class RegConfig(object):
+	def __init__(self, root_path, tree=winreg.HKEY_CURRENT_USER):
+		self.root_path = root_path
+		self.tree = tree
+
+	def _get_key(self):
+		return winreg.CreateKey(self.tree, self.root_path)
+
+	@staticmethod
+	def infer_key_type(value):
+		if isinstance(value, int):
+			return winreg.REG_DWORD
+		if isinstance(value, basestring):
+			if '%' in value:
+				return winreg.REG_EXPAND_SZ
+			return winreg.REG_SZ
+		raise ValueError('Unable to infer type for {value}'.format(**vars()))
+
+	def __setitem__(self, key, value):
+		keytype = self.infer_key_type(value)
+		self.set(key, value, keytype)
+
+	def set(self, key, value, keytype):
+		winreg.SetValueEx(self._get_key(), key, None, keytype, value)
+
+	def __getitem__(self, key):
+		try:
+			value, type = winreg.QueryValueEx(self._get_key(), key)
+		except WindowsError:
+			raise KeyError(key)
+		return value
+
+	def get(self, key, default=None):
+		try:
+			value = self[key]
+		except KeyError:
+			value = default
+		return value
+	
 class ForwardingService(win32serviceutil.ServiceFramework):
 	"""
 	_svc_name_:			The name of the service (used in the Windows registry).
@@ -70,15 +109,15 @@ class ForwardingService(win32serviceutil.ServiceFramework):
 		_svc_display_name_,
 		)		 													# The log directory for the stderr and 
 																	# stdout logs.
-	#_listen_host = '2002:41de:a625::41de:a625'
-	#_listen_host = '2002:41de:a627::41de:a627'
-	_listen_host = '2002:425c:a677::425c:a677' # teach
-	
+
+	config = RegConfig(r'Software\jaraco.net\DNS Forwarding Service',
+		winreg.HKEY_LOCAL_MACHINE)
+
 	def SvcDoRun(self):
 		""" Called when the Windows Service runs. """
 		self.init_logging()
 		self.ReportServiceStatus(win32service.SERVICE_START_PENDING)
-		self.forwarder = Forwarder(self._listen_host)
+		self.forwarder = Forwarder(self.config.get('Listen Address', '::0'))
 		self.ReportServiceStatus(win32service.SERVICE_RUNNING)
 		self.forwarder.serve_forever()
 	
@@ -97,9 +136,18 @@ class ForwardingService(win32serviceutil.ServiceFramework):
 		sys.stderr = open(os.path.join(ForwardingService.log_dir, 'stderr.log'), 'a')
 
 def start_service():
-	win32serviceutil.HandleCommandLine(ForwardingService)
+	def listen_setter(opts):
+		opts = dict(opts)
+		if '-b' in opts:
+			ForwardingService.config['Listen Address'] = opts['-b']
+	params = dict(
+		customInstallOptions = 'b:', # use -b to specify bind address
+		customOptionHandler = listen_setter,
+	)
+	win32serviceutil.HandleCommandLine(ForwardingService, **params)
 
 def main():
-	Forwarder(ForwardingService._listen_host).serve_forever()
+	addr = ForwardingService.config['Listen Address']
+	Forwarder(addr).serve_forever()
 
 if __name__ == '__main__': main()
