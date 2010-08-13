@@ -41,6 +41,7 @@ Changes
 1.2
 ~~~
 
+* Added function wait_for_host to icmp lib
 * Added support for a custom bind address to the DNS Forwarding Service
 
 1.1
