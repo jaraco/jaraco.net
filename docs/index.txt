@@ -14,8 +14,8 @@ projects developed by the author.
 <http://www.opensource.org/licenses/mit-license.php>`_.
 
 You can install it with ``easy_install jaraco.net``, or from the
-`subversion repository
-<https://svn.jaraco.com/jaraco/python/jaraco.net#egg=jaraco.net-dev>`_ with
+`mercurial repository
+<http://bitbucket.org/jaraco/jaraco.net/tip/get.zip#egg=jaraco.net-dev>`_ with
 ``easy_install jaraco.net==dev``.
 
 DNS Forwarding Service
