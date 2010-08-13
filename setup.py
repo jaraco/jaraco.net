@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 
-""" Setup script for building jaraco.net
+"""
+Setup script for building jaraco.net
 
-Copyright © 2009 Jason R. Coombs
+Copyright © 2009-2010 Jason R. Coombs
 """
 
 __author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
@@ -31,7 +32,7 @@ except:
 
 setup(
 	name = 'jaraco.net',
-	version = '1.2',
+	use_hg_version_increment='0.1',
 	description = 'Networking tools by jaraco',
 	long_description = long_description,
 	author = 'Jason R. Coombs',
@@ -76,4 +77,7 @@ setup(
 	],
 	test_suite = "nose.collector",
 	cmdclass=dict(build_py=build_py),
+	setup_requires = [
+		'hgtools >= 0.4',
+	],
 )
