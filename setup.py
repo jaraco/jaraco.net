@@ -7,9 +7,6 @@ Copyright © 2009-2010 Jason R. Coombs
 """
 
 __author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
-__version__ = '$Rev$'[6:-2]
-__svnauthor__ = '$Author$'[9:-2]
-__date__ = '$Date$'[7:-2]
 
 try:
 	from distutils.command.build_py import build_py_2to3 as build_py
@@ -73,7 +70,7 @@ setup(
 	dependency_links = [
 	],
 	tests_require=[
-		'nose>=0.10',
+		'nose>=0.11',
 	],
 	test_suite = "nose.collector",
 	cmdclass=dict(build_py=build_py),
