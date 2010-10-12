@@ -1,5 +1,9 @@
+from __future__ import print_function
+
 import socket
 from optparse import OptionParser
+
+from jaraco.util.string import local_format as lf
 
 def get_connect_options():
 	parser = OptionParser(conflict_handler="resolve")
@@ -18,8 +22,17 @@ def test_connect():
 	try:
 		conn = sock.connect(sockaddr)
 	except socket.error as e:
-		print e
+		print(e)
 		raise SystemExit(1)
 	args = vars(options)
-	print "Successfully connected to {host} on port {port}".format(**args)
-	
+	print(lf("Successfully connected to {host} on port {port}"))
+
+def start_echo_server():
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.bind(('', 8099))
+	s.listen(1)
+	while True:
+		conn, addr = s.accept()
+		print('connected from', addr)
+		while True:
+			conn.send(conn.recv(4096))

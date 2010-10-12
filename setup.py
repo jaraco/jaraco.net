@@ -58,6 +58,7 @@ setup(
 			'ntp = jaraco.net.ntp:handle_command_line',
 			'remove-known-spammers = jaraco.net.email:remove_known_spammers',
 			'tcp-test-connect = jaraco.net.tcp:test_connect',
+			'tcp-echo-server = jaraco.net.tcp:start_echo_server',
 			],
 	},
 	install_requires=[
