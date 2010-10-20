@@ -1,8 +1,7 @@
-#!/usr/bin/env python
+from __future__ import print_function
 
-# $Id$
-
-"""HTTP routines
+"""
+HTTP routines
 """
 
 import logging
@@ -17,6 +16,7 @@ from optparse import OptionParser
 import urlparse
 import urllib
 import urllib2
+import httplib
 import cgi
 import ClientForm
 import cookielib
@@ -39,7 +39,7 @@ def GetContentLength(request):
 	match = re.search('^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
 	if match:
 		return int(match.group(1))
-	print >> sys.stderr, 'no content length found'
+	print('no content length found', file=sys.stderr)
 
 def GetHeaders(conn):
 	res = ''
@@ -47,8 +47,8 @@ def GetHeaders(conn):
 		res += conn.recv(1024)
 	bytes = len(res)
 	res, content = res.split('\r\n\r\n')
-	print >> sys.stderr, 'received %(bytes)d bytes' % vars()
-	print res
+	print('received %(bytes)d bytes' % vars(), file=sys.stderr)
+	print(res)
 	return res, content
 
 def GetContent(conn, res, content):
@@ -56,8 +56,8 @@ def GetContent(conn, res, content):
 	while len(content) < cl:
 		content += conn.recv(1024)
 	bytes = len(content)
-	print >> sys.stderr, 'received %(bytes)d bytes content' % vars()
-	print content
+	print('received %(bytes)d bytes content' % vars(), file=sys.stderr)
+	print(content)
 	return content
 
 def GetResponse(conn):
@@ -70,10 +70,10 @@ def GetResponse(conn):
 		conn.send('\r\nGot It!')
 		conn.close()
 	except socket.error, e:
-		print 'Error %s' % e
+		print('Error %s' % e)
 		if res:
-			print 'partial result'
-			print repr(res)
+			print('partial result')
+			print(repr(res))
 
 
 def start_simple_server():
@@ -83,7 +83,7 @@ def start_simple_server():
 	s.bind((options.host, options.port))
 	s.listen(1)
 	conn, addr = s.accept()
-	print 'Accepted connection from', addr
+	print('Accepted connection from', addr)
 	
 	GetResponse(conn)
 
@@ -292,5 +292,30 @@ except ImportError:
 		atime = os.stat(filename).st_atime
 		os.utime(filename, (atime, mtime))
 
+def print_headers(url):
+	parsed = urlparse.urlparse(url)
+	conn_class = dict(
+		http=httplib.HTTPConnection,
+		https=httplib.HTTPSConnection,
+		)
+	conn = conn_class[parsed.scheme](parsed.netloc)
+	selector = parsed.path or '/'
+	if parsed.query: selector += '?' + parsed.query
+	conn.request('HEAD', selector)
+	response = conn.getresponse()
+	if response.status == 200:
+		print(response.msg)
+
+def _get_url_from_command_line():
+	parser = OptionParser('$prog <url>')
+	options, args = parser.parse_args()
+	if not args: parser.error('URL required')
+	url = args.pop()
+	if args: parser.error('Too many parameters')
+	return url
+
 def wget():
-	get_url(sys.argv[1])
+	get_url(_get_url_from_command_line())
+
+def headers():
+	print_headers(_get_url_from_command_line())

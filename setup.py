@@ -59,6 +59,7 @@ setup(
 			'remove-known-spammers = jaraco.net.email:remove_known_spammers',
 			'tcp-test-connect = jaraco.net.tcp:test_connect',
 			'tcp-echo-server = jaraco.net.tcp:start_echo_server',
+			'http-headers = jaraco.net.http:headers',
 			],
 	},
 	install_requires=[
