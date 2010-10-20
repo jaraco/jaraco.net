@@ -157,6 +157,9 @@ class Query(dict):
 			query = map(unquoteSequence, itemPairs)
 		if isinstance(query, (tuple, list)):
 			query = dict(query)
+		if not isinstance(query, dict):
+			msg = "Can't construct a %s from %s"
+			raise ValueError(msg % (self.__class__, query))
 		self.update(query)
 
 	def __repr__(self):
@@ -165,7 +168,7 @@ class Query(dict):
 	@staticmethod
 	def __QueryFromURL__(url):
 		"Return the query portion of a URL"
-		return urlparse.urlparse(url)[4]
+		return urlparse.urlparse(url).query
 
 class PageGetter(object):
 	"""
