@@ -35,4 +35,6 @@ def start_echo_server():
 		conn, addr = s.accept()
 		print('connected from', addr)
 		while True:
-			conn.send(conn.recv(4096))
+			dat = conn.recv(4096)
+			if not dat: break
+			conn.send(dat)
