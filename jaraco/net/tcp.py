@@ -25,6 +25,7 @@ def test_connect():
 		print(e)
 		raise SystemExit(1)
 	args = vars(options)
+	host, port = addr
 	print(lf("Successfully connected to {host} on port {port}"))
 
 def start_echo_server():
