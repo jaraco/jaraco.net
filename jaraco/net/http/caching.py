@@ -172,7 +172,6 @@ class CachedResponse(StringIO):
 	"""
 	cached = True
 	def __init__(self, response):
-		#super(CachedResponse, self).__init__(response.read())
 		StringIO.__init__(self, response.read())
 		self.seek(0)
 		self.headers = response.info()
@@ -181,11 +180,13 @@ class CachedResponse(StringIO):
 		self.msg = response.msg
 
 	def save(self):
+		"Produce a serialized version of this response"
 		self.headers['x-urllib2-cache'] = 'Stored'
 		return pickle.dumps(self)
 
 	@classmethod
 	def load(cls, payload):
+		"Construct a CachedResponse from a serialized payload"
 		if payload is None:
 			return None
 		result = pickle.loads(payload)

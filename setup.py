@@ -19,23 +19,19 @@ try:
 except ImportError:
 	from distutils.command.build_py import build_py
 
-from setuptools import setup, find_packages
+from setuptools import find_packages
 
-try:
-	from jaraco.util.package import read_long_description
-	long_description = read_long_description()
-except:
-	long_description = None
+name = 'jaraco.net'
 
-setup(
-	name = 'jaraco.net',
+setup_params = dict(
+	name = name,
 	use_hg_version_increment='0.1',
 	description = 'Networking tools by jaraco',
-	long_description = long_description,
+	long_description = open('README').read(),
 	author = 'Jason R. Coombs',
 	author_email = 'jaraco@jaraco.com',
-	url = 'http://www.jaraco.com/',
-	packages = find_packages(exclude=['ez_setup', 'tests', 'examples']),
+	url = 'http://bitbucket.org/' + name,
+	packages = find_packages(),
 	namespace_packages = ['jaraco',],
 	license = 'MIT',
 	classifiers = [
@@ -72,11 +68,13 @@ setup(
 	dependency_links = [
 	],
 	tests_require=[
-		'nose>=0.11',
 	],
-	test_suite = "nose.collector",
 	cmdclass=dict(build_py=build_py),
 	setup_requires = [
-		'hgtools >= 0.4',
+		'hgtools',
 	],
 )
+
+if __name__ == '__main__':
+	from setuptools import setup
+	setup(**setup_params)

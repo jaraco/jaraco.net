@@ -1,3 +1,5 @@
+.. -*- restructuredtext -*-
+
 jaraco.net
 ==========
 
@@ -43,6 +45,11 @@ Changes
 
 * Added jaraco.net.devices package. Includes a Manager class for
   retrieving MAC addresses and IP addresses on the host.
+* Created jaraco.net.http package (from module of the same name)
+* Added jaraco.net.http.caching, an early attempt at providing a
+  CachingHandler for urllib2 with HTTP protocol support.
+* Added a simple echo server.
+* Added http-headers command.
 
 1.2
 ~~~
