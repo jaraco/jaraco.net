@@ -117,7 +117,7 @@ class CacheHandler(urllib2.BaseHandler):
 		if not is_get or not cacheable_response: return response
 
 		if self.should_cache(response):
-			response = CachedResponse(response)
+			response = CachedResponse.from_response(response)
 			self.store.set(key, response.save())
 		return response
 
@@ -171,25 +171,29 @@ class CachedResponse(StringIO):
 	cached responses.
 	"""
 	cached = True
-	def __init__(self, response):
-		StringIO.__init__(self, response.read())
-		self.seek(0)
-		self.headers = response.info()
-		self.url = response.url
-		self.code = response.code
-		self.msg = response.msg
+	
+	@classmethod
+	def from_response(cls, response):
+		cr = cls(response.read())
+		cr.seek(0)
+		cr.headers = response.info()
+		cr.url = response.url
+		cr.code = response.code
+		cr.msg = response.msg
+		return cr
 
 	def save(self):
 		"Produce a serialized version of this response"
 		self.headers['x-urllib2-cache'] = 'Stored'
-		return pickle.dumps(self)
+		return pickle.dumps(vars(self))
 
 	@classmethod
 	def load(cls, payload):
 		"Construct a CachedResponse from a serialized payload"
 		if payload is None:
 			return None
-		result = pickle.loads(payload)
+		result = cls()
+		result.__dict__.update(pickle.loads(payload))
 		result.headers['x-urllib2-cache'] = 'Cached'
 		return result
 
@@ -200,8 +204,12 @@ class CachedResponse(StringIO):
 		return self.url
 
 	def reload(self, store):
+		"""
+		Force a reload of this response
+		"""
 		opener = urllib2.build_opener()
-		self.__init__(opener.open(self.url))
+		cr = self.from_response(opener.open(self.url))
+		self.__dict__.update(vars(cr))
 		store.set(self.url, self.save())
 
 	@property
@@ -294,7 +302,7 @@ def quick_test():
 	store = FileCache(".cache")
 	opener = urllib2.build_opener(CacheHandler(store))
 	urllib2.install_opener(opener)
-	response = opener.open("http://www.google.com/")
+	response = urllib2.urlopen("http://www.google.com/")
 	print response.headers
 	print "Response:", response.read()[:100], '...\n'
 
