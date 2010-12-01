@@ -101,9 +101,13 @@ def get_hosts(host_spec):
 	If a pattern is not recognized, assume the input is a valid address.
 	>>> list(get_hosts('192.168.0.1'))
 	['192.168.0.1']
+
+	One may also specify named hosts
+	>>> list(get_hosts('www.example.com'))
+	['192.0.32.10']
 	"""
 	_map = {
-		r'[\w.]+': ('match', _get_named_host),
+		r'[\D.]+$': ('match', _get_named_host),
 		r'([\d\.]+)/(\d+)': ('match', _get_mask_host),
 		r'(\d+)-(\d+)$': ('search', _get_range_host),
 		r'(\d+\.){3}\d+$': ('match', lambda spec, match: [spec]),
