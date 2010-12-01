@@ -40,6 +40,12 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+1.4
+~~~
+
+* Fixed issue where passing a numeric host to scanner would be detected
+  as a named host.
+
 1.3
 ~~~
 

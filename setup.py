@@ -25,7 +25,7 @@ name = 'jaraco.net'
 
 setup_params = dict(
 	name = name,
-	use_hg_version_increment='0.1',
+	use_hg_version=dict(increment='0.1'),
 	description = 'Networking tools by jaraco',
 	long_description = open('README').read(),
 	author = 'Jason R. Coombs',
@@ -71,7 +71,7 @@ setup_params = dict(
 	],
 	cmdclass=dict(build_py=build_py),
 	setup_requires = [
-		'hgtools',
+		'hgtools>=0.6.4',
 	],
 )
 
