@@ -46,7 +46,7 @@ def GetHeaders(conn):
 	while not '\r\n\r\n' in res:
 		res += conn.recv(1024)
 	bytes = len(res)
-	res, content = res.split('\r\n\r\n')
+	res, _sep, content = res.partition('\r\n\r\n')
 	print('received %(bytes)d bytes' % vars(), file=sys.stderr)
 	print(res)
 	return res, content

@@ -45,6 +45,7 @@ Changes
 
 * Fixed issue where passing a numeric host to scanner would be detected
   as a named host.
+* Fixed HTTP server to work with multipart requests.
 
 1.3
 ~~~
