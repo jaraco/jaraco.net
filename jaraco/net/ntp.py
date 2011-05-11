@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
-# $Id$
-
 from socket import *
 import struct
 import sys
 import time
 import logging
+import argparse
+
 from jaraco.util import trim
+import jaraco.util.logging
 
 log = logging.getLogger(__name__)
 
@@ -42,17 +43,15 @@ def query(server, force_ipv6=False):
 
 def handle_command_line():
 	"""
-	%prog [options] ntp-server
-	
 	Query the NTP server for the current time.
 	"""
-	logging.basicConfig(level=logging.INFO, format="%(message)s")
-	from optparse import OptionParser
-	parser = OptionParser(usage=trim(handle_command_line.__doc__))
-	parser.add_option('-6', '--ipv6', help="Force IPv6", action="store_true", default=False)
-	options, args = parser.parse_args()
-	server = args.pop()
-	if args: parser.error('Too many arguments supplied')
-	query(server, options.ipv6)
+	parser = argparse.ArgumentParser(usage=trim(handle_command_line.__doc__))
+	parser.add_argument('-6', '--ipv6', help="Force IPv6", action="store_true", default=False)
+	parser.add_argument('server', help="IP Address of server to query")
+	jaraco.util.logging.add_arguments(parser)
+	args = parser.parse_args()
+	jaraco.util.logging.setup(args)
+	logging.root.handlers[0].setFormatter(logging.Formatter("%(message)s"))
+	query(args.server, args.ipv6)
 
 if __name__ == '__main__': handle_command_line()

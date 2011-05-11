@@ -49,6 +49,8 @@ Changes
 * Pickling in http.cache.CachedResponse is now less depedent on the actual
   implementation.
 * Added tail module that utilizes CherryPy to serve the tail of a file.
+* Fixed issue in setup script with deprecated hgtools usage.
+* Using argparse and enabling logging config in ntp module.
 
 1.3
 ~~~
