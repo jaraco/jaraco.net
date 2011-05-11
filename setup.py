@@ -3,10 +3,10 @@
 """
 Setup script for building jaraco.net
 
-Copyright © 2009-2010 Jason R. Coombs
+Copyright © 2009-2011 Jason R. Coombs
 """
 
-__author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
+import sys
 
 try:
 	from distutils.command.build_py import build_py_2to3 as build_py
@@ -22,6 +22,8 @@ except ImportError:
 from setuptools import find_packages
 
 name = 'jaraco.net'
+
+py26reqs = ['argparse'] if sys.version_info < (2,7) else []
 
 setup_params = dict(
 	name = name,
@@ -59,10 +61,10 @@ setup_params = dict(
 			],
 	},
 	install_requires=[
-		'jaraco.util',
+		'jaraco.util>=3.8',
 		'clientform>=0.2.7',
 		'BeautifulSoup',
-	],
+	] + py26reqs,
 	extras_require = {
 	},
 	dependency_links = [
