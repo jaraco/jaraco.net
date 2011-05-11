@@ -16,13 +16,12 @@ TIME1970 = 2208988800L		# Thanks to F.Lundh
 
 def query(server, force_ipv6=False):
 	timeout = 3
-	ntpport = 123
+	ntp_port = 123
 
-	args = [server, ntpport]
-	if force_ipv6:
-		args.append(AF_INET6)
+	family = AF_INET6 if force_ipv6 else 0
+	sock_type = SOCK_DGRAM
 	
-	infos = getaddrinfo(*args)
+	infos = getaddrinfo(server, ntp_port, family, sock_type)
 
 	log.debug(infos)
 	family, socktype, proto, canonname, sockaddr = infos[0]
