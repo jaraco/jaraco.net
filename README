@@ -46,6 +46,9 @@ Changes
 * Fixed issue where passing a numeric host to scanner would be detected
   as a named host.
 * Fixed HTTP server to work with multipart requests.
+* Pickling in http.cache.CachedResponse is now less depedent on the actual
+  implementation.
+* Added tail module that utilizes CherryPy to serve the tail of a file.
 
 1.3
 ~~~
