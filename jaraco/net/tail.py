@@ -12,12 +12,12 @@ def tail_f(filename):
 			if not line:
 				time.sleep(interval)
 				file.seek(where)
+				yield '\n'
 			else:
 				yield line
 
 def close_source():
-	print("closing source")
-	cherrypy.error("closing source")
+	cherrypy.log.error("closing source")
 	cherrypy.request.source.close()
 
 cherrypy.tools.closer = cherrypy.Tool('on_end_request', close_source)
