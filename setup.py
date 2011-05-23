@@ -58,6 +58,7 @@ setup_params = dict(
 			'tcp-test-connect = jaraco.net.tcp:test_connect',
 			'tcp-echo-server = jaraco.net.tcp:start_echo_server',
 			'http-headers = jaraco.net.http:headers',
+			'build-dir-index = jaraco.net.site:make_index_cmd',
 			],
 	},
 	install_requires=[

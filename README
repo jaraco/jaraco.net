@@ -40,6 +40,12 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+1.5
+~~~
+
+* Adding simple script for creating a directory index (used for legacy
+  support).
+
 1.4
 ~~~
 
