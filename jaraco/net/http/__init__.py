@@ -21,6 +21,7 @@ import cgi
 import ClientForm
 import cookielib
 import jaraco.util.string
+from jaraco.filesystem import set_time
 
 log = logging.getLogger(__name__)
 
@@ -288,16 +289,6 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	if mod_time:
 		set_time(fname, mod_time)
 	return fname
-
-try:
-	from jaraco.filesystem import set_time
-except ImportError:
-	# keep a copy here for backward compatibilty
-	def set_time(filename, mod_time):
-		log.debug('Setting modified time to %s', mod_time)
-		mtime = calendar.timegm(mod_time.utctimetuple())
-		atime = os.stat(filename).st_atime
-		os.utime(filename, (atime, mtime))
 
 def print_headers(url):
 	parsed = urlparse.urlparse(url)
