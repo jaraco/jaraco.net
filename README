@@ -43,8 +43,10 @@ Changes
 1.5
 ~~~
 
-* Adding simple script for creating a directory index (used for legacy
+* Added simple script for creating a directory index (used for legacy
   support).
+* Added command script "serve-local" which uses cherrypy to serve the
+  current directory on port 8080.
 
 1.4
 ~~~

@@ -48,6 +48,7 @@ setup_params = dict(
 			'fake-http = jaraco.net.http:start_simple_server',
 			'fake-http-auth = jaraco.net.http:auth_request_server',
 			'wget = jaraco.net.http:wget',
+			'serve-local = jaraco.net.http.static:serve_local',
 			'fake-smtp = jaraco.net.smtp:start_simple_server',
 			'udp-send = jaraco.net.udp:Sender',
 			'udp-echo = jaraco.net.udp:EchoServer',
