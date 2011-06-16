@@ -222,6 +222,9 @@ def get_content_disposition_filename(url):
 	"""
 	Get the content disposition filename from a URL.
 	Returns None if no such disposition can be found.
+
+	If `url` is already an addinfourl object, it will use its headers.
+	Otherwise, urllib2 is used to retrieve the headers.
 	
 	>>> url = 'http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?file=pythonutils-0.3.0.zip'
 	>>> get_content_disposition_filename(url) in (None, 'pythonutils-0.3.0.zip')
