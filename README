@@ -40,6 +40,11 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+1.5.1
+~~~~~
+
+* Added directory listing support to serve-local.
+
 1.5
 ~~~
 
