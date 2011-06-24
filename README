@@ -40,6 +40,11 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+1.6
+~~~
+
+* Added jaraco.net.importer, featuring URLImporter.
+
 1.5.1
 ~~~~~
 
