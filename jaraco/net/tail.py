@@ -11,7 +11,6 @@ def tail_f(filename):
 		while True:
 			where = file.tell()
 			line = file.readline()
-			print 'read', line
 			if not line:
 				time.sleep(interval)
 				file.seek(where)
@@ -43,10 +42,12 @@ class TailTracker(cherrypy.process.plugins.SimplePlugin, list):
 		self.append(cherrypy.request.source)
 
 	def stop(self):
+		self.bus.log("Closing tails")
 		# close all tails
 		for tail in self:
 			tail.close()
-	stop.priority = 100
+	# need this to be called before server stop (25)
+	stop.priority = 20
 
 	def __hash__(self):
 		return hash(id(self))
