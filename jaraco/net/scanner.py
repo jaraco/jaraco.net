@@ -34,7 +34,7 @@ def GetParser():
 					   help="Frequency (Hz) of connection attempt")
 	description=  """No Description"""
 	return parser
-	
+
 def setupLogger(output_level):
 	outputHandler = logging.StreamHandler(sys.stdout)
 	outputHandler.level = getattr(logging, output_level.upper())
@@ -65,7 +65,7 @@ def _get_mask_host(host_spec, matcher):
 
 def _get_range_host(host_spec, matcher):
 	"""
-	
+
 	"""
 	#matcher = matcher.next()
 	rng = map(int, matcher.groups())
@@ -81,16 +81,18 @@ def _get_ip_range_host(spec, matcher):
 
 def _get_named_host(spec, matcher):
 	infos = iter(socket.getaddrinfo(spec, None))
-	family, socktype, proto, canonname, sockaddr = next(infos)
-	return sockaddr[0]
+	sockaddrs = [sockaddr for
+		family, socktype, proto, canonname, sockaddr in infos]
+	hosts = [host for host, port in sockaddrs]
+	return hosts
 
 def get_hosts(host_spec):
 	"""
 	Get a list of hosts specified by subnet mask or using a specific range.
-	
+
 	>>> list(get_hosts('192.168.0.0/30'))
 	['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']
-	
+
 	>>> list(get_hosts('192.168.0.1-4'))
 	['192.168.0.1', '192.168.0.2', '192.168.0.3', '192.168.0.4']
 
@@ -104,7 +106,7 @@ def get_hosts(host_spec):
 
 	One may also specify named hosts
 	>>> list(get_hosts('www.example.com'))
-	['192.0.32.10']
+	['192.0.43.10']
 	"""
 	_map = {
 		r'[\D.]+$': ('match', _get_named_host),
