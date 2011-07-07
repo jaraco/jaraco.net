@@ -4,15 +4,15 @@ import struct
 import time
 import operator
 import random
-from jaraco.util import QuickTimer
+from jaraco.util import Stopwatch
 
 def calculate_checksum(bytes):
 	r"""
 	Calculate a 16-bit checksum on the bytes.
-	
+
 	In partucilar, the 16-bit one's complement of
 	the one's complement sum of all 16-bit words
-	
+
 	>>> calculate_checksum('ABCD\n')
 	31089
 	"""
@@ -37,9 +37,9 @@ def pack_echo_header(id, data, sequence=1):
 def ping(dest_addr, timeout = 2):
 	"""
 	Send an ICMP Echo request to a host and return how long it takes.
-	
+
 	Raise socket.timeout if no response is received within timeout.
-	
+
 	>>> ping('127.0.0.1')
 	datetime.timedelta(...)
 	"""
@@ -52,10 +52,10 @@ def ping(dest_addr, timeout = 2):
 	header = pack_echo_header(id, data)
 	packet = header + data
 	icmp_socket.sendto(packet, (dest_addr, icmp_port))
-	
-	timer = QuickTimer()
+
+	timer = Stopwatch()
 	read_fs, write_fs, ex_fs = select.select([icmp_socket], [], [], timeout)
-	delay = timer.Stop()
+	delay = timer.stop()
 	if not read_fs:
 		raise socket.timeout('timed out')
 
@@ -76,4 +76,3 @@ def wait_for_host(host):
 	import datetime
 	return datetime.datetime.now()
 
-		
