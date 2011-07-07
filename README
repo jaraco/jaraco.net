@@ -44,6 +44,8 @@ Changes
 ~~~
 
 * Added jaraco.net.importer, featuring URLImporter.
+* Added jaraco.net.http.content.ContentTypeReporter, a cherrypy app to
+  report the content type of uploaded content.
 
 1.5.1
 ~~~~~

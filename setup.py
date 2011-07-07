@@ -60,6 +60,7 @@ setup_params = dict(
 			'tcp-echo-server = jaraco.net.tcp:start_echo_server',
 			'http-headers = jaraco.net.http:headers',
 			'build-dir-index = jaraco.net.site:make_index_cmd',
+			'content-type-reporter = jaraco.net.http.content:ContentTypeReporter.run',
 			],
 	},
 	install_requires=[
