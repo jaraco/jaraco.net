@@ -1,7 +1,6 @@
 import sys
 try:
-	__mod = __import__(sys.platform)
+	__mod = __import__(__name__+'.'+sys.platform, fromlist=['Manager'])
 	Manager = __mod.Manager
 except ImportError:
-	raise
 	from base import BaseManager as Manager
