@@ -40,6 +40,12 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+1.7
+~~~
+
+* Added web-tail command, which "tails" a file, serving the content over
+  http to multiple clients (requires CherryPy).
+
 1.6
 ~~~
 

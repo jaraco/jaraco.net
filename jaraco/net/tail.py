@@ -62,6 +62,9 @@ class TailTracker(cherrypy.process.plugins.SimplePlugin, list):
 	def __hash__(self):
 		return hash(id(self))
 
-if __name__ == '__main__':
+def handle_command_line():
 	TailTracker(cherrypy.engine).subscribe()
 	cherrypy.quickstart(TailedFileServer(sys.argv[1]))
+
+if __name__ == '__main__':
+	handle_command_line()

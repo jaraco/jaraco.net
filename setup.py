@@ -61,6 +61,7 @@ setup_params = dict(
 			'http-headers = jaraco.net.http:headers',
 			'build-dir-index = jaraco.net.site:make_index_cmd',
 			'content-type-reporter = jaraco.net.http.content:ContentTypeReporter.run',
+			'web-tail = jaraco.net.tail:handle_command_line',
 			],
 	},
 	install_requires=[
