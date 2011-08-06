@@ -27,11 +27,11 @@ DNS Forwarding Service
 because Microsoft appears to be unable to bind to 6 to 4 and Teredo
 addresses with their production DNS Server. After installing
 ``jaraco.net``, the service executable is available as
-`%PYTHON%\Scripts\dns-forwarding-service.exe`. In addition to the
+`%PYTHON%\Scripts\dns-forward-service.exe`. In addition to the
 documented install/uninstall/start/stop commands, it's also possible
 to configure a bind address with the -b option. For example::
 
-    dns-forwarding-service -b 2002:41de:a625::41de:a625 install
+    dns-forward-service -b 2002:41de:a625::41de:a625 install
 
 The service will be installed and the bind address will be stored in
 `HKLM\Software\jaraco.net\DNS Forwarding Service\Listen Address`. Note
