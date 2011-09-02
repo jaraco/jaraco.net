@@ -8,7 +8,7 @@ from . import htmldir
 
 def get_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-p', '--port', default=80)
+	parser.add_argument('-p', '--port', default=80, type=int)
 	return parser.parse_args()
 
 def serve_local():
