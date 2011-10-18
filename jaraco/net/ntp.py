@@ -7,7 +7,7 @@ import time
 import logging
 import argparse
 
-from jaraco.util import trim
+from jaraco.util.string import trim
 import jaraco.util.logging
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ def query(server, force_ipv6=False):
 
 	family = AF_INET6 if force_ipv6 else 0
 	sock_type = SOCK_DGRAM
-	
+
 	infos = getaddrinfo(server, ntp_port, family, sock_type)
 
 	log.debug(infos)
@@ -30,7 +30,7 @@ def query(server, force_ipv6=False):
 	log.info('Requesting time from %(sockaddr)s' % vars())
 	client = socket(family=family, type=socktype, proto=proto)
 	client.settimeout(timeout)
-	
+
 	data = '\x1b' + 47 * '\0'
 	client.sendto(data, sockaddr)
 	data, address = client.recvfrom(1024)

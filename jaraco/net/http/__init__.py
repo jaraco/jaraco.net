@@ -20,7 +20,7 @@ import httplib
 import cgi
 import ClientForm
 import cookielib
-from jaraco.util import splitter
+import jaraco.util.string
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def get_args():
 	p.add_option('-p', '--port', type='int', help="Bind to port", default=80)
 	p.add_option('-t', '--timeout', type='int', help="Socket timeout", default=3)
 	p.add_option('-d', '--delay', type='float', help="Artificial delay in response", default=0)
-	
+
 	options, args = p.parse_args()
 
 def GetContentLength(request):
@@ -84,7 +84,7 @@ def start_simple_server():
 	s.listen(1)
 	conn, addr = s.accept()
 	print('Accepted connection from', addr)
-	
+
 	GetResponse(conn)
 
 def init_logging():
@@ -129,7 +129,7 @@ def auth_request_server():
 	while True:
 		conn, addr = s.accept()
 		log.info('Accepted connection from %s', addr)
-		
+
 		if not CheckAuthResponse(conn) == 'retry': break
 
 class Query(dict):
@@ -152,7 +152,7 @@ class Query(dict):
 			items = query.split('&')
 			# remove any empty values
 			items = filter(None, items)
-			itemPairs = map(splitter('='), items)
+			itemPairs = map(jaraco.util.string.splitter('='), items)
 			unquoteSequence = lambda l: map(urllib.unquote, l)
 			query = map(unquoteSequence, itemPairs)
 		if isinstance(query, (tuple, list)):
@@ -175,9 +175,9 @@ class PageGetter(object):
 	PageGetter
 	A helper class for common HTTP page retrieval.
 	"""
-	
+
 	_opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
-	
+
 	def __init__(self, **attrs):
 		"set url to the target url or set request to the urllib2.Request object"
 		self.__dict__.update(attrs)
@@ -217,7 +217,7 @@ class PageGetter(object):
 
 class HeadRequest(urllib2.Request):
 	def get_method(self): return 'HEAD'
-  
+
 def get_content_disposition_filename(url):
 	"""
 	Get the content disposition filename from a URL.
@@ -225,21 +225,21 @@ def get_content_disposition_filename(url):
 
 	If `url` is already an addinfourl object, it will use its headers.
 	Otherwise, urllib2 is used to retrieve the headers.
-	
+
 	>>> url = 'http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?file=pythonutils-0.3.0.zip'
 	>>> get_content_disposition_filename(url) in (None, 'pythonutils-0.3.0.zip')
 	True
-	
+
 	>>> url = 'http://www.example.com/invalid_url'
 	>>> get_content_disposition_filename(url) is None
 	True
-	
+
 	>>> url = 'http://www.google.com/'
 	>>> get_content_disposition_filename(url) is None
 	True
-	
+
 	"""
-	
+
 	res = url
 	if not isinstance(url, urllib2.addinfourl):
 		req = HeadRequest(url)

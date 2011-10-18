@@ -4,7 +4,8 @@ import struct
 import time
 import operator
 import random
-from jaraco.util import Stopwatch
+
+from jaraco.util.timing import Stopwatch
 
 def calculate_checksum(bytes):
 	r"""
