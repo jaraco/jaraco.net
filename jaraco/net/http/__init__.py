@@ -287,6 +287,7 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	dest.close()
 	if mod_time:
 		set_time(fname, mod_time)
+	return fname
 
 try:
 	from jaraco.filesystem import set_time
