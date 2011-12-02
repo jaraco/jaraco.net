@@ -40,6 +40,12 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+1.8
+~~~
+
+* Added jaraco.net.http.MethodRequest, a urllib2.Request subclass which takes
+  a 'method' parameter.
+
 1.7
 ~~~
 

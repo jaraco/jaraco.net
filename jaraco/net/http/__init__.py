@@ -216,8 +216,23 @@ class PageGetter(object):
 		next.request = self.Process()
 		return next
 
-class HeadRequest(urllib2.Request):
-	def get_method(self): return 'HEAD'
+class MethodRequest(urllib2.Request):
+	def __init__(self, *args, **kwargs):
+		"""
+		Construct a MethodRequest. Usage is the same as for
+		`urllib2.Request` except it also takes an optional `method`
+		keyword argument. If supplied, `method` will be used instead of
+		the default.
+		"""
+		if 'method' in kwargs:
+			self.method = kwargs.pop('method')
+		return urllib2.Request.__init__(self, *args, **kwargs)
+
+	def get_method(self):
+		return getattr(self, 'method', urllib2.Request.get_method(self))
+
+class HeadRequest(MethodRequest):
+	method = 'HEAD'
 
 def get_content_disposition_filename(url):
 	"""
