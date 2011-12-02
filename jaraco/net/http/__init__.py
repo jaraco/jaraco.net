@@ -20,7 +20,9 @@ import httplib
 import cgi
 import ClientForm
 import cookielib
+
 import jaraco.util.string
+from jaraco.util.string import local_format as lf
 from jaraco.filesystem import set_time
 
 log = logging.getLogger(__name__)
@@ -35,7 +37,7 @@ class SimpleServer(object):
 	def start(cls):
 		options = cls.get_args()
 		server = cls(**vars(options))
-		server.serve_one()
+		server.serve()
 
 	@staticmethod
 	def get_args():
@@ -57,6 +59,7 @@ class SimpleServer(object):
 		self.conn, addr = s.accept()
 		print('Accepted connection from', addr)
 		self.get_response()
+	serve = serve_one
 
 	def get_response(self):
 		try:
@@ -103,17 +106,31 @@ class SimpleServer(object):
 		return content
 
 
-def init_logging():
-	logging.basicConfig(level=logging.INFO, format="%(message)s")
+class AuthRequestServer(SimpleServer):
+	def serve_until_auth(self):
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.bind((self.host, self.port))
+		s.listen(1)
+		while True:
+			self.conn, addr = s.accept()
+			print(lf('Accepted connection from {addr}'))
 
-def CheckAuthResponse(conn):
-	try:
-		conn.settimeout(options.timeout)
-		headers, content = GetHeaders(conn)
-		content = GetContent(conn, headers, content)
-		user_pat = re.compile('^Authorization:\s+(.*)\s*$', re.I|re.MULTILINE)
-		matched_header = user_pat.search(headers)
-		if not matched_header:
+			if not self.check_auth_response(self.conn) == 'retry': break
+	serve = serve_until_auth
+
+	def check_auth_response(self, conn):
+		try:
+			conn.settimeout(self.timeout)
+			headers, content = self.get_headers(conn)
+			content_len = self.get_content_length(headers) or 0
+			content = self.get_content(self.conn, content, content_len)
+			user_pat = re.compile('^Authorization:\s+(.*)\s*$', re.I|re.MULTILINE)
+			matched_header = user_pat.search(headers)
+			if matched_header:
+				conn.send('HTTP/1.0 200 OK\r\n')
+				user = matched_header.group(1)
+				conn.send('\r\nYou are authenticated as %(user)s' % vars())
+				return
 			conn.send('HTTP/1.0 401 Authorization Required\r\n')
 			conn.send('Connection: close\r\n')
 			msg = 'Go get me some credentials'
@@ -122,31 +139,17 @@ def CheckAuthResponse(conn):
 			conn.send('WWW-Authenticate: Basic realm="fake-auth"\r\n')
 			conn.send('\r\n')
 			conn.send(msg)
-			log.info('sent authorization request')
-		else:
-			conn.send('HTTP/1.0 200 OK\r\n')
-			user = matched_header.group(1)
-			conn.send('\r\nYou are authenticated as %(user)s' % vars())
-	except socket.error, e:
-		log.exception('error in connection')
-		if res:
-			log.info('partial result')
-			log.info(repr(res))
-	finally:
-		conn.close()
-	return 'retry'
+			print('sent authorization request')
+		except socket.error, e:
+			print('error in connection')
+			traceback.print_exc()
+			if res:
+				print('partial result')
+				print(repr(res))
+		finally:
+			conn.close()
+		return 'retry'
 
-def auth_request_server():
-	init_logging()
-	get_args()
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.bind((options.host, options.port))
-	s.listen(1)
-	while True:
-		conn, addr = s.accept()
-		log.info('Accepted connection from %s', addr)
-
-		if not CheckAuthResponse(conn) == 'retry': break
 
 class Query(dict):
 	"""HTTP Query takes as an argument an HTTP query request
