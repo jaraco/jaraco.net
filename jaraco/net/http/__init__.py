@@ -12,7 +12,7 @@ import re
 import time
 import calendar
 import datetime
-from optparse import OptionParser
+import argparse
 import urlparse
 import urllib
 import urllib2
@@ -25,68 +25,83 @@ from jaraco.filesystem import set_time
 
 log = logging.getLogger(__name__)
 
-def get_args():
-	global options
 
-	p = OptionParser(conflict_handler="resolve")
-	p.add_option('-h', '--host', help="Bind to IP address", default='')
-	p.add_option('-p', '--port', type='int', help="Bind to port", default=80)
-	p.add_option('-t', '--timeout', type='int', help="Socket timeout", default=3)
-	p.add_option('-d', '--delay', type='float', help="Artificial delay in response", default=0)
+class SimpleServer(object):
+	def __init__(self, host, port, timeout, response_delay):
+		self.__dict__.update(vars())
+		del self.self
 
-	options, args = p.parse_args()
+	@classmethod
+	def start(cls):
+		options = cls.get_args()
+		server = cls(**vars(options))
+		server.serve_one()
 
-def GetContentLength(request):
-	match = re.search('^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
-	if match:
-		return int(match.group(1))
-	print('no content length found', file=sys.stderr)
+	@staticmethod
+	def get_args():
+		p = argparse.ArgumentParser(conflict_handler="resolve")
+		p.add_argument('-h', '--host', help="Bind to IP address", default='')
+		p.add_argument('-p', '--port', type=int, help="Bind to port",
+			default=80)
+		p.add_argument('-t', '--timeout', type=int, help="Socket timeout",
+			default=3)
+		seconds = lambda seconds: datetime.timedelta(seconds=seconds)
+		p.add_argument('-d', '--delay', dest='response_delay', type=seconds,
+			help="Artificial delay in response", default=datetime.timedelta())
+		return p.parse_args()
 
-def GetHeaders(conn):
-	res = ''
-	while not '\r\n\r\n' in res:
-		res += conn.recv(1024)
-	bytes = len(res)
-	res, _sep, content = res.partition('\r\n\r\n')
-	print('received %(bytes)d bytes' % vars(), file=sys.stderr)
-	print(res)
-	return res, content
+	def serve_one(self):
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.bind((self.host, self.port))
+		s.listen(1)
+		self.conn, addr = s.accept()
+		print('Accepted connection from', addr)
+		self.get_response()
 
-def GetContent(conn, res, content):
-	cl = GetContentLength(res) or 0
-	while len(content) < cl:
-		content += conn.recv(1024)
-	bytes = len(content)
-	print('received %(bytes)d bytes content' % vars(), file=sys.stderr)
-	print(content)
-	return content
+	def get_response(self):
+		try:
+			self.conn.settimeout(self.timeout)
+			headers, content = self.get_headers(self.conn)
+			content_len = self.get_content_length(headers) or 0
+			content = self.get_content(self.conn, content, content_len)
+			self.conn.send('HTTP/1.0 200 OK\r\n')
+			time.sleep(self.response_delay.total_seconds())
+			self.conn.send('\r\nGot It!')
+		except socket.error, e:
+			print('Error %s' % e)
+			if content:
+				print('partial result')
+				print(repr(content))
+		finally:
+			self.conn.close()
 
-def GetResponse(conn):
-	try:
-		conn.settimeout(options.timeout)
-		res, content = GetHeaders(conn)
-		content = GetContent(conn, res, content)
-		conn.send('HTTP/1.0 200 OK\r\n')
-		time.sleep(options.delay)
-		conn.send('\r\nGot It!')
-		conn.close()
-	except socket.error, e:
-		print('Error %s' % e)
-		if res:
-			print('partial result')
-			print(repr(res))
+	@staticmethod
+	def get_content_length(request):
+		match = re.search('^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
+		if match:
+			return int(match.group(1))
+		print('no content length found', file=sys.stderr)
 
+	@staticmethod
+	def get_headers(conn):
+		res = ''
+		while not '\r\n\r\n' in res:
+			res += conn.recv(1024)
+		bytes = len(res)
+		headers, _sep, content = res.partition('\r\n\r\n')
+		print('received %(bytes)d bytes' % vars(), file=sys.stderr)
+		print(headers)
+		return headers, content
 
-def start_simple_server():
-	"A simple web server that sends a simple response"
-	get_args()
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.bind((options.host, options.port))
-	s.listen(1)
-	conn, addr = s.accept()
-	print('Accepted connection from', addr)
+	@staticmethod
+	def get_content(conn, content='', length=0):
+		while len(content) < length:
+			content += conn.recv(1024)
+		bytes = len(content)
+		print('received %(bytes)d bytes content' % vars(), file=sys.stderr)
+		print(content)
+		return content
 
-	GetResponse(conn)
 
 def init_logging():
 	logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -320,12 +335,10 @@ def print_headers(url):
 		print(response.msg)
 
 def _get_url_from_command_line():
-	parser = OptionParser('$prog <url>')
-	options, args = parser.parse_args()
-	if not args: parser.error('URL required')
-	url = args.pop()
-	if args: parser.error('Too many parameters')
-	return url
+	parser = argparse.ArgumentParser()
+	parser.add_argument('url')
+	args = parser.parse_args()
+	return args.url
 
 def wget():
 	get_url(_get_url_from_command_line())

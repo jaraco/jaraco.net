@@ -27,7 +27,7 @@ py26reqs = ['argparse'] if sys.version_info < (2,7) else []
 
 setup_params = dict(
 	name = name,
-	use_hg_version=dict(increment='0.1'),
+	use_hg_version=dict(increment='1.0'),
 	description = 'Networking tools by jaraco',
 	long_description = open('README').read(),
 	author = 'Jason R. Coombs',
@@ -45,7 +45,7 @@ setup_params = dict(
 		'console_scripts': [
 			'whois-bridge = jaraco.net.whois:main',
 			'scanner = jaraco.net.scanner:scan',
-			'fake-http = jaraco.net.http:start_simple_server',
+			'fake-http = jaraco.net.http:SimpleServer.start',
 			'fake-http-auth = jaraco.net.http:auth_request_server',
 			'wget = jaraco.net.http:wget',
 			'serve-local = jaraco.net.http.static:serve_local',
