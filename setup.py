@@ -45,8 +45,8 @@ setup_params = dict(
 		'console_scripts': [
 			'whois-bridge = jaraco.net.whois:main',
 			'scanner = jaraco.net.scanner:scan',
-			'fake-http = jaraco.net.http:SimpleServer.start',
-			'fake-http-auth = jaraco.net.http:AuthRequestServer.start',
+			'fake-http = jaraco.net.http.servers:Simple.start',
+			'fake-http-auth = jaraco.net.http.servers:AuthRequest.start',
 			'wget = jaraco.net.http:wget',
 			'serve-local = jaraco.net.http.static:serve_local',
 			'fake-smtp = jaraco.net.smtp:start_simple_server',

@@ -45,7 +45,8 @@ Changes
 
 * Added jaraco.net.http.MethodRequest, a urllib2.Request subclass which takes
   a 'method' parameter.
-* Consolidated many functions into `jaraco.net.http.SimpleServer`.
+* Consolidated many functions from jaraco.net.http to classes in
+  `jaraco.net.http.servers`.
 
 1.7
 ~~~
