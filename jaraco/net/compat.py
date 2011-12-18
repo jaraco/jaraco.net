@@ -1,8 +1,10 @@
-# Some Python builds are missing essential constants, but works fine if the 
-#  constants are known. This module restores some of those constants until
-#  such issues can be resolved.
-# See http://mail.python.org/pipermail/python-list/2008-May/489377.html
-# See http://bugs.python.org/issue6926
+"""
+Some Python builds are missing essential constants, but works fine if the
+ constants are defined. This module restores some of those constants until
+ such issues can be resolved.
+ See http://mail.python.org/pipermail/python-list/2008-May/489377.html
+ and http://bugs.python.org/issue6926
+"""
 
 import socket
 
