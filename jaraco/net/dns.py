@@ -14,7 +14,7 @@ class Forwarder(object):
 	support listening on tunneled IPv6 addresses.  See
 	http://social.technet.microsoft.com/Forums/en-US/winserverPN/thread/fe12c783-f6b8-4560-9a9a-8ab7c46b80cb
 	for details.
-	
+
 	This forwarder can be installed as a service and run on any such server,
 	and it will forward DNS requests to the IPv6 localhost address.
 	"""
@@ -89,26 +89,28 @@ class RegConfig(object):
 		except KeyError:
 			value = default
 		return value
-	
+
 class ForwardingService(win32serviceutil.ServiceFramework):
 	"""
 	_svc_name_:			The name of the service (used in the Windows registry).
 						DEFAULT: The capitalized name of the current directory.
 	_svc_display_name_: The name that will appear in the Windows Service Manager.
-						DEFAULT: The capitalized name of the current directory.	   
+						DEFAULT: The capitalized name of the current directory.
 	log_dir:			The desired location of the stdout and stderr
 						log files.
 						DEFAULT: %system%\LogFiles\%(_svc_display_name_)s
 	"""
-	_svc_name_ = 'dns_forward'										# The name of the service.
-	_svc_display_name_ = 'DNS Forwarding Service'					# The Service Manager display name.
+	_svc_name_ = 'dns_forward'
+	"The name of the service"
+	_svc_display_name_ = 'DNS Forwarding Service'
+	"The Service Manager display name."
 	log_dir = os.path.join(
 		os.environ['SYSTEMROOT'],
 		'System32',
 		'LogFiles',
 		_svc_display_name_,
-		)		 													# The log directory for the stderr and 
-																	# stdout logs.
+		)
+	"The log directory for the stderr and stdout logs."
 
 	config = RegConfig(r'Software\jaraco.net\DNS Forwarding Service',
 		winreg.HKEY_LOCAL_MACHINE)
@@ -120,10 +122,10 @@ class ForwardingService(win32serviceutil.ServiceFramework):
 		self.forwarder = Forwarder(self.config.get('Listen Address', '::0'))
 		self.ReportServiceStatus(win32service.SERVICE_RUNNING)
 		self.forwarder.serve_forever()
-	
+
 	def SvcStop(self):
 		"""Called when Windows receives a service stop request."""
-		
+
 		self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
 		self.forwarder.stop()
 		self.ReportServiceStatus(win32service.SERVICE_STOPPED)
@@ -135,16 +137,17 @@ class ForwardingService(win32serviceutil.ServiceFramework):
 		sys.stdout = open(os.path.join(ForwardingService.log_dir, 'stdout.log'), 'a')
 		sys.stderr = open(os.path.join(ForwardingService.log_dir, 'stderr.log'), 'a')
 
-def start_service():
-	def listen_setter(opts):
-		opts = dict(opts)
-		if '-b' in opts:
-			ForwardingService.config['Listen Address'] = opts['-b']
-	params = dict(
-		customInstallOptions = 'b:', # use -b to specify bind address
-		customOptionHandler = listen_setter,
-	)
-	win32serviceutil.HandleCommandLine(ForwardingService, **params)
+	@classmethod
+	def handle_command_line(cls):
+		def listen_setter(opts):
+			opts = dict(opts)
+			if '-b' in opts:
+				ForwardingService.config['Listen Address'] = opts['-b']
+		params = dict(
+			customInstallOptions = 'b:', # use -b to specify bind address
+			customOptionHandler = listen_setter,
+		)
+		win32serviceutil.HandleCommandLine(cls, **params)
 
 def main():
 	addr = ForwardingService.config['Listen Address']
