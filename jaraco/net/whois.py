@@ -4,60 +4,68 @@
 
 HTTP scraper for nic servers who only offer whois service via web only.
 
-Run the script from the command line and it will service port 43 as a whois server,
-passing the query to the appropriate web form and parsing the results into a textual format.
+Run the script from the command line and it will service port 43 as a whois
+server, passing the query to the appropriate web form and parsing the results
+into a textual format.
 
-Copyright © 2005-2009 Jason R. Coombs
+Copyright © 2005-2011 Jason R. Coombs
 """
 
-__author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
-__version__ = '$Rev$'[6:-2]
-__svnauthor__ = '$Author$'[9:-2]
-__date__ = '$Date$'[7:-2]
-
-import urllib2
 import os
 import re
 import sys
-from ClientForm import ParseResponse, ItemNotFoundError
-from htmllib import HTMLParser
-from formatter import NullFormatter, DumbWriter, AbstractFormatter
-from jaraco.net.http import PageGetter
-from jaraco.util.meta import LeafClassesMeta
-from urllib import basejoin
 import logging
-from StringIO import StringIO
+import htmllib
+import abc
+import formatter
+import urllib
+import urllib2
+import cookielib
+import socket
+import select
+import SocketServer
+
+from ClientForm import ParseResponse, ItemNotFoundError
 from BeautifulSoup import BeautifulSoup, UnicodeDammit
+from jaraco.util.meta import LeafClassesMeta
+
+try:
+	import win32service, win32serviceutil, win32event
+except ImportError:
+	pass
+
+from .http import PageGetter
 
 log = logging.getLogger(__name__)
 
-try:
-	import cookielib
-	urlopen = urllib2.urlopen
-except ImportError:
-	from ClientCookie import urlopen
-
 def init():
-	"""Initialize HTTP functionality to support cookies, which are necessary
-	to use the HTTP interface."""
-	try:
-		cj = cookielib.CookieJar()
-		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-		urllib2.install_opener(opener)
-	except NameError:
-		pass
+	"""
+	Initialize HTTP functionality to support cookies, which are necessary
+	to use the HTTP interface.
+	"""
+	cj = cookielib.CookieJar()
+	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+	urllib2.install_opener(opener)
 
 class WhoisHandler(object):
-	"""WhoisHandler is an abstract class for defining whois interfaces for
+	"""
+	WhoisHandler is an abstract class for defining whois interfaces for
 	web-based nic servers.
-	Child classes must define a 'services' attribute which is a regular expression
-	that will match domains serviced by that handler.
-	Also, child classes must define LoadHTTP which will retrieve the HTTP response
-	and a _parser class which is an HTMLParser capable of parsing the response and
-	outputting the textual result."""
-	
+	"""
+
 	__metaclass__ = LeafClassesMeta
-	
+
+	@abc.abstractproperty
+	def services(self):
+		"Regular expression that will match domains serviced by this handler."
+
+	@abc.abstractmethod
+	def LoadHTTP(self):
+		"""
+		Retrieve the HTTP response and a _parser class which is an HTMLParser
+		capable of parsing the response and outputting the textual result.
+		"""
+
 	def __init__(self, query = None):
 		self._query = query
 
@@ -91,15 +99,15 @@ class WhoisHandler(object):
 		# response = str(tidy.parseString(response, drop_empty_paras = False))
 		response = re.sub(r'<(\w+)/>', r'<\1 />', self._response)
 		writer = MyWriter(s_out)
-		self._parser(AbstractFormatter(writer)).feed(response)
+		self._parser(formatter.AbstractFormatter(writer)).feed(response)
 
 class ArgentinaWhoisHandler(WhoisHandler):
 	services = r'\.ar$'
-	
+
 	def LoadHTTP(self):
 		query = self._query
 		pageURL = 'http://www.nic.ar/consdom.html'
-		form = ParseResponse(urlopen(pageURL))[0]
+		form = ParseResponse(urllib2.urlopen(pageURL))[0]
 		form['nombre'] = query[:query.find('.')]
 		try:
 			domain = query[query.find('.') :]
@@ -109,36 +117,36 @@ class ArgentinaWhoisHandler(WhoisHandler):
 		req = form.click()
 		#req.data = 'nombre=%s&dominio=.com.ar' % query
 		req.add_header('referer', pageURL)
-		resp = urlopen(req)
+		resp = urllib2.urlopen(req)
 		self._response = resp.read()
 
-	class _parser(HTMLParser):
+	class _parser(htmllib.HTMLParser):
 		def start_tr(self, attrs):
 			pass # have to define this for end_tr to be called.
-			
+
 		def end_tr(self):
 			self.formatter.add_line_break()
 
 class CoZaWhoisHandler(WhoisHandler):
 	services = r'\.co\.za$'
-	
+
 	def LoadHTTP(self):
 		query = self._query
 		pageURL = 'http://whois.co.za/'
-		form = ParseResponse(urlopen(pageURL))[0]
+		form = ParseResponse(urllib2.urlopen(pageURL))[0]
 		form['Domain'] = query[:query.find('.')]
 		req = form.click()
-		resp = urlopen(req)
+		resp = urllib2.urlopen(req)
 		self._response = resp.read()
 
-	_parser = HTMLParser
+	_parser = htmllib.HTMLParser
 
 class GovWhoisHandler(WhoisHandler):
 	services = r'(\.fed\.us|\.gov)$'
 	def LoadHTTP(self):
 		query = self._query
-		"Perform an whois query on the dotgov server."
-		url = urlopen('http://dotgov.gov/whois.aspx')
+		# Perform an whois query on the dotgov server.
+		url = urllib2.urlopen('http://dotgov.gov/whois.aspx')
 		forms = ParseResponse(url)
 		assert len(forms) == 1
 		form = forms[0]
@@ -151,22 +159,22 @@ class GovWhoisHandler(WhoisHandler):
 			# agree.aspx page.
 			return self.LoadHTTP()
 		form['who_search'] = query
-		resp = urlopen(forms[0].click())
+		resp = urllib2.urlopen(forms[0].click())
 		self._response = resp.read()
 
 	def Agree(self, form):
 		"agree to the dotgov agreement"
 		agree_req = form.click()
-		u2 = urlopen(agree_req)
+		u2 = urllib2.urlopen(agree_req)
 		resp = u2.read()
 
-	class _parser(HTMLParser):
+	class _parser(htmllib.HTMLParser):
 		def __init__(self, formatter):
 			self.__formatter__ = formatter
 			# Use the null formatter to start; we'll switch to the outputting
 			#  formatter when we find the right point in the HTML.
-			HTMLParser.__init__(self, NullFormatter())
-			
+			htmllib.HTMLParser.__init__(self, formatter.NullFormatter())
+
 		def start_td(self, attrs):
 			attrs = dict(attrs)
 			# I identify the important content by the tag with the ID 'TD1'.
@@ -177,8 +185,8 @@ class GovWhoisHandler(WhoisHandler):
 
 		def end_td(self):
 			# switch back to the NullFormatter
-			if not isinstance(self.formatter, NullFormatter):
-				self.formatter = NullFormatter()
+			if not isinstance(self.formatter, formatter.NullFormatter):
+				self.formatter = formatter.NullFormatter()
 
 mozilla_headers = {
 	'referer': 'http://www.nic.bo/buscar.php',
@@ -195,10 +203,10 @@ class BoliviaPageGetter(PageGetter):
 #		request = super(self.__class__, self).GetRequest()
 #		map(request.add_header, mozilla_headers.keys(), mozilla_headers.values())
 #		return request
-	
+
 class BoliviaWhoisHandler(WhoisHandler):
 	services = r'\.bo$'
-	class _parser(HTMLParser):
+	class _parser(htmllib.HTMLParser):
 		def anchor_end(self):
 			if self.anchor:
 				self.handle_data('[%s]' % self.anchor)
@@ -212,14 +220,14 @@ class BoliviaWhoisHandler(WhoisHandler):
 		getter.request = getter.Process()
 		self._response = getter.Fetch().read()
 		del getter.request
-		
+
 		# now that we've submitted the request, we've got a response.
 		# Unfortunately, this page returns 'available' or 'not available'
 		# If it's not available, we need to know who owns it.
 		if re.search('Dominio %s registrado' % self._query, self._response):
-			getter.url = basejoin(getter.url, 'informacion.php')
+			getter.url = urllib.basejoin(getter.url, 'informacion.php')
 			self._response = getter.Fetch().read()
-		
+
 	def ParseResponse(self, s_out):
 		soup = BeautifulSoup(self._response)
 		#self._response = unicode(soup.strong.parent.div).encode('latin-1')
@@ -245,17 +253,14 @@ class DebugHandler(WhoisHandler):
 			s_out.write('result: %s' % eval(match.group(1)))
 del DebugHandler # disable the debug handler
 
-class MyWriter(DumbWriter):
+class MyWriter(formatter.DumbWriter):
 	def send_flowing_data(self, data):
 		data = UnicodeDammit(data).unicode
 		# convert non-breaking spaces to regular spaces
 		data = data.replace(u'\xa0', u' ')
-		DumbWriter.send_flowing_data(self, data)
-		
-from SocketServer import ThreadingTCPServer, BaseRequestHandler, StreamRequestHandler, socket
-from select import select
+		formatter.DumbWriter.send_flowing_data(self, data)
 
-class Handler(StreamRequestHandler):
+class Handler(SocketServer.StreamRequestHandler):
 	def handle(self):
 		try:
 			self._handle()
@@ -281,9 +286,9 @@ class Handler(StreamRequestHandler):
 
 class ConnectionClosed(Exception): pass
 
-class Listener(ThreadingTCPServer):
+class Listener(SocketServer.ThreadingTCPServer):
 	def __init__(self):
-		ThreadingTCPServer.__init__(self, ('', 43), Handler)
+		SocketServer.ThreadingTCPServer.__init__(self, ('', 43), Handler)
 
 	def serve_until_closed(self):
 		try:
@@ -296,20 +301,22 @@ class Listener(ThreadingTCPServer):
 		#  is closed.  Simply blocking on accept will block even if the socket
 		#  object is closed.
 		try:
-			select((self.socket,), (), ())
+			select.select((self.socket,), (), ())
 		except socket.error, e:
 			if e[1].lower() == 'bad file descriptor':
 				raise ConnectionClosed
-		return ThreadingTCPServer.get_request(self)
+		return SocketServer.ThreadingTCPServer.get_request(self)
 
 def serve():
-		init()
-		l = Listener()
-		l.serve_forever()
-		
-try:
-	import win32service, win32serviceutil, win32event
+	init()
+	l = Listener()
+	l.serve_forever()
 
+# On Unix, serve as a daemon
+main = serve
+
+# On Windows, run as a service
+if 'win32serviceutil' in globals():
 	class TheService(win32serviceutil.ServiceFramework):
 		_svc_name_ = 'whois_bridge'
 		_svc_display_name_ = 'Whois HTTP Bridge'
@@ -324,7 +331,7 @@ try:
 		def SvcDoRun(self):
 			import servicemanager
 
-			self._setup_logging()			
+			self._setup_logging()
 
 			log.info('%s service is starting.', self._svc_display_name_)
 			servicemanager.LogMsg(
@@ -359,11 +366,9 @@ try:
 			sys.stdout = LogFileWrapper('stdout')
 			sys.stderr = LogFileWrapper('stderr')
 			logging.root.level = logging.INFO
-			
+
 	def main():
 		win32serviceutil.HandleCommandLine(TheService)
-except ImportError:
-	main = serve
 
 if __name__ == '__main__':
 	main()
