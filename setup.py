@@ -8,17 +8,6 @@ Copyright © 2009-2011 Jason R. Coombs
 
 import sys
 
-try:
-	from distutils.command.build_py import build_py_2to3 as build_py
-	# exclude some fixers that break already compatible code
-	from lib2to3.refactor import get_fixers_from_package
-	fixers = get_fixers_from_package('lib2to3.fixes')
-	for skip_fixer in ['import']:
-		fixers.remove('lib2to3.fixes.fix_' + skip_fixer)
-	build_py.fixer_names = fixers
-except ImportError:
-	from distutils.command.build_py import build_py
-
 from setuptools import find_packages
 
 name = 'jaraco.net'
@@ -79,10 +68,10 @@ setup_params = dict(
 	],
 	tests_require=[
 	],
-	cmdclass=dict(build_py=build_py),
 	setup_requires = [
 		'hgtools>=0.6.4',
 	],
+	use_2to3=True,
 )
 
 if __name__ == '__main__':
