@@ -312,12 +312,9 @@ def serve():
 	l = Listener()
 	l.serve_forever()
 
-# On Unix, serve as a daemon
-main = serve
-
 # On Windows, run as a service
 if 'win32serviceutil' in globals():
-	class TheService(win32serviceutil.ServiceFramework):
+	class Service(win32serviceutil.ServiceFramework):
 		_svc_name_ = 'whois_bridge'
 		_svc_display_name_ = 'Whois HTTP Bridge'
 
@@ -367,8 +364,9 @@ if 'win32serviceutil' in globals():
 			sys.stderr = LogFileWrapper('stderr')
 			logging.root.level = logging.INFO
 
-	def main():
-		win32serviceutil.HandleCommandLine(TheService)
+		@classmethod
+		def handle_command_line(cls):
+			win32serviceutil.HandleCommandLine(cls)
 
 if __name__ == '__main__':
-	main()
+	serve()

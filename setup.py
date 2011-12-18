@@ -25,6 +25,10 @@ name = 'jaraco.net'
 
 py26reqs = ['argparse'] if sys.version_info < (2,7) else []
 
+windows_scripts = [
+	'whois-bridge-service = jaraco.net.whois:Service.handle_command_line',
+	] if sys.platform == 'win32' else []
+
 setup_params = dict(
 	name = name,
 	use_hg_version=dict(increment='1.0'),
@@ -43,7 +47,7 @@ setup_params = dict(
 	],
 	entry_points = {
 		'console_scripts': [
-			'whois-bridge = jaraco.net.whois:main',
+			'whois-bridge = jaraco.net.whois:serve',
 			'scanner = jaraco.net.scanner:scan',
 			'fake-http = jaraco.net.http.servers:Simple.start',
 			'fake-http-auth = jaraco.net.http.servers:AuthRequest.start',
@@ -62,10 +66,10 @@ setup_params = dict(
 			'build-dir-index = jaraco.net.site:make_index_cmd',
 			'content-type-reporter = jaraco.net.http.content:ContentTypeReporter.run',
 			'web-tail = jaraco.net.tail:handle_command_line',
-			],
+			] + windows_scripts,
 	},
 	install_requires=[
-		'jaraco.util>=4.0dev',
+		'jaraco.util>=4.0',
 		'clientform>=0.2.7',
 		'BeautifulSoup',
 	] + py26reqs,
