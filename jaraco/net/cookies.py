@@ -22,21 +22,31 @@ from jaraco.util.dictlib import FoldedCaseKeyedDict
 
 class CookieMonster(object):
 	"Read cookies out of a user's IE cookies file"
-	def __init__(self, filename):
-		profileDir = os.environ['USERPROFILE']
-		self.cookieDir = os.path.join(profileDir, 'Cookies')
-		self.cookieFile = file(os.path.join(self.cookieDir, filename))
-		self.entries = self.getEntries(self.cookieFile)
 
-	def getEntries(self, cookieFile):
-		while True:
-			entry = itertools.takewhile(isNotCookieDelimiter, cookieFile)
-			entry = map(string.rstrip, entry)
-			if not entry: break
-			cookie = self.makeCookie(*entry)
-			yield cookie
+	@property
+	def cookie_dir(self):
+		import _winreg as winreg
+		key = winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, 'Software'
+			'\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
+		cookie_dir, type = winreg.QueryValueEx(key, 'Cookies')
+		return cookie_dir
 
-	def makeCookie(self, key, value, domain, flags, ExpireLow, ExpireHigh,
+	def entries(self, filename):
+		with open(os.path.join(self.cookie_dir, filename)) as cookie_file:
+			while True:
+				entry = itertools.takewhile(self.is_not_cookie_delimiter,
+					cookie_file)
+				entry = map(string.rstrip, entry)
+				if not entry: break
+				cookie = self.make_cookie(*entry)
+				yield cookie
+
+	@staticmethod
+	def is_not_cookie_delimiter(s):
+		return s != '*\n'
+
+	@staticmethod
+	def make_cookie(key, value, domain, flags, ExpireLow, ExpireHigh,
 		CreateLow, CreateHigh):
 		expires = (int(ExpireHigh) << 32) | int(ExpireLow)
 		created = (int(CreateHigh) << 32) | int(CreateLow)
@@ -45,7 +55,6 @@ class CookieMonster(object):
 		domain, path = string.split(domain, '/', 1)
 		path = '/' + path
 		cookie = vars()
-		del cookie['self']
 		return cookie
 
 def getCookies(source, path=None):
@@ -73,9 +82,6 @@ def getCookies(source, path=None):
 		path and c.setPathIfEmpty(path)
 		result.append(c)
 	return result
-
-def isNotCookieDelimiter(s):
-	return s != '*\n'
 
 class cookie(object):
 	"""
