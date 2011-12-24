@@ -3,8 +3,11 @@
 import os
 import sys
 import socket
-from functools import partial
 import _winreg as winreg
+
+import win32serviceutil
+import win32service
+from win32com.client import constants
 
 port = socket.getservbyname('domain')
 
@@ -46,10 +49,6 @@ class Forwarder(object):
 			self.socket.sendto(resp, requester)
 		except socket.timeout:
 			pass
-
-import win32serviceutil
-import win32service
-from win32com.client import constants
 
 class RegConfig(object):
 	def __init__(self, root_path, tree=winreg.HKEY_CURRENT_USER):
