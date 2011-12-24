@@ -17,7 +17,22 @@ class BlocklistHit(object):
 	def __str__(self):
 		return "{host} listed with {blocklist} as {result}".format(**vars(self))
 
-class Server(unicode):
+class Service(unicode):
+	"""
+	Blocklist service. Represents a blocklist service suitable for referencing
+	the reputation of potentially malicious or malfeasant hosts.
+
+	Initialize with the domain of the blocklist service or use the classmethod
+	Service.get_services to get Services for a commonly-used set of domains.
+	"""
+	service_domains = [
+		'dnsbl.jaraco.com',
+		'zen.spamhaus.org',
+		'ips.backscatterer.org',
+		'bl.spamcop.net',
+		'list.dsbl.org',
+	]
+
 	@staticmethod
 	def reverse_ip(ip):
 		return '.'.join(reversed(ip.split('.')))
@@ -40,19 +55,16 @@ class Server(unicode):
 		args = parser.parse_args()
 		cls.lookup_all(args.host)
 
-	@staticmethod
-	def lookup_all(host):
-		for server in blocklist_servers:
-			res = server.lookup(host)
+	@classmethod
+	def lookup_all(cls, host):
+		services = cls.get_services()
+		for service in services:
+			res = service.lookup(host)
 			if res: print(res)
 
-blocklist_servers = map(Server, [
-	'dnsbl.jaraco.com',
-	'zen.spamhaus.org',
-	'ips.backscatterer.org',
-	'bl.spamcop.net',
-	'list.dsbl.org',
-])
+	@classmethod
+	def get_services(cls):
+		return map(cls, cls.service_domains)
 
 if __name__ == '__main__':
-	Server.handle_command_line()
+	Service.handle_command_line()
