@@ -50,6 +50,7 @@ Changes
 * `whois-bridge` now runs the daemon. A new script `whois-bridge-service` is
   installed on Windows only and specifically invokes the service.
 * Removed `cookies` module.
+* Refactored `dnsbl` module. Replaced `lookup_host` with `Server.lookup_all`.
 
 1.7
 ~~~
