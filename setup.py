@@ -61,6 +61,7 @@ setup_params = dict(
 		'jaraco.util>=4.0',
 		'clientform>=0.2.7',
 		'BeautifulSoup',
+		'keyring>=0.6',
 	] + py26reqs,
 	extras_require = {
 	},
