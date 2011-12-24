@@ -70,8 +70,9 @@ auth_param = token + "=" + ( token | quoted_string )
 # need something for n#m(expr) syntax
 def ListOfElements(expr, min=0, max=float('Inf')):
 	"List of elements separated by commas (and whitespace robust)"
+	# todo: implement this
 
 # challenge is auth-scheme followed by one or more spaces followed by
 #  one or more auth-params separated by commas.
 
-challenge = auth_scheme + ListOfElements(auth_param, min=1)
+challenge = auth_scheme + OneOrMore(delimitedList(auth_param))
