@@ -1,17 +1,15 @@
 # -*- coding: UTF-8 -*-
 
-"""TableParser
+"""
+TableParser
 	Objects for parsing an HTML file with tables in it.
 
 Copyright © 2004 Jason R. Coombs
 """
 
-__author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
-__version__ = '$Revision$a'[11:-2]
-__svnauthor__ = '$Author$'[9:-2]
-__date__ = '$Date$'[7:-2]
-
-import htmllib, formatter, types
+import htmllib
+import formatter
+import types
 import logging
 
 log = logging.getLogger('TableParser')
@@ -30,7 +28,7 @@ class HTMLElement(object):
 	"A mutable variant object"
 	def __init__(self):
 		self.value = None
-		
+
 	def setValue(self, value):
 		self.value = value
 
@@ -43,7 +41,7 @@ class HTMLElement(object):
 			self.value += value
 		if self.value is None:
 			self.value = value
-			
+
 	def __str__(self):
 		return str(self.value)
 
@@ -54,8 +52,9 @@ class HTMLElement(object):
 		return self.value
 
 class TableParser(htmllib.HTMLParser):
-	"""Parses any number of tables from an HTML file.  This will attempt to parse incorrect HTML
-	as well, but no guarantees are made.
+	"""
+	Parse any number of tables from an HTML file.  Attempts to parse incorrect
+	HTML as well, but no guarantees are made.
 
 	The parser will accept nested tables as <table> inside <td> elements.
 	"""
@@ -66,7 +65,8 @@ class TableParser(htmllib.HTMLParser):
 
 	def start_table(self, attrs):
 		if self.currentTable:
-			# we were already in a table, so grab any data that was already parsed for this element
+			# We were already in a table, so grab any data that was already
+			#  parsed for this element.
 			self.saveCurrent()
 		newTable = HTMLTable()
 		self.tables.append(newTable)
@@ -91,14 +91,16 @@ class TableParser(htmllib.HTMLParser):
 			#do nothing and
 			return
 		self.checkForExtraRows()
-		# the following two statements might be a bit confusing, so here's some background.
-		# the first statement replaces all elements in the current row with elements converted
-		# to strings.  It uses the [:] notation so it modifies the existing object in place and doesn't
-		# just replace it... and since that object is referenced by the list of rows in the currentTable,
-		# that list will also be modified.
-		# the second statement removes the currentRow reference, but the object is still referenced
-		# by the list of rows in the currentTable.
-		self.currentTable.currentRow[:] = map(lambda x: x.getValue(), self.currentTable.currentRow)
+		# The following two statements might be a bit confusing, so here's
+		#  some background. The first statement replaces all elements in the
+		#  current row with elements converted to strings.  It uses the [:]
+		#  notation so it modifies the existing object in place and doesn't
+		#  just replace it... and since that object is referenced by the list
+		#  of rows in the currentTable, that list will also be modified. The
+		#  second statement removes the currentRow reference, but the object
+		#  is still referenced by the list of rows in the currentTable.
+		self.currentTable.currentRow[:] = map(lambda x: x.getValue(),
+			self.currentTable.currentRow)
 		self.currentTable.currentRow = None
 
 	def start_td(self, attrs):
@@ -110,7 +112,9 @@ class TableParser(htmllib.HTMLParser):
 		try:
 			# TODO: assign for additional columns as well if 'colspan' is set
 			currentColumnNumber = len(self.currentTable.currentRow)
-			self.currentTable.extraRows[currentColumnNumber] = int(attrs['rowspan']) - 1
+			self.currentTable.extraRows[currentColumnNumber] = (
+				int(attrs['rowspan']) - 1
+			)
 		except KeyError:
 			pass
 		try:
@@ -126,7 +130,9 @@ class TableParser(htmllib.HTMLParser):
 	def end_td(self):
 		self.saveCurrent()
 		# fill in blanks for the extra columns
-		self.currentTable.currentRow.extend([HTMLElement()] * self.currentTable.currentRow.extraCols)
+		self.currentTable.currentRow.extend(
+			[HTMLElement()] * self.currentTable.currentRow.extraCols)
+		)
 		self.currentTable.currentRow.currentElement = None
 
 	def saveCurrent(self):
