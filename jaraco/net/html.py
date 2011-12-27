@@ -53,6 +53,7 @@ class TableParser(htmllib.HTMLParser):
 	The parser will accept nested tables as <table> inside <td> elements.
 	"""
 	def __init__(self):
+		# HTMLParser is not a new-style class :(
 		htmllib.HTMLParser.__init__(self, formatter.NullFormatter())
 		self.tables = []
 		self.current_table = None
@@ -126,7 +127,7 @@ class TableParser(htmllib.HTMLParser):
 		self.save_current()
 		# fill in blanks for the extra columns
 		self.current_table.current_row.extend(
-			[HTMLElement()] * self.current_table.current_row.extraCols)
+			[HTMLElement()] * self.current_table.current_row.extraCols
 		)
 		self.current_table.current_row.current_element = None
 
