@@ -4,6 +4,7 @@ import struct
 import time
 import operator
 import random
+import datetime
 
 from jaraco.util.timing import Stopwatch
 
@@ -11,7 +12,7 @@ def calculate_checksum(bytes):
 	r"""
 	Calculate a 16-bit checksum on the bytes.
 
-	In partucilar, the 16-bit one's complement of
+	In particular, the 16-bit one's complement of
 	the one's complement sum of all 16-bit words
 
 	>>> calculate_checksum('ABCD\n')
@@ -28,6 +29,14 @@ def calculate_checksum(bytes):
 	return (~sum) & 0xffff
 
 def pack_echo_header(id, data, sequence=1):
+	r"""
+	Assemble an ICMP echo header
+
+	>>> pack_echo_header(1, 'echo-request')
+	'\x08\x00\xaco\x01\x00\x01\x00'
+	>>> pack_echo_header(2, 'second-request')
+	'\x08\x004\t\x02\x00\x01\x00'
+	"""
 	ICMP_ECHO_REQUEST = 8
 	code = 0
 	sequence = 1
@@ -43,6 +52,10 @@ def ping(dest_addr, timeout = 2):
 
 	>>> ping('127.0.0.1')
 	datetime.timedelta(...)
+	>>> ping('10.10.10.254') # expect this address not to respond
+	Traceback (most recent call last):
+	...
+	timeout: timed out
 	"""
 	icmp_proto = socket.getprotobyname('icmp')
 	icmp_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp_proto)
@@ -68,12 +81,15 @@ def ping(dest_addr, timeout = 2):
 	return delay
 
 def wait_for_host(host):
+	"""
+	Continuously wait for a host until it becomes available. When it does,
+	return the datetime when it occurred.
+	"""
 	while True:
 		try:
 			ping(host)
 			break
 		except socket.error:
 			pass
-	import datetime
-	return datetime.datetime.now()
+	return datetime.datetime.utcnow()
 
