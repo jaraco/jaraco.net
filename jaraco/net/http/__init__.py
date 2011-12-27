@@ -44,7 +44,7 @@ class Query(dict):
 			items = query.split('&')
 			# remove any empty values
 			items = filter(None, items)
-			itemPairs = map(jaraco.util.string.splitter('='), items)
+			itemPairs = map(jaraco.util.string.Splitter('='), items)
 			unquoteSequence = lambda l: map(urllib.unquote, l)
 			query = map(unquoteSequence, itemPairs)
 		if isinstance(query, (tuple, list)):
