@@ -59,13 +59,3 @@ class URLImporter(str):
 		if path_p.scheme in ('http', 'https'):
 			return cls(path)
 		raise ImportError(path)
-
-def test_importer():
-	# todo - change this logging to a context
-	logging.basicConfig(level=logging.DEBUG)
-	URLImporter.install()
-	sys.path.append('http://python-distribute.org/')
-	try:
-		import distribute_setup
-	finally:
-		URLImporter.remove()
