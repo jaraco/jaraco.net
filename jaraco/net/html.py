@@ -19,18 +19,15 @@ class HTMLObject(object):
 		self.name = name
 
 class HTMLTable(list):
-	currentRow = None
+	current_row = None
 
 class HTMLRow(list):
-	currentElement = None
+	current_element = None
 
 class HTMLElement(object):
 	"A mutable variant object"
 	def __init__(self):
 		self.value = None
-
-	def setValue(self, value):
-		self.value = value
 
 	def append(self, value):
 		if type(self.value) == types.ListType:
@@ -48,9 +45,6 @@ class HTMLElement(object):
 	def __repr__(self):
 		return repr(self.value)
 
-	def getValue(self):
-		return self.value
-
 class TableParser(htmllib.HTMLParser):
 	"""
 	Parse any number of tables from an HTML file.  Attempts to parse incorrect
@@ -61,90 +55,91 @@ class TableParser(htmllib.HTMLParser):
 	def __init__(self):
 		htmllib.HTMLParser.__init__(self, formatter.NullFormatter())
 		self.tables = []
-		self.currentTable = None
+		self.current_table = None
 
 	def start_table(self, attrs):
-		if self.currentTable:
+		if self.current_table:
 			# We were already in a table, so grab any data that was already
 			#  parsed for this element.
-			self.saveCurrent()
-		newTable = HTMLTable()
-		self.tables.append(newTable)
-		newTable.parentTable = self.currentTable
-		self.currentTable = newTable
-		self.currentTable.extraRows = {}
+			self.save_current()
+		new_table = HTMLTable()
+		self.tables.append(new_table)
+		new_table.parent_table = self.current_table
+		self.current_table = new_table
+		self.current_table.extra_rows = {}
 
 	def end_table(self):
-		self.currentTable = self.currentTable.parentTable
-		if self.currentTable:
+		self.current_table = self.current_table.parent_table
+		if self.current_table:
 			# we were already in a table, so start saving data again.
 			self.save_bgn()
 
 	def start_tr(self, attrs):
 		self.end_tr()
-		newRow = HTMLRow()
-		self.currentTable.append(newRow)
-		self.currentTable.currentRow = newRow
+		new_row = HTMLRow()
+		self.current_table.append(new_row)
+		self.current_table.current_row = new_row
 
 	def end_tr(self):
-		if self.currentTable.currentRow is None:
+		if self.current_table.current_row is None:
 			#do nothing and
 			return
-		self.checkForExtraRows()
+		self.check_for_extra_rows()
 		# The following two statements might be a bit confusing, so here's
 		#  some background. The first statement replaces all elements in the
 		#  current row with elements converted to strings.  It uses the [:]
 		#  notation so it modifies the existing object in place and doesn't
 		#  just replace it... and since that object is referenced by the list
-		#  of rows in the currentTable, that list will also be modified. The
-		#  second statement removes the currentRow reference, but the object
-		#  is still referenced by the list of rows in the currentTable.
-		self.currentTable.currentRow[:] = map(lambda x: x.getValue(),
-			self.currentTable.currentRow)
-		self.currentTable.currentRow = None
+		#  of rows in the current_table, that list will also be modified. The
+		#  second statement removes the current_row reference, but the object
+		#  is still referenced by the list of rows in the current_table.
+		self.current_table.current_row[:] = (
+			x.value for x in self.current_table.current_row
+		)
+		self.current_table.current_row = None
 
 	def start_td(self, attrs):
-		if self.currentTable.currentRow is None:
+		if self.current_table.current_row is None:
 			# found a <td> tag not preceeded by a <tr> tag, so one is implied.
 			self.start_tr({})
-		self.checkForExtraRows()
+		self.check_for_extra_rows()
 		attrs = dict(attrs)
 		try:
 			# TODO: assign for additional columns as well if 'colspan' is set
-			currentColumnNumber = len(self.currentTable.currentRow)
-			self.currentTable.extraRows[currentColumnNumber] = (
+			current_column_number = len(self.current_table.current_row)
+			self.current_table.extra_rows[current_column_number] = (
 				int(attrs['rowspan']) - 1
 			)
 		except KeyError:
 			pass
 		try:
-		    self.currentTable.currentRow.extraCols = int(attrs['colspan']) - 1
+		    self.current_table.current_row.extraCols = int(attrs['colspan']) - 1
 		except KeyError:
-			self.currentTable.currentRow.extraCols = 0
-		newElement = HTMLElement()
-		self.currentTable.currentRow.append(newElement)
-		self.currentTable.currentRow.currentElement = newElement
+			self.current_table.current_row.extraCols = 0
+		new_element = HTMLElement()
+		self.current_table.current_row.append(new_element)
+		self.current_table.current_row.current_element = new_element
 		# start remembering the contents of the element
 		self.save_bgn()
 
 	def end_td(self):
-		self.saveCurrent()
+		self.save_current()
 		# fill in blanks for the extra columns
-		self.currentTable.currentRow.extend(
-			[HTMLElement()] * self.currentTable.currentRow.extraCols)
+		self.current_table.current_row.extend(
+			[HTMLElement()] * self.current_table.current_row.extraCols)
 		)
-		self.currentTable.currentRow.currentElement = None
+		self.current_table.current_row.current_element = None
 
-	def saveCurrent(self):
-		self.currentTable.currentRow.currentElement.append(self.save_end())
+	def save_current(self):
+		self.current_table.current_row.current_element.append(self.save_end())
 
-	def checkForExtraRows(self):
-		currentColumnNumber = len(self.currentTable.currentRow)
-		extraRows = self.currentTable.extraRows
-		if extraRows.has_key(currentColumnNumber):
-			extraRows[currentColumnNumber] -= 1
-			self.currentTable.currentRow.append(HTMLElement())
-			if extraRows[currentColumnNumber] == 0:
-				del extraRows[currentColumnNumber]
+	def check_for_extra_rows(self):
+		current_column_number = len(self.current_table.current_row)
+		extra_rows = self.current_table.extra_rows
+		if extra_rows.has_key(current_column_number):
+			extra_rows[current_column_number] -= 1
+			self.current_table.current_row.append(HTMLElement())
+			if extra_rows[current_column_number] == 0:
+				del extra_rows[current_column_number]
 			# Now check again
-			self.checkForExtraRows()
+			self.check_for_extra_rows()
