@@ -12,27 +12,25 @@ import struct
 import socket
 import itertools
 import logging.handlers
-from optparse import OptionParser
+import argparse
 
-import inet
+import jaraco.util.logging
+
+from . import inet
 
 log = logging.getLogger('port scanner')
 
 def GetParser():
-	usage = 'usage: %prog [options]'
-	parser = OptionParser(usage)
-	parser.add_option('-l', '--logging-level',
-					   help="Set the logging level (DEBUG, INFO, WARNING, ERROR)",
-					   default = 'INFO')
-	parser.add_option('-o', '--host-spec',
-					   help="The host range or host range to scan",
-					   default = r'localhost')
-	parser.add_option('-p', '--port-range',
-					   help="Port range to scan",
-					   default = '[25,80]')
-	parser.add_option('-f', '--frequency', default = 20, type="int",
-					   help="Frequency (Hz) of connection attempt")
-	description=  """No Description"""
+	parser = argparse.ArgumentParser()
+	jaraco.util.logging.add_arguments(parser)
+	parser.add_argument('-o', '--host-spec',
+		help="The host range or host range to scan",
+		default = r'localhost')
+	parser.add_argument('-p', '--port-range',
+		help="Port range to scan",
+		default = '[25,80]')
+	parser.add_argument('-f', '--frequency', default = 20, type=int,
+		help="Frequency (Hz) of connection attempt")
 	return parser
 
 def setupLogger(output_level):
