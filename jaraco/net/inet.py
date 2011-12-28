@@ -13,6 +13,8 @@ Objects:
 Copyright © 2004-2011 Jason R. Coombs
 """
 
+from __future__ import division
+
 import threading
 import socket
 import sys
@@ -86,7 +88,7 @@ def portscan(host, ports = range(1024), frequency = 20):
 	for tester in testers:
 		log.debug('starting tester')
 		tester.start()
-		time.sleep(1.0/frequency)
+		time.sleep(1/frequency)
 		
 class PortListener(threading.Thread):
 	def __init__(self, port):
@@ -118,11 +120,11 @@ class PortRangeListener(object):
 	def __init__(self):
 		self.ranges = [range(1, 1024)]
 
-	def Listen(self):
+	def listen(self):
 		ports = reduce(operator.add, self.ranges)
 		ports.sort()
 		self.threads = map(PortListener, ports)
-		map(lambda t: t.start(), self.threads)
+		[t.start for t in self.threads]
 
 def ping_host(host):
 	try:
