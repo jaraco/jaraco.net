@@ -1,21 +1,21 @@
-#!python
-
-# $Id$
-
 """
-  scanner.py
+scanner.py
 
 TCP port scanning utility
 """
 
-import os, operator, sys
-import re, struct, socket, itertools
+import os
+import operator
+import sys
+import re
+import struct
+import socket
+import itertools
+import logging.handlers
 from optparse import OptionParser
 
 import inet
-from logging.handlers import TimedRotatingFileHandler
 
-import logging
 log = logging.getLogger('port scanner')
 
 def GetParser():
@@ -43,7 +43,8 @@ def setupLogger(output_level):
 	logbase = os.path.join(logdir, 'scan.log')
 	if not os.path.isdir(logdir):
 		os.makedirs(logdir)
-	logfilehandler = TimedRotatingFileHandler(logbase, when='d')
+	logfilehandler = logging.handlers.TimedRotatingFileHandler(
+		logbase, when='d')
 	logfilehandler.level = logging.INFO
 	handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] %(message)s'
 	formatter = logging.Formatter(handlerFormat)
