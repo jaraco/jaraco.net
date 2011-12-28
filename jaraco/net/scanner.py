@@ -37,14 +37,16 @@ def setup_logger(output_level):
 	outputHandler = logging.StreamHandler(sys.stdout)
 	outputHandler.level = getattr(logging, output_level.upper())
 	logging.root.handlers.append(outputHandler)
-	logdir = os.path.join(os.environ['SystemRoot'], 'system32', 'logfiles', 'portscan')
+	logdir = os.path.join(os.environ['SystemRoot'], 'system32',
+		'logfiles', 'portscan')
 	logbase = os.path.join(logdir, 'scan.log')
 	if not os.path.isdir(logdir):
 		os.makedirs(logdir)
 	logfilehandler = logging.handlers.TimedRotatingFileHandler(
 		logbase, when='d')
 	logfilehandler.level = logging.INFO
-	handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] %(message)s'
+	handlerFormat = ('[%(asctime)s] - %(levelname)s - [%(name)s] '
+		'%(message)s')
 	formatter = logging.Formatter(handlerFormat)
 	logfilehandler.setFormatter(formatter)
 	logging.root.handlers.append(logfilehandler)
