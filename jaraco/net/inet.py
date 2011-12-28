@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 """
-IPTools
+inet.py
+
 Tools for IP communication.
 
 Objects:
@@ -9,39 +10,40 @@ Objects:
 	PortListener: listens on a port
 	PortRangeListener: listens on a range of ports
 	
-Copyright © 2004-2009 Jason R. Coombs
+Copyright © 2004-2011 Jason R. Coombs
 """
 
-__author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
-__version__ = '$Revision$a'[11:-2]
-__svnauthor__ = '$Author$'[9:-2]
-__date__ = '$Date$'[7:-2]
-
-import threading, socket, sys, operator, time
-
+import threading
+import socket
+import sys
+import operator
+import time
 import logging
-log = logging.getLogger('IP Tools')
+
+from . import icmp
+
+log = logging.getLogger(__name__)
 
 class PortScanner(object):
 	def __init__(self):
 		self.ranges = [range(1, 1024)]
-		self.nThreads = 100
+		self.n_threads = 100
 		
-	def SetRange(self, *r):
+	def set_range(self, *r):
 		self.ranges = [range(*r)]
 
-	def AddRange(self, *r):
+	def add_range(self, *r):
 		self.ranges.append(range(*r))
 
 class ScanThread(threading.Thread):
-	allTesters = []
+	all_testers = []
 	
 	def __init__(self, address):
 		threading.Thread.__init__(self)
 		self.address = address
 		
 	def run(self):
-		ScanThread.allTesters.append(self)
+		ScanThread.all_testers.append(self)
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		try:
 			s.connect(self.address)
@@ -52,32 +54,34 @@ class ScanThread(threading.Thread):
 		
 		self.report()
 
-	def __str__(self):
-		resultMsg = {
-			True: '%(address)s connection established.',
-			False: '%(address)s connection failed.',
-			None: '%(address)s no result obtained.'}
-		resultMsg = resultMsg[getattr(self,'result',None)]
-		return resultMsg % vars(self)
+	def __unicode__(self):
+		msg_map = {
+			True: '{address} connection established.',
+			False: '{address} connection failed.',
+			None: '{address} no result obtained.'
+		}
+		msg_fmt = msg_map[getattr(self, 'result', None)]
+		return msg_fmt.format(**vars(self))
 		
 	def report(self):
-		log_method = {
+		log_method_map = {
 			True: log.info,
 			False: log.debug,
-			None: log.error}
-		log_method = log_method[getattr(self,'result',None)]
-		log_method(str(self))
+			None: log.error
+		}
+		log_method = log_method_map[getattr(self, 'result', None)]
+		log_method(unicode(self))
 
-	def waitForTestersToFinish():
-		map(lambda x: x.join(), ScanThread.allTesters)
-	waitForTestersToFinish = staticmethod(waitForTestersToFinish)
+	@staticmethod
+	def wait_for_testers_to_finish():
+		map(lambda x: x.join(), ScanThread.all_testers)
 
 def portscan_hosts(hosts, *args, **kargs):
 	map(lambda h: portscan(h, *args, **kargs), hosts)
 
 def portscan(host, ports = range(1024), frequency = 20):
-	makeAddress = lambda port: (host, port)
-	addresses = map(makeAddress, ports)
+	make_address = lambda port: (host, port)
+	addresses = map(make_address, ports)
 	testers = map(ScanThread, addresses)
 	for tester in testers:
 		log.debug('starting tester')
@@ -98,12 +102,17 @@ class PortListener(threading.Thread):
 			s.listen(1)
 			while 1:
 				conn, addr = s.accept()
-				self.output.write('Received connection on %d from %s.\n' % (self.port, str(addr)))
+				self.output.write(
+					'Received connection on {self.port} from {addr}.\n'
+					.format(**vars())
+				)
 				conn.close()
 		except socket.error, e:
 			if e[0] == 10048:
-				self.output.write('Cannot listen on port %d: Address already in use.\n' % self.port)
-			else: raise
+				self.output.write('Cannot listen on port %d: Address '
+					'already in use.\n' % self.port)
+			else:
+				raise
 
 class PortRangeListener(object):
 	def __init__(self):
@@ -116,9 +125,10 @@ class PortRangeListener(object):
 		map(lambda t: t.start(), self.threads)
 
 def ping_host(host):
-	x = os.system("ping %s -n 1" % host)
-	if x:
-		print("Either %s is offline, or ping request has been blocked." %ip)
-	else:
-		print("%s is online." %ip)
-		
+	try:
+		icmp.ping(host)
+		msg = "{host} is online"
+	except socket.error:
+		msg = ("Either {host} is offline or ping request has been "
+			"blocked.")
+	print(msg.format(**vars()))
