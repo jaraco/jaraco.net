@@ -18,9 +18,9 @@ import jaraco.util.logging
 
 from . import inet
 
-log = logging.getLogger('port scanner')
+log = logging.getLogger(__name__)
 
-def GetParser():
+def get_args():
 	parser = argparse.ArgumentParser()
 	jaraco.util.logging.add_arguments(parser)
 	parser.add_argument('-o', '--host-spec',
@@ -31,9 +31,9 @@ def GetParser():
 		default = '[25,80]')
 	parser.add_argument('-f', '--frequency', default = 20, type=int,
 		help="Frequency (Hz) of connection attempt")
-	return parser
+	return parser.parse_args()
 
-def setupLogger(output_level):
+def setup_logger(output_level):
 	outputHandler = logging.StreamHandler(sys.stdout)
 	outputHandler.level = getattr(logging, output_level.upper())
 	logging.root.handlers.append(outputHandler)
@@ -47,7 +47,7 @@ def setupLogger(output_level):
 	handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] %(message)s'
 	formatter = logging.Formatter(handlerFormat)
 	logfilehandler.setFormatter(formatter)
-	logging.root.handlers.append(logfilehandler )
+	logging.root.handlers.append(logfilehandler)
 	logging.root.level = 0
 
 def _get_mask_host(host_spec, matcher):
@@ -82,7 +82,8 @@ def _get_named_host(spec, matcher):
 	infos = iter(socket.getaddrinfo(spec, None))
 	sockaddrs = [sockaddr for
 		family, socktype, proto, canonname, sockaddr in infos]
-	hosts = [host for host, port in sockaddrs]
+	get_host = operator.itemgetter(0)
+	hosts = map(get_host, sockaddrs)
 	return hosts
 
 def get_hosts(host_spec):
@@ -122,17 +123,13 @@ def get_hosts(host_spec):
 	raise ValueError("Could not recognize host spec %s" % host_spec)
 
 def scan():
-	parser = GetParser()
-	options, args = parser.parse_args()
-	if not len(args) == 0:
-		parser.error('Incorrect number of arguments supplied')
-		sys.exit(1)
-	setupLogger(options.logging_level)
+	args = get_args()
+	setup_logger(args.log_level)
 	try:
-		ports = eval(options.port_range)
-		hosts = get_hosts(options.host_spec)
-		inet.portscan_hosts(hosts, ports, options.frequency)
-		inet.ScanThread.waitForTestersToFinish()
+		ports = eval(args.port_range)
+		hosts = get_hosts(args.host_spec)
+		inet.portscan_hosts(hosts, ports, args.frequency)
+		inet.ScanThread.wait_for_testers_to_finish()
 	except KeyboardInterrupt:
 		log.info('Terminated by user')
 	except:
