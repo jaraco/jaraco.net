@@ -20,8 +20,9 @@ def logging_context(**kwargs):
 def test_importer():
 	with logging_context(level=logging.DEBUG):
 		importer.URLImporter.install()
-		sys.path.append('http://python-distribute.org/')
+		sys.path.append('http://dl.dropbox.com/u/54081/modules/')
 		try:
-			import distribute_setup
+			import tester
+			assert tester.echo(True, x=3) == ((True,), dict(x=3))
 		finally:
 			importer.URLImporter.remove()
