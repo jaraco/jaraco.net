@@ -34,27 +34,21 @@ def parse_filter(filter_string):
 	spec_date = date_parser.parse(date_string)
 	return lambda entry: op(datetime.datetime(*entry.updated_parsed[:6]), spec_date)
 
-class CombinedFilter(object):
-	def __init__(self, filters):
-		self.filters = filters
-
+class CombinedFilter(list):
+	"""
+	A list of callables that can be applied to a filter call.
+	"""
 	def __call__(self, subject):
-		results = [filter(subject) for filter in self.filters]
-		return reduce(operator.and_, results, True)
-
-def _parse_filters(args):
-	filters = map(parse_filter, args.date_filter)
-	args.date_filter = CombinedFilter(filters)
+		return all(filter(subject) for filter in self)
 
 def _parse_args(parser=None):
 	parser = parser or argparse.ArgumentParser()
 	parser.add_argument('url')
 	parser.add_argument('-f', '--date-filter',
-		help="add a date filter such as 'before 2006'", default=[],
-		action="append")
+		help="add a date filter such as 'before 2006'",
+		default=CombinedFilter(), action="append", type=parse_filter)
 	jaraco.util.logging.add_arguments(parser)
 	args = parser.parse_args()
-	_parse_filters(args)
 	jaraco.util.logging.setup(args)
 	return args
 
