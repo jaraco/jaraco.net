@@ -1,65 +1,61 @@
 import sys
-from socket import *
+import socket
+import argparse
 
 class EchoServer(object):
 	def __init__(self):
-		options, args = self.get_options()
-		if args:
-			raise RuntimeError, 'Incorrect arguments'
-		self.serve(options)
+		args = self._get_args()
+		self.serve(args)
 
-	def get_options(self):
-		from optparse import OptionParser
-		parser = OptionParser()
-		parser.add_option("-p", "--port",
-						   help="listen on this port", type="int",
-						   default=9999)
+	@staticmethod
+	def _get_args():
+		parser = argparse.ArgumentParser()
+		parser.add_argument("-p", "--port",
+			help="listen on this port", type=int,
+			default=9999)
 		return parser.parse_args()
 
-	def serve(self, options):
+	def serve(self, args):
 		host = ''
-		port = options.port
-		infos = getaddrinfo(host, port)
+		port = args.port
+		infos = socket.getaddrinfo(host, port)
 		(family, socktype, proto, canonname, sockaddr) = infos[0]
-		s = socket(family, SOCK_DGRAM)
+		s = socket.socket(family, socket.SOCK_DGRAM)
 		s.settimeout(1)
-		s.bind(('', options.port))
+		s.bind(('', args.port))
 		while True:
 			try:
 				res, addr = s.recvfrom(1024)
 				print res, addr
-			except timeout:
+			except socket.timeout:
 				pass
 			except KeyboardInterrupt:
 				break
 
 class Sender(object):
 	def __init__(self):
-		self.options, args = self.get_options()
-		if len(args) != 0:
-			raise RuntimeError, 'Bad arguments provided'
+		self.args = self._get_args()
 		self.send_message()
-		
+
 	def send_message(self):
-		host, port = self.options.connect.split(':')
-		infos = getaddrinfo(host, port)
+		host, port = self.args.connect.split(':')
+		infos = socket.getaddrinfo(host, port)
 		(family, socktype, proto, canonname, sockaddr) = infos[0]
 		self.sockaddr = sockaddr
-		s = socket(family, SOCK_DGRAM)
+		s = socket(family, sock.SOCK_DGRAM)
 		s.connect(sockaddr)
-		s.send(self.options.message)
+		s.send(self.args.message)
 		s.close()
 
-	def get_options(self):
-		from optparse import OptionParser
-		parser = OptionParser()
+	@staticmethod
+	def _get_args():
+		parser = argparse.ArgumentParser()
 		parser.add_option("-m", "--message",
-						   help="send this message", default="message!")
+			help="send this message", default="message!")
 		parser.add_option('-c', '--connect',
-						   help="host:port to connect to",
-						   default="localhost:9999")
+			help="host:port to connect to",
+			default="localhost:9999")
 		return parser.parse_args()
 
 	def __repr__(self):
-		return 'message sent to %(sockaddr)s' % self.__dict__
-		
+		return 'message sent to {sockaddr}'.format(**vars(self))
