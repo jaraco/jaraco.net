@@ -48,8 +48,7 @@ def _parse_filters(args):
 
 def _parse_args(parser=None):
 	parser = parser or argparse.ArgumentParser()
-	parser.add_argument('-u', '--url', nargs=1)
-	#parser.add_argument('-r', '--reverse', help="show in reverse order")
+	parser.add_argument('url')
 	parser.add_argument('-f', '--date-filter',
 		help="add a date filter such as 'before 2006'", default=[],
 		action="append")
