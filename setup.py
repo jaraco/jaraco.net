@@ -30,7 +30,7 @@ setup_params = dict(
 	namespace_packages = ['jaraco',],
 	license = 'MIT',
 	classifiers = [
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Intended Audience :: Developers",
 		"Programming Language :: Python",
 	],
@@ -62,6 +62,7 @@ setup_params = dict(
 		'clientform>=0.2.7',
 		'BeautifulSoup',
 		'keyring>=0.6',
+		'feedparser',
 	] + py26reqs,
 	extras_require = {
 	},
