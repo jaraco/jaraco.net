@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-from socket import *
+import socket
 import struct
 import sys
 import time
@@ -18,27 +16,28 @@ def query(server, force_ipv6=False):
 	timeout = 3
 	ntp_port = 123
 
-	family = AF_INET6 if force_ipv6 else 0
-	sock_type = SOCK_DGRAM
+	family = socket.AF_INET6 if force_ipv6 else 0
+	sock_type = socket.SOCK_DGRAM
 
-	infos = getaddrinfo(server, ntp_port, family, sock_type)
+	infos = socket.getaddrinfo(server, ntp_port, family, sock_type)
 
 	log.debug(infos)
 	family, socktype, proto, canonname, sockaddr = infos[0]
-	socktype = SOCK_DGRAM
 
 	log.info('Requesting time from %(sockaddr)s' % vars())
-	client = socket(family=family, type=socktype, proto=proto)
+	client = socket.socket(family=family, type=sock_type, proto=proto)
 	client.settimeout(timeout)
 
 	data = '\x1b' + 47 * '\0'
 	client.sendto(data, sockaddr)
 	data, address = client.recvfrom(1024)
-	if data:
-		log.info('Response received from: %s', address)
-		t = struct.unpack('!12I', data)[10]
-		t -= TIME1970
-		log.info('\tTime=%s', time.ctime(t))
+	if not data:
+		return
+
+	log.info('Response received from: %s', address)
+	t = struct.unpack('!12I', data)[10]
+	t -= TIME1970
+	log.info('\tTime=%s', time.ctime(t))
 
 def handle_command_line():
 	"""
