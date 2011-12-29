@@ -2,10 +2,8 @@
 Routines for handling RSS feeds
 """
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import
 
-import feedparser
 import itertools
 import subprocess
 import os
@@ -17,11 +15,14 @@ import sys
 import mimetypes
 import urllib2
 import logging
-import jaraco.util.logging
-from jaraco.util.filesystem import encode as encode_filename
-from jaraco.net.http import get_url
-from dateutil import parser as date_parser
 from optparse import OptionParser
+
+import feedparser
+import jaraco.util.logging
+from dateutil import parser as date_parser
+from jaraco.util.filesystem import encode as encode_filename
+
+from jaraco.net.http import get_url
 
 log = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ def download_enclosures():
 	for entry in filter(options.date_filter, d['entries']):
 		enclosure = entry.enclosures.pop()
 		assert not entry.enclosures, "Only support one enclosure per item"
-		
+
 		title = entry.title
 		ext = mimetypes.guess_extension(enclosure.type) or '.mp3'
 		filename = title + ext
@@ -90,7 +91,7 @@ def load_feed_enclosure(url, filter_=None, index=None):
 	d = feedparser.parse(url)
 	print('loaded', d['feed']['title'])
 	filtered_entries = filter(filter_, d['entries'])
-	
+
 	if index is None:
 		for i, entry in enumerate(filtered_entries):
 			fmt = unicode('{0:4d} {1}')
@@ -105,7 +106,7 @@ def load_feed_enclosure(url, filter_=None, index=None):
 		r'C:\Program Files\Windows Media Player\wmplayer.exe',
 		r'C:\Program Files (x86)\Windows Media Player\wmplayer.exe',
 		)
-	player = itertools.ifilter(os.path.exists, player_search).next()
+	player = next(itertools.ifilter(os.path.exists, player_search))
 
 	command = [player, filtered_entries[index].enclosures[0].href]
 	print('running', subprocess.list2cmdline(command))
