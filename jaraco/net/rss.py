@@ -15,7 +15,7 @@ import sys
 import mimetypes
 import urllib2
 import logging
-from optparse import OptionParser
+import argparse
 
 import feedparser
 import jaraco.util.logging
@@ -42,26 +42,27 @@ class CombinedFilter(object):
 		results = [filter(subject) for filter in self.filters]
 		return reduce(operator.and_, results, True)
 
-def _parse_filters(options):
-	filters = map(parse_filter, options.date_filter)
-	options.date_filter = CombinedFilter(filters)
+def _parse_filters(args):
+	filters = map(parse_filter, args.date_filter)
+	args.date_filter = CombinedFilter(filters)
 
 def _parse_args(parser=None):
-	parser = parser or OptionParser()
-	parser.add_option('-u', '--url')
-	#parser.add_option('-r', '--reverse', help="show in reverse order")
-	parser.add_option('-f', '--date-filter', help="add a date filter such as 'before 2006'", default=[], action="append")
-	jaraco.util.logging.add_options(parser)
-	options, args = parser.parse_args()
-	if not options.url: parser.error("URL is required")
-	_parse_filters(options)
-	jaraco.util.logging.setup(options)
-	return options, args
+	parser = parser or argparse.ArgumentParser()
+	parser.add_argument('-u', '--url', n_args=1)
+	#parser.add_argument('-r', '--reverse', help="show in reverse order")
+	parser.add_argument('-f', '--date-filter',
+		help="add a date filter such as 'before 2006'", default=[],
+		action="append")
+	jaraco.util.logging.add_arguments(parser)
+	args = parser.parse_args()
+	_parse_filters(args)
+	jaraco.util.logging.setup(args)
+	return args
 
 def download_enclosures():
-	options, args = _parse_args()
-	d = feedparser.parse(options.url)
-	for entry in filter(options.date_filter, d['entries']):
+	args = _parse_args()
+	d = feedparser.parse(args.url)
+	for entry in filter(args.date_filter, d['entries']):
 		enclosure = entry.enclosures.pop()
 		assert not entry.enclosures, "Only support one enclosure per item"
 
@@ -81,11 +82,11 @@ def launch_feed_enclosure():
 	"""
 	RSS Feed Launcher
 	"""
-	parser = OptionParser(usage=launch_feed_enclosure.__doc__)
-	parser.add_option('-i', '--index', help="launch feed found at specified index")
-	options, args = _parse_args(parser)
-	assert not args, "Positional arguments not allowed"
-	load_feed_enclosure(options.url, options.date_filter, options.index)
+	parser = argparse.ArgumentParser(usage=launch_feed_enclosure.__doc__)
+	parser.add_argument('-i', '--index',
+		help="launch feed found at specified index")
+	args = _parse_args(parser)
+	load_feed_enclosure(args.url, args.date_filter, args.index)
 
 def load_feed_enclosure(url, filter_=None, index=None):
 	d = feedparser.parse(url)
