@@ -1,22 +1,20 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import socket
-from optparse import OptionParser
+import argparse
 
 from jaraco.util.string import local_format as lf
 
 def get_connect_options():
-	parser = OptionParser(conflict_handler="resolve")
-	parser.add_option('-h', '--host', default='localhost')
-	parser.add_option('-p', '--port', default=80, type='int')
-	options, args = parser.parse_args()
-	if not len(args) == 0:
-		parser.error("Unexpected positional argument")
-	return options
+	parser = argparse.ArgumentParser(conflict_handler="resolve")
+	parser.add_argument('-h', '--host', default='localhost')
+	parser.add_argument('-p', '--port', default=80, type=int)
+	args = parser.parse_args()
+	return args
 
 def test_connect():
-	options = get_connect_options()
-	addr = options.host, options.port
+	args = get_connect_options()
+	addr = args.host, args.port
 	family, socktype, proto, canonname, sockaddr = socket.getaddrinfo(*addr)[0]
 	sock = socket.socket(family, socktype, proto)
 	try:
@@ -24,9 +22,7 @@ def test_connect():
 	except socket.error as e:
 		print(e)
 		raise SystemExit(1)
-	args = vars(options)
-	host, port = addr
-	print(lf("Successfully connected to {host} on port {port}"))
+	print(lf("Successfully connected to {args.host} on port {args.port}"))
 
 def start_echo_server():
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
