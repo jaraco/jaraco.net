@@ -55,6 +55,8 @@ setup_params = dict(
 			'build-dir-index = jaraco.net.site:make_index_cmd',
 			'content-type-reporter = jaraco.net.http.content:ContentTypeReporter.run',
 			'web-tail = jaraco.net.tail:handle_command_line',
+			'rss-launch = jaraco.net.rss:launch_feed_enclosure',
+			'rss-download = jaraco.net.rss:download_enclosures',
 			] + windows_scripts,
 	},
 	install_requires=[
