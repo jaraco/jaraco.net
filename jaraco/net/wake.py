@@ -1,8 +1,10 @@
 import struct
 import socket
 
+from jaraco.util.string import local_format as lf
+
 def wake_on_lan(self, addr='00:00:00:00:00:00'):
-	"wake up a computer on the network"
+	"Wake up a computer on the network"
 	bytes = map(lambda bs: int(bs,16), addr.split(':'))
 	binary_addr = struct.pack('BBBBBB', *bytes)
 	magic_packet = '\xff'*6 + binary_addr*16
@@ -10,4 +12,4 @@ def wake_on_lan(self, addr='00:00:00:00:00:00'):
 	s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 	s.sendto(magic_packet, ('<broadcast>', 9))
 	s.close()
-	return 'Woke up the computer at %s' % addr
+	return lf('Woke up the computer at {addr}')
