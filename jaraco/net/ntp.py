@@ -13,6 +13,9 @@ log = logging.getLogger(__name__)
 TIME1970 = 2208988800L		# Thanks to F.Lundh
 
 def query(server, force_ipv6=False):
+	"""
+	>>> query('us.pool.ntp.org')
+	"""
 	timeout = 3
 	ntp_port = 123
 
