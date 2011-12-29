@@ -57,7 +57,7 @@ setup_params = dict(
 			'web-tail = jaraco.net.tail:handle_command_line',
 			'rss-launch = jaraco.net.rss:launch_feed_enclosure',
 			'rss-download = jaraco.net.rss:download_enclosures',
-			] + windows_scripts,
+		] + windows_scripts,
 	},
 	install_requires=[
 		'jaraco.util>=4.2.2',
