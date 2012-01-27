@@ -30,7 +30,9 @@ from BeautifulSoup import BeautifulSoup, UnicodeDammit
 from jaraco.util.meta import LeafClassesMeta
 
 try:
-	import win32service, win32serviceutil, win32event
+	import win32service
+	import win32serviceutil
+	import win32event
 except ImportError:
 	pass
 
@@ -85,7 +87,7 @@ class WhoisHandler(object):
 				'Domain for %s is not serviced by this server.',
 				'Server error, ambiguous nic server resolution for %s.',
 				][bool(len(matches))]
-			raise ValueError, error % query
+			raise ValueError(error % query)
 		return matches[0](query)
 
 	def _IsWhoisHandler_(ob):
@@ -110,10 +112,10 @@ class ArgentinaWhoisHandler(WhoisHandler):
 		form = ParseResponse(urllib2.urlopen(pageURL))[0]
 		form['nombre'] = query[:query.find('.')]
 		try:
-			domain = query[query.find('.') :]
+			domain = query[query.find('.'):]
 			form['dominio'] = [domain]
 		except ItemNotFoundError:
-			raise ValueError, 'Invalid domain (%s)' % domain
+			raise ValueError('Invalid domain (%s)' % domain)
 		req = form.click()
 		#req.data = 'nombre=%s&dominio=.com.ar' % query
 		req.add_header('referer', pageURL)
@@ -122,7 +124,7 @@ class ArgentinaWhoisHandler(WhoisHandler):
 
 	class _parser(htmllib.HTMLParser):
 		def start_tr(self, attrs):
-			pass # have to define this for end_tr to be called.
+			"One must define start_tr for end_tr to be called."
 
 		def end_tr(self):
 			self.formatter.add_line_break()
@@ -143,6 +145,7 @@ class CoZaWhoisHandler(WhoisHandler):
 
 class GovWhoisHandler(WhoisHandler):
 	services = r'(\.fed\.us|\.gov)$'
+
 	def LoadHTTP(self):
 		query = self._query
 		# Perform an whois query on the dotgov server.
@@ -166,7 +169,7 @@ class GovWhoisHandler(WhoisHandler):
 		"agree to the dotgov agreement"
 		agree_req = form.click()
 		u2 = urllib2.urlopen(agree_req)
-		resp = u2.read()
+		u2.read()
 
 	class _parser(htmllib.HTMLParser):
 		def __init__(self, formatter):
@@ -206,6 +209,7 @@ class BoliviaPageGetter(PageGetter):
 
 class BoliviaWhoisHandler(WhoisHandler):
 	services = r'\.bo$'
+
 	class _parser(htmllib.HTMLParser):
 		def anchor_end(self):
 			if self.anchor:
@@ -246,12 +250,16 @@ class SourceWhoisHandler(WhoisHandler):
 class DebugHandler(WhoisHandler):
 	services = r'^debug (.*)$'
 	authorized_addresses = ['127.0.0.1']
+
 	def LoadHTTP(self): pass
+
 	def ParseResponse(self, s_out):
 		if self.client_address[0] in self.authorized_addresses:
 			match = re.match(self.services, self._query)
 			s_out.write('result: %s' % eval(match.group(1)))
-del DebugHandler # disable the debug handler
+
+# disable the debug handler
+del DebugHandler
 
 class MyWriter(formatter.DumbWriter):
 	def send_flowing_data(self, data):
