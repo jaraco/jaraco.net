@@ -60,7 +60,7 @@ setup_params = dict(
 		] + windows_scripts,
 	},
 	install_requires=[
-		'jaraco.util>=4.2.2',
+		'jaraco.util>=5.0',
 		'clientform>=0.2.7',
 		'BeautifulSoup',
 		'keyring>=0.6',
