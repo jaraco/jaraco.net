@@ -12,7 +12,7 @@ from setuptools import find_packages
 
 name = 'jaraco.net'
 
-py26reqs = ['argparse'] if sys.version_info < (2,7) else []
+py26reqs = ['argparse'] if sys.version_info < (2, 7) else []
 
 windows_scripts = [
 	'whois-bridge-service = jaraco.net.whois:Service.handle_command_line',
@@ -20,14 +20,14 @@ windows_scripts = [
 
 setup_params = dict(
 	name = name,
-	use_hg_version=dict(increment='1.0'),
+	use_hg_version=dict(increment='0.0.1'),
 	description = 'Networking tools by jaraco',
 	long_description = open('README').read(),
 	author = 'Jason R. Coombs',
 	author_email = 'jaraco@jaraco.com',
 	url = 'http://bitbucket.org/jaraco/' + name,
 	packages = find_packages(),
-	namespace_packages = ['jaraco',],
+	namespace_packages = ['jaraco'],
 	license = 'MIT',
 	classifiers = [
 		"Development Status :: 5 - Production/Stable",
