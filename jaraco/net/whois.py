@@ -25,6 +25,7 @@ import socket
 import select
 import SocketServer
 
+import jaraco.util.logging
 from ClientForm import ParseResponse, ItemNotFoundError
 from BeautifulSoup import BeautifulSoup, UnicodeDammit
 from jaraco.util.meta import LeafClassesMeta
@@ -32,7 +33,7 @@ from jaraco.util.meta import LeafClassesMeta
 try:
 	import win32service
 	import win32serviceutil
-	import win32event
+	import servicemanager
 except ImportError:
 	pass
 
@@ -242,7 +243,9 @@ class SourceWhoisHandler(WhoisHandler):
 	"""This is not a typical Whois handler, but rather a special
 	handler that returns the source of this file"""
 	services = r'^source$'
+
 	def LoadHTTP(self): pass
+
 	def ParseResponse(self, s_out):
 		filename = os.path.splitext(__file__)[0] + '.py'
 		s_out.write(open(filename).read())
@@ -334,8 +337,6 @@ if 'win32serviceutil' in globals():
 			self.listener.server_close()
 
 		def SvcDoRun(self):
-			import servicemanager
-
 			self._setup_logging()
 
 			log.info('%s service is starting.', self._svc_display_name_)
@@ -360,16 +361,15 @@ if 'win32serviceutil' in globals():
 			self.listener.serve_until_closed()
 
 		def _setup_logging(self):
-			from jaraco.util import TimestampFileHandler, LogFileWrapper
 			logfile = os.path.join(os.environ['WINDIR'], 'system32', 'LogFiles', self._svc_display_name_, 'events.log')
-			handler = TimestampFileHandler(logfile)
+			handler = jaraco.util.logging.TimestampFileHandler(logfile)
 			handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] %(message)s'
 			handler.setFormatter(logging.Formatter(handlerFormat))
 			logging.root.addHandler(handler)
 			# if I don't redirect stdoutput and stderr, when the stdio flushes,
 			#  an exception will be thrown and the service will bail
-			sys.stdout = LogFileWrapper('stdout')
-			sys.stderr = LogFileWrapper('stderr')
+			sys.stdout = jaraco.util.logging.LogFileWrapper('stdout')
+			sys.stderr = jaraco.util.logging.LogFileWrapper('stderr')
 			logging.root.level = logging.INFO
 
 		@classmethod
