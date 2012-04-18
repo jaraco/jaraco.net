@@ -39,6 +39,11 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+2.1
+~~~
+
+* Added '--outfile' parameter to fake-http.
+
 2.0
 ~~~
 

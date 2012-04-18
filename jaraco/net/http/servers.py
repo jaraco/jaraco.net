@@ -6,11 +6,12 @@ import re
 import time
 import datetime
 import argparse
+import functools
 
 from jaraco.util.string import local_format as lf
 
 class Simple(object):
-	def __init__(self, host, port, timeout, response_delay):
+	def __init__(self, host, port, timeout, response_delay, outfile):
 		self.__dict__.update(vars())
 		del self.self
 
@@ -28,6 +29,9 @@ class Simple(object):
 			default=80)
 		p.add_argument('-t', '--timeout', type=int, help="Socket timeout",
 			default=3)
+		p.add_argument('-o', '--outfile', default=sys.stdout,
+			type=functools.partial(open, mode='w'), help='save output to file',
+		)
 		seconds = lambda seconds: datetime.timedelta(seconds=seconds)
 		p.add_argument('-d', '--delay', dest='response_delay', type=seconds,
 			help="Artificial delay in response", default=datetime.timedelta())
@@ -55,7 +59,7 @@ class Simple(object):
 			print('Error %s' % e)
 			if content:
 				print('partial result')
-				print(repr(content))
+				print(repr(content), file=self.outfile)
 		finally:
 			self.conn.close()
 
@@ -77,13 +81,12 @@ class Simple(object):
 		print(headers)
 		return headers, content
 
-	@staticmethod
-	def get_content(conn, content='', length=0):
+	def get_content(self, conn, content='', length=0):
 		while len(content) < length:
 			content += conn.recv(1024)
 		bytes = len(content)
 		print('received %(bytes)d bytes content' % vars(), file=sys.stderr)
-		print(content)
+		print(content, file=self.outfile)
 		return content
 
 
