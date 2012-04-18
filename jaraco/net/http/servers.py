@@ -30,7 +30,7 @@ class Simple(object):
 		p.add_argument('-t', '--timeout', type=int, help="Socket timeout",
 			default=3)
 		p.add_argument('-o', '--outfile', default=sys.stdout,
-			type=functools.partial(open, mode='w'), help='save output to file',
+			type=functools.partial(open, mode='wb'), help='save output to file',
 		)
 		seconds = lambda seconds: datetime.timedelta(seconds=seconds)
 		p.add_argument('-d', '--delay', dest='response_delay', type=seconds,
