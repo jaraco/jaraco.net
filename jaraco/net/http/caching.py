@@ -32,22 +32,22 @@ class CacheHandler(urllib2.BaseHandler):
 		if request.get_method() is not 'GET':
 			# defer to other handlers
 			return None
-		
+
 		self._convert_pragma(request.headers)
 
 		# check the request cache-control header
 		cc = self._parse_cache_control(request.headers)
-		
+
 		# check that the user-agent hasn't asked us to bypass the cache
 		if 'no-cache' in cc:
 			return None
-				
+
 		# get the cached response, or None if it's not found
 		cached_resp = CachedResponse.load(self.store.get(key))
 		if not cached_resp and 'only-if-cached' in cc:
 			raise urllib2.HTTPError(request.get_full_url(), 504,
 				'content is not cached', hdrs=None, fp=None)
-		
+
 		if cached_resp and not cached_resp.fresh_for(request.headers):
 			log.debug('request is stale')
 			self._add_stale_cache_request_headers(request, cached_resp)
@@ -142,7 +142,7 @@ class CacheHandler(urllib2.BaseHandler):
 	def _parse_cache_control(headers):
 		"""
 		Parse the cache-control header.
-		
+
 		>>> pcc = CacheHandler._parse_cache_control
 		>>> sample = {'cache-control':'max-age=3, bar=baz, Foo'}
 		>>> sorted(pcc(sample).items())
@@ -160,7 +160,7 @@ class CacheHandler(urllib2.BaseHandler):
 			name, sep, val = map(str.lower, map(str.strip,
 				part.partition('=')))
 			return name, (val or None)
-			
+
 		cc_header = headers.get('cache-control', '')
 		return dict(map(parse_part, cc_header.split(',')))
 
@@ -171,7 +171,7 @@ class CachedResponse(StringIO):
 	cached responses.
 	"""
 	cached = True
-	
+
 	@classmethod
 	def from_response(cls, response):
 		cr = cls(response.read())
