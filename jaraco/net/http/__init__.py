@@ -7,7 +7,6 @@ HTTP routines
 import logging
 import os
 import re
-import calendar
 import datetime
 import argparse
 import urlparse
