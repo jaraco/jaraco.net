@@ -147,6 +147,9 @@ class CacheHandler(urllib2.BaseHandler):
 		>>> sample = {'cache-control':'max-age=3, bar=baz, Foo'}
 		>>> sorted(pcc(sample).items())
 		[('bar', 'baz'), ('foo', None), ('max-age', '3')]
+
+		>>> pcc({})
+		{}
 		"""
 		def parse_part(part):
 			"""
@@ -162,7 +165,7 @@ class CacheHandler(urllib2.BaseHandler):
 			return name, (val or None)
 
 		cc_header = headers.get('cache-control', '')
-		return dict(map(parse_part, cc_header.split(',')))
+		return dict(parse_part(part) for part in cc_header.split(',') if part)
 
 
 class CachedResponse(StringIO):
