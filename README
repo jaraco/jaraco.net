@@ -43,6 +43,7 @@ Changes
 ~~~
 
 * Added '--outfile' parameter to fake-http.
+* Fixed bug in http caching support when max-age is not specified.
 
 2.0
 ~~~
