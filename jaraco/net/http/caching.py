@@ -228,7 +228,7 @@ class CachedResponse(StringIO):
 		cc = CacheHandler._parse_cache_control(self.headers)
 		if 'no-cache' in cc:
 			return False
-		if not self.within_max_age(cc):
+		if self.exceeds_max_age(cc):
 			return False
 		if 'expires' in cc:
 			try:
@@ -246,13 +246,13 @@ class CachedResponse(StringIO):
 		respect to the request headers.
 		"""
 		cc = CacheHandler._parse_cache_control(req_headers)
-		return self.fresh() and self.within_max_age(cc)
+		return self.fresh() and not self.exceeds_max_age(cc)
 
-	def within_max_age(self, cache_control):
+	def exceeds_max_age(self, cache_control):
 		if not 'date' in self.headers:
-			return False
+			return True
 		if 'max-age' not in cache_control:
-			return False
+			return True
 		# user-agent might have a 'min-fresh' directive indicating the
 		#  client will only accept a cached request if it will still be
 		#  fresh min-fresh seconds from now.
@@ -265,10 +265,10 @@ class CachedResponse(StringIO):
 			max_age = datetime.timedelta(
 				seconds=int(cache_control['max-age']))
 			if self.age + min_fresh > max_age:
-				return False
+				return True
 		except ValueError:
 			pass
-		return True
+		return False
 
 	def update_headers(self, new_headers):
 		for header in get_endpoint_headers(new_headers):
