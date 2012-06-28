@@ -249,9 +249,10 @@ class CachedResponse(StringIO):
 		return self.fresh() and not self.exceeds_max_age(cc)
 
 	def exceeds_max_age(self, cache_control):
-		if not 'date' in self.headers:
-			return True
 		if 'max-age' not in cache_control:
+			# If max-age is not indicated, it can't be exceeded
+			return False
+		if not 'date' in self.headers:
 			return True
 		# user-agent might have a 'min-fresh' directive indicating the
 		#  client will only accept a cached request if it will still be
