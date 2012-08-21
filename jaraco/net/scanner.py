@@ -35,7 +35,7 @@ def get_args():
 
 def setup_logger(output_level):
 	outputHandler = logging.StreamHandler(sys.stdout)
-	outputHandler.level = getattr(logging, output_level.upper())
+	outputHandler.level = output_level
 	logging.root.handlers.append(outputHandler)
 	logdir = os.path.join(os.environ['SystemRoot'], 'system32',
 		'logfiles', 'portscan')

@@ -9,7 +9,7 @@ Objects:
 	PortScanner: scans a range of ports
 	PortListener: listens on a port
 	PortRangeListener: listens on a range of ports
-	
+
 Copyright © 2004-2011 Jason R. Coombs
 """
 
@@ -30,7 +30,7 @@ class PortScanner(object):
 	def __init__(self):
 		self.ranges = [range(1, 1024)]
 		self.n_threads = 100
-		
+
 	def set_range(self, *r):
 		self.ranges = [range(*r)]
 
@@ -39,11 +39,11 @@ class PortScanner(object):
 
 class ScanThread(threading.Thread):
 	all_testers = []
-	
+
 	def __init__(self, address):
 		threading.Thread.__init__(self)
 		self.address = address
-		
+
 	def run(self):
 		ScanThread.all_testers.append(self)
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,7 +53,7 @@ class ScanThread(threading.Thread):
 			self.result = True
 		except socket.error:
 			self.result = False
-		
+
 		self.report()
 
 	def __unicode__(self):
@@ -64,7 +64,7 @@ class ScanThread(threading.Thread):
 		}
 		msg_fmt = msg_map[getattr(self, 'result', None)]
 		return msg_fmt.format(**vars(self))
-		
+
 	def report(self):
 		log_method_map = {
 			True: log.info,
@@ -89,14 +89,14 @@ def portscan(host, ports = range(1024), frequency = 20):
 		log.debug('starting tester')
 		tester.start()
 		time.sleep(1/frequency)
-		
+
 class PortListener(threading.Thread):
 	def __init__(self, port):
 		threading.Thread.__init__(self)
 		self.port = port
 		self.setDaemon(1)
 		self.output = sys.stdout
-		
+
 	def run(self):
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		try:
