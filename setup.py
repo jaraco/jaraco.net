@@ -16,6 +16,7 @@ py26reqs = ['argparse'] if sys.version_info < (2, 7) else []
 
 windows_scripts = [
 	'whois-bridge-service = jaraco.net.whois:Service.handle_command_line',
+	'wget = jaraco.net.http:wget',
 	] if sys.platform == 'win32' else []
 
 setup_params = dict(
@@ -40,7 +41,6 @@ setup_params = dict(
 			'scanner = jaraco.net.scanner:scan',
 			'fake-http = jaraco.net.http.servers:Simple.start',
 			'fake-http-auth = jaraco.net.http.servers:AuthRequest.start',
-			'wget = jaraco.net.http:wget',
 			'serve-local = jaraco.net.http.static:serve_local',
 			'fake-smtp = jaraco.net.smtp:start_simple_server',
 			'udp-send = jaraco.net.udp:Sender',
