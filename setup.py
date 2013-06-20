@@ -62,7 +62,7 @@ setup_params = dict(
 	install_requires=[
 		'jaraco.util>=5.0',
 		'clientform>=0.2.7',
-		'BeautifulSoup',
+		'BeautifulSoup4',
 		'keyring>=0.6',
 		'feedparser',
 	] + py26reqs,
