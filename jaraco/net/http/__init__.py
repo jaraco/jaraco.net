@@ -9,12 +9,16 @@ import os
 import re
 import datetime
 import argparse
-import urlparse
-import urllib
-import urllib2
 import httplib
 import cgi
 import cookielib
+
+try:
+	import urllib.parse as urllib_parse
+	import urllib.request as urllib_request
+except ImportError:
+	import urlparse as urllib_parse
+	import urllib2 as urllib_request
 
 import jaraco.util.string
 from jaraco.filesystem import set_time
@@ -43,7 +47,7 @@ class Query(dict):
 			# remove any empty values
 			items = filter(None, items)
 			itemPairs = map(jaraco.util.string.Splitter('='), items)
-			unquoteSequence = lambda l: map(urllib.unquote, l)
+			unquoteSequence = lambda l: map(urllib_parse.unquote, l)
 			query = map(unquoteSequence, itemPairs)
 		if isinstance(query, (tuple, list)):
 			query = dict(query)
@@ -53,27 +57,27 @@ class Query(dict):
 		self.update(query)
 
 	def __repr__(self):
-		return urllib.urlencode(self)
+		return urllib_parse.urlencode(self)
 
 	@staticmethod
 	def __QueryFromURL__(url):
 		"Return the query portion of a URL"
 		return urlparse.urlparse(url).query
 
-class MethodRequest(urllib2.Request):
+class MethodRequest(urllib_request.Request):
 	def __init__(self, *args, **kwargs):
 		"""
 		Construct a MethodRequest. Usage is the same as for
-		`urllib2.Request` except it also takes an optional `method`
+		`urllib.request.Request` except it also takes an optional `method`
 		keyword argument. If supplied, `method` will be used instead of
 		the default.
 		"""
 		if 'method' in kwargs:
 			self.method = kwargs.pop('method')
-		return urllib2.Request.__init__(self, *args, **kwargs)
+		return urllib_request.Request.__init__(self, *args, **kwargs)
 
 	def get_method(self):
-		return getattr(self, 'method', urllib2.Request.get_method(self))
+		return getattr(self, 'method', urllib_request.Request.get_method(self))
 
 class HeadRequest(MethodRequest):
 	method = 'HEAD'
@@ -84,7 +88,7 @@ def get_content_disposition_filename(url):
 	Returns None if no such disposition can be found.
 
 	If `url` is already an addinfourl object, it will use its headers.
-	Otherwise, urllib2 is used to retrieve the headers.
+	Otherwise, urllib.request is used to retrieve the headers.
 
 	>>> url = 'http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?file=pythonutils-0.3.0.zip'
 	>>> get_content_disposition_filename(url) in (None, 'pythonutils-0.3.0.zip')
@@ -101,11 +105,11 @@ def get_content_disposition_filename(url):
 	"""
 
 	res = url
-	if not isinstance(url, urllib2.addinfourl):
+	if not isinstance(url, urllib_request.addinfourl):
 		req = HeadRequest(url)
 		try:
-			res = urllib2.urlopen(req)
-		except urllib2.URLError:
+			res = urllib.request.urlopen(req)
+		except urllib.request.URLError:
 			return
 	header = res.headers.get('content-disposition', '')
 	value, params = cgi.parse_header(header)
@@ -115,7 +119,7 @@ def get_url_filename(url):
 	return os.path.basename(urlparse.urlparse(url).path)
 
 def get_url(url, dest=None, replace_newer=False, touch_older=True):
-	src = urllib2.urlopen(url)
+	src = urllib_request.urlopen(url)
 	log.debug(src.headers)
 	if 'last-modified' in src.headers:
 		mod_time = datetime.datetime.strptime(src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
