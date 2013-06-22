@@ -62,7 +62,7 @@ class Query(dict):
 	@staticmethod
 	def __QueryFromURL__(url):
 		"Return the query portion of a URL"
-		return urlparse.urlparse(url).query
+		return urllib_parse.urlparse(url).query
 
 class MethodRequest(urllib_request.Request):
 	def __init__(self, *args, **kwargs):
@@ -87,7 +87,7 @@ def get_content_disposition_filename(url):
 	Get the content disposition filename from a URL.
 	Returns None if no such disposition can be found.
 
-	If `url` is already an addinfourl object, it will use its headers.
+	If `url` is already a response object, it will use its headers.
 	Otherwise, urllib.request is used to retrieve the headers.
 
 	>>> url = 'http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?file=pythonutils-0.3.0.zip'
@@ -105,7 +105,7 @@ def get_content_disposition_filename(url):
 	"""
 
 	res = url
-	if not isinstance(url, urllib_request.addinfourl):
+	if not getattr(res, 'headers', None):
 		req = HeadRequest(url)
 		try:
 			res = urllib.request.urlopen(req)
@@ -116,7 +116,7 @@ def get_content_disposition_filename(url):
 	return params.get('filename')
 
 def get_url_filename(url):
-	return os.path.basename(urlparse.urlparse(url).path)
+	return os.path.basename(urllib_parse.urlparse(url).path)
 
 def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	src = urllib_request.urlopen(url)
@@ -154,7 +154,7 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	return fname
 
 def print_headers(url):
-	parsed = urlparse.urlparse(url)
+	parsed = urllib_parse.urlparse(url)
 	conn_class = dict(
 		http=httplib.HTTPConnection,
 		https=httplib.HTTPSConnection,
