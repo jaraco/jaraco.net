@@ -37,7 +37,7 @@ try:
 except ImportError:
 	pass
 
-from .http import PageGetter
+from .http import mechanize
 
 log = logging.getLogger(__name__)
 
@@ -201,13 +201,6 @@ mozilla_headers = {
 	'accept-language': 'en-us,en;q=0.5',
 }
 
-class BoliviaPageGetter(PageGetter):
-	url = 'http://www.nic.bo/'
-#	def GetRequest(self):
-#		request = super(self.__class__, self).GetRequest()
-#		map(request.add_header, mozilla_headers.keys(), mozilla_headers.values())
-#		return request
-
 class BoliviaWhoisHandler(WhoisHandler):
 	services = r'\.bo$'
 
@@ -220,18 +213,19 @@ class BoliviaWhoisHandler(WhoisHandler):
 	def LoadHTTP(self):
 		name, domain = self._query.split('.', 1)
 		domain = '.' + domain
-		getter = BoliviaPageGetter()
-		getter.form_items = {'subdominio': [domain], 'dominio': name}
-		getter.request = getter.Process()
-		self._response = getter.Fetch().read()
-		del getter.request
+		getter = mechanize.PageGetter()
+		search_page = getter.load('http://www.nic.bo/')
+		form_items = {'subdominio': [domain], 'dominio': name}
+		resp = getter.process_form(search_page, form_items)
 
 		# now that we've submitted the request, we've got a response.
-		# Unfortunately, this page returns 'available' or 'not available'
+		# This page returns 'available' or 'not available'
 		# If it's not available, we need to know who owns it.
-		if re.search('Dominio %s registrado' % self._query, self._response):
-			getter.url = urllib.basejoin(getter.url, 'informacion.php')
-			self._response = getter.Fetch().read()
+		if re.search('Dominio %s registrado' % self._query, resp.text):
+			info_url = urllib.basejoin(resp.url, 'informacion.php')
+			resp = getter.load(info_url)
+
+		self._response = resp.text
 
 	def ParseResponse(self, s_out):
 		soup = BeautifulSoup(self._response)
