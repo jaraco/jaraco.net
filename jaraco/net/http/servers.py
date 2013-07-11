@@ -7,6 +7,7 @@ import time
 import datetime
 import argparse
 import functools
+import traceback
 
 from jaraco.util.string import local_format as lf
 
@@ -30,8 +31,8 @@ class Simple(object):
 		p.add_argument('-t', '--timeout', type=int, help="Socket timeout",
 			default=3)
 		p.add_argument('-o', '--outfile', default=sys.stdout,
-			type=functools.partial(open, mode='wb'), help='save output to file',
-		)
+			type=functools.partial(open, mode='wb'),
+			help='save output to file')
 		seconds = lambda seconds: datetime.timedelta(seconds=seconds)
 		p.add_argument('-d', '--delay', dest='response_delay', type=seconds,
 			help="Artificial delay in response", default=datetime.timedelta())
@@ -52,10 +53,10 @@ class Simple(object):
 			headers, content = self.get_headers(self.conn)
 			content_len = self.get_content_length(headers) or 0
 			content = self.get_content(self.conn, content, content_len)
-			self.conn.send('HTTP/1.0 200 OK\r\n')
+			self.conn.send(b'HTTP/1.0 200 OK\r\n')
 			time.sleep(self.response_delay.total_seconds())
-			self.conn.send('\r\nGot It!')
-		except socket.error, e:
+			self.conn.send(b'\r\nGot It!')
+		except socket.error as e:
 			print('Error %s' % e)
 			if content:
 				print('partial result')
@@ -72,12 +73,13 @@ class Simple(object):
 
 	@staticmethod
 	def get_headers(conn):
-		res = ''
-		while not '\r\n\r\n' in res:
+		res = b''
+		while not b'\r\n\r\n' in res:
 			res += conn.recv(1024)
 		bytes = len(res)
-		headers, _sep, content = res.partition('\r\n\r\n')
-		print('received %(bytes)d bytes' % vars(), file=sys.stderr)
+		headers, _sep, content = res.partition(b'\r\n\r\n')
+		print('received', bytes, 'bytes', file=sys.stderr)
+		headers = headers.decode('utf-8')
 		print(headers)
 		return headers, content
 
@@ -85,7 +87,7 @@ class Simple(object):
 		while len(content) < length:
 			content += conn.recv(1024)
 		bytes = len(content)
-		print('received %(bytes)d bytes content' % vars(), file=sys.stderr)
+		print('received', bytes, 'bytes content', file=sys.stderr)
 		print(content, file=self.outfile)
 		return content
 
@@ -111,25 +113,22 @@ class AuthRequest(Simple):
 			user_pat = re.compile('^Authorization:\s+(.*)\s*$', re.I|re.MULTILINE)
 			matched_header = user_pat.search(headers)
 			if matched_header:
-				conn.send('HTTP/1.0 200 OK\r\n')
-				user = matched_header.group(1)
-				conn.send('\r\nYou are authenticated as %(user)s' % vars())
+				conn.send(b'HTTP/1.0 200 OK\r\n')
+				user = matched_header.group(1).encode('ascii')
+				conn.send(b'\r\nYou are authenticated as ' + user)
 				return
-			conn.send('HTTP/1.0 401 Authorization Required\r\n')
-			conn.send('Connection: close\r\n')
-			msg = 'Go get me some credentials'
-			conn.send('Content-Length: %d\r\n' % len(msg))
-			conn.send('WWW-Authenticate: NTLM\r\n')
-			conn.send('WWW-Authenticate: Basic realm="fake-auth"\r\n')
-			conn.send('\r\n')
+			conn.send(b'HTTP/1.0 401 Authorization Required\r\n')
+			conn.send(b'Connection: close\r\n')
+			msg = b'Go get me some credentials'
+			conn.send(b'Content-Length: %d\r\n' % len(msg))
+			conn.send(b'WWW-Authenticate: NTLM\r\n')
+			conn.send(b'WWW-Authenticate: Basic realm="fake-auth"\r\n')
+			conn.send(b'\r\n')
 			conn.send(msg)
 			print('sent authorization request')
-		except socket.error, e:
+		except socket.error:
 			print('error in connection')
 			traceback.print_exc()
-			if res:
-				print('partial result')
-				print(repr(res))
 		finally:
 			conn.close()
 		return 'retry'
