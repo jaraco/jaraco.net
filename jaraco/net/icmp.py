@@ -1,3 +1,6 @@
+from __future__ import print_function
+
+import sys
 import socket
 import select
 import struct
@@ -5,6 +8,7 @@ import time
 import operator
 import random
 import datetime
+import functools
 
 from jaraco.util.timing import Stopwatch
 
@@ -23,7 +27,7 @@ def calculate_checksum(bytes):
 		bytes = ''.join((bytes, '\x00'))
 	n_values = len(bytes)/2
 	values = struct.unpack('%dH' % n_values, bytes)
-	sum = reduce(operator.add, values)
+	sum = functools.reduce(operator.add, values)
 	sum = (sum >> 16) + (sum & 0xffff)
 	sum += (sum >> 16)
 	return (~sum) & 0xffff
@@ -93,3 +97,29 @@ def wait_for_host(host):
 			pass
 	return datetime.datetime.utcnow()
 
+def monitor_cmd():
+	try:
+		monitor_hosts(sys.argv[1:])
+	except KeyboardInterrupt:
+		pass
+
+def monitor_hosts(hosts):
+	while True:
+		for host in hosts:
+			try:
+				delay = ping(host)
+			except socket.timeout:
+				delay = None
+			save_result(host, delay)
+		time.sleep(3)
+
+def save_result(host, delay):
+	with open('ping-results.txt', 'a') as res:
+		ts = datetime.datetime.now()
+		msg = 'time: {ts}, host: {host}, res: {delay}'.format(
+			ts=ts, host=host, delay=delay)
+		print(msg, file=res)
+
+
+if __name__ == '__main__':
+	monitor_cmd()
