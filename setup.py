@@ -3,12 +3,12 @@
 """
 Setup script for building jaraco.net
 
-Copyright © 2009-2011 Jason R. Coombs
+Copyright © 2009-2013 Jason R. Coombs
 """
 
 import sys
 
-from setuptools import find_packages
+import setuptools
 
 name = 'jaraco.net'
 
@@ -27,7 +27,7 @@ setup_params = dict(
 	author = 'Jason R. Coombs',
 	author_email = 'jaraco@jaraco.com',
 	url = 'http://bitbucket.org/jaraco/' + name,
-	packages = find_packages(),
+	packages = setuptools.find_packages(),
 	namespace_packages = ['jaraco'],
 	license = 'MIT',
 	classifiers = [
@@ -79,5 +79,4 @@ setup_params = dict(
 )
 
 if __name__ == '__main__':
-	from setuptools import setup
-	setup(**setup_params)
+	setuptools.setup(**setup_params)
