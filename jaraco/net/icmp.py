@@ -110,6 +110,8 @@ def monitor_hosts(hosts):
 				delay = ping(host)
 			except socket.timeout:
 				delay = None
+			except socket.error as exc:
+				delay = str(exc)
 			save_result(host, delay)
 		time.sleep(3)
 
