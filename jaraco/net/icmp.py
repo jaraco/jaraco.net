@@ -19,12 +19,12 @@ def calculate_checksum(bytes):
 	In particular, the 16-bit one's complement of
 	the one's complement sum of all 16-bit words
 
-	>>> calculate_checksum('ABCD\n')
+	>>> calculate_checksum(b'ABCD\n')
 	31089
 	"""
 	# null pad bytes to ensure 16-bit values
 	if len(bytes) % 2:
-		bytes = ''.join((bytes, '\x00'))
+		bytes += b'\x00'
 	n_values = len(bytes)/2
 	values = struct.unpack('%dH' % n_values, bytes)
 	sum = functools.reduce(operator.add, values)
@@ -37,10 +37,12 @@ def pack_echo_header(id, data, sequence=1):
 	Assemble an ICMP echo header
 
 	>>> pack_echo_header(1, 'echo-request')
-	'\x08\x00\xaco\x01\x00\x01\x00'
+	b'\x08\x00\xaco\x01\x00\x01\x00'
 	>>> pack_echo_header(2, 'second-request')
-	'\x08\x004\t\x02\x00\x01\x00'
+	b'\x08\x004\t\x02\x00\x01\x00'
 	"""
+	if not isinstance(data, bytes):
+		data = data.encode()
 	ICMP_ECHO_REQUEST = 8
 	code = 0
 	sequence = 1
@@ -59,7 +61,7 @@ def ping(dest_addr, timeout = 2):
 	>>> ping('10.10.10.254') # expect this address not to respond
 	Traceback (most recent call last):
 	...
-	timeout: timed out
+	socket.timeout: timed out
 	"""
 	icmp_proto = socket.getprotobyname('icmp')
 	icmp_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp_proto)

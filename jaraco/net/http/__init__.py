@@ -9,12 +9,11 @@ import os
 import re
 import datetime
 import argparse
-import httplib
 import cgi
 
 import six
-from six.moves.urllib import request
-from six.moves.urllib import parse
+from six.moves import urllib
+from six.moves import http_client
 
 import jaraco.util.string
 from jaraco.filesystem import set_time
@@ -38,14 +37,14 @@ class Query(dict):
 	def __init__(self, query):
 		query = Query.__QueryFromURL__(query) or query
 		if not re.match(r'(\w+=\w+(&\w+=\w+)*)*$', query): query = ()
-		if isinstance(query, six.text_types):
+		if isinstance(query, six.string_types):
 			items = query.split('&')
 			# remove any empty values
 			items = filter(None, items)
 			itemPairs = map(jaraco.util.string.Splitter('='), items)
-			unquoteSequence = lambda l: map(parse.unquote, l)
+			unquoteSequence = lambda l: map(urllib.parse.unquote, l)
 			query = map(unquoteSequence, itemPairs)
-		if isinstance(query, (tuple, list)):
+		if not isinstance(query, dict):
 			query = dict(query)
 		if not isinstance(query, dict):
 			msg = "Can't construct a %s from %s"
@@ -53,14 +52,16 @@ class Query(dict):
 		self.update(query)
 
 	def __repr__(self):
-		return parse.urlencode(self)
+		return urllib.parse.urlencode(self)
 
 	@staticmethod
 	def __QueryFromURL__(url):
 		"Return the query portion of a URL"
-		return parse.urlparse(url).query
+		return urllib.parse.urlparse(url).query
 
-class MethodRequest(request.Request):
+class MethodRequest(urllib.request.Request):
+	method = None
+
 	def __init__(self, *args, **kwargs):
 		"""
 		Construct a MethodRequest. Usage is the same as for
@@ -68,12 +69,14 @@ class MethodRequest(request.Request):
 		keyword argument. If supplied, `method` will be used instead of
 		the default.
 		"""
-		if 'method' in kwargs:
-			self.method = kwargs.pop('method')
-		return request.Request.__init__(self, *args, **kwargs)
+		method = kwargs.pop('method', self.method)
+		req = urllib.request.Request.__init__(self, *args, **kwargs)
+		# write the method after __init__ as Python 3.3 overrides the value
+		req.method = method
+		return req
 
 	def get_method(self):
-		return getattr(self, 'method', request.Request.get_method(self))
+		return getattr(self, 'method') or urllib.request.Request.get_method(self)
 
 class HeadRequest(MethodRequest):
 	method = 'HEAD'
@@ -104,18 +107,18 @@ def get_content_disposition_filename(url):
 	if not getattr(res, 'headers', None):
 		req = HeadRequest(url)
 		try:
-			res = request.urlopen(req)
-		except request.URLError:
+			res = urllib.request.urlopen(req)
+		except urllib.error.URLError:
 			return
 	header = res.headers.get('content-disposition', '')
 	value, params = cgi.parse_header(header)
 	return params.get('filename')
 
 def get_url_filename(url):
-	return os.path.basename(parse.urlparse(url).path)
+	return os.path.basename(urllib.parse.urlparse(url).path)
 
 def get_url(url, dest=None, replace_newer=False, touch_older=True):
-	src = request.urlopen(url)
+	src = urllib.request.urlopen(url)
 	log.debug(src.headers)
 	if 'last-modified' in src.headers:
 		mod_time = datetime.datetime.strptime(src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
@@ -151,10 +154,10 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	return fname
 
 def print_headers(url):
-	parsed = parse.urlparse(url)
+	parsed = urllib.parse.urlparse(url)
 	conn_class = dict(
-		http=httplib.HTTPConnection,
-		https=httplib.HTTPSConnection,
+		http=http_client.HTTPConnection,
+		https=http_client.HTTPSConnection,
 		)
 	conn = conn_class[parsed.scheme](parsed.netloc)
 	selector = parsed.path or '/'

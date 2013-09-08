@@ -13,20 +13,23 @@ import os
 import re
 import sys
 import logging
-import htmllib
 import abc
 import formatter
-import urllib
-import urllib2
-import cookielib
 import socket
 import select
-import SocketServer
 
 import six
+from six.moves import html_parser
+from six.moves import urllib
+from six.moves import http_cookiejar
+from six.moves import socketserver
+
 import jaraco.util.logging
-from ClientForm import ParseResponse, ItemNotFoundError
-from BeautifulSoup import BeautifulSoup, UnicodeDammit
+try:
+	from ClientForm import ParseResponse, ItemNotFoundError
+except ImportError:
+	"Disabled for Python 3 compatibility"
+from bs4 import BeautifulSoup, UnicodeDammit
 from jaraco.util.meta import LeafClassesMeta
 
 try:
@@ -45,9 +48,9 @@ def init():
 	Initialize HTTP functionality to support cookies, which are necessary
 	to use the HTTP interface.
 	"""
-	cj = cookielib.CookieJar()
-	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-	urllib2.install_opener(opener)
+	cj = http_cookiejar.CookieJar()
+	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+	urllib.request.install_opener(opener)
 
 class WhoisHandler(object):
 	"""
@@ -109,7 +112,7 @@ class ArgentinaWhoisHandler(WhoisHandler):
 	def LoadHTTP(self):
 		query = self._query
 		pageURL = 'http://www.nic.ar/consdom.html'
-		form = ParseResponse(urllib2.urlopen(pageURL))[0]
+		form = ParseResponse(urllib.request.urlopen(pageURL))[0]
 		form['nombre'] = query[:query.find('.')]
 		try:
 			domain = query[query.find('.'):]
@@ -119,10 +122,10 @@ class ArgentinaWhoisHandler(WhoisHandler):
 		req = form.click()
 		#req.data = 'nombre=%s&dominio=.com.ar' % query
 		req.add_header('referer', pageURL)
-		resp = urllib2.urlopen(req)
+		resp = urllib.request.urlopen(req)
 		self._response = resp.read()
 
-	class _parser(htmllib.HTMLParser):
+	class _parser(html_parser.HTMLParser):
 		def start_tr(self, attrs):
 			"One must define start_tr for end_tr to be called."
 
@@ -135,13 +138,13 @@ class CoZaWhoisHandler(WhoisHandler):
 	def LoadHTTP(self):
 		query = self._query
 		pageURL = 'http://whois.co.za/'
-		form = ParseResponse(urllib2.urlopen(pageURL))[0]
+		form = ParseResponse(urllib.request.urlopen(pageURL))[0]
 		form['Domain'] = query[:query.find('.')]
 		req = form.click()
-		resp = urllib2.urlopen(req)
+		resp = urllib.request.urlopen(req)
 		self._response = resp.read()
 
-	_parser = htmllib.HTMLParser
+	_parser = html_parser.HTMLParser
 
 class GovWhoisHandler(WhoisHandler):
 	services = r'(\.fed\.us|\.gov)$'
@@ -149,7 +152,7 @@ class GovWhoisHandler(WhoisHandler):
 	def LoadHTTP(self):
 		query = self._query
 		# Perform an whois query on the dotgov server.
-		url = urllib2.urlopen('http://dotgov.gov/whois.aspx')
+		url = urllib.request.urlopen('http://dotgov.gov/whois.aspx')
 		forms = ParseResponse(url)
 		assert len(forms) == 1
 		form = forms[0]
@@ -162,21 +165,21 @@ class GovWhoisHandler(WhoisHandler):
 			# agree.aspx page.
 			return self.LoadHTTP()
 		form['who_search'] = query
-		resp = urllib2.urlopen(forms[0].click())
+		resp = urllib.request.urlopen(forms[0].click())
 		self._response = resp.read()
 
 	def Agree(self, form):
 		"agree to the dotgov agreement"
 		agree_req = form.click()
-		u2 = urllib2.urlopen(agree_req)
+		u2 = urllib.request.urlopen(agree_req)
 		u2.read()
 
-	class _parser(htmllib.HTMLParser):
+	class _parser(html_parser.HTMLParser):
 		def __init__(self, formatter):
 			self.__formatter__ = formatter
 			# Use the null formatter to start; we'll switch to the outputting
 			#  formatter when we find the right point in the HTML.
-			htmllib.HTMLParser.__init__(self, formatter.NullFormatter())
+			html_parser.HTMLParser.__init__(self, formatter.NullFormatter())
 
 		def start_td(self, attrs):
 			attrs = dict(attrs)
@@ -203,7 +206,7 @@ mozilla_headers = {
 class BoliviaWhoisHandler(WhoisHandler):
 	services = r'\.bo$'
 
-	class _parser(htmllib.HTMLParser):
+	class _parser(html_parser.HTMLParser):
 		def anchor_end(self):
 			if self.anchor:
 				self.handle_data('[%s]' % self.anchor)
@@ -221,7 +224,7 @@ class BoliviaWhoisHandler(WhoisHandler):
 		# This page returns 'available' or 'not available'
 		# If it's not available, we need to know who owns it.
 		if re.search('Dominio %s registrado' % self._query, resp.text):
-			info_url = urllib.basejoin(resp.url, 'informacion.php')
+			info_url = urllib.parse.basejoin(resp.url, 'informacion.php')
 			resp = getter.load(info_url)
 
 		self._response = resp.text
@@ -264,7 +267,7 @@ class MyWriter(formatter.DumbWriter):
 		data = data.replace(u'\xa0', u' ')
 		formatter.DumbWriter.send_flowing_data(self, data)
 
-class Handler(SocketServer.StreamRequestHandler):
+class Handler(socketserver.StreamRequestHandler):
 	def handle(self):
 		try:
 			self._handle()
@@ -280,7 +283,7 @@ class Handler(SocketServer.StreamRequestHandler):
 			handler.LoadHTTP()
 			handler.ParseResponse(self.wfile)
 			log.info('%s success', self.client_address)
-		except urllib2.URLError:
+		except urllib.error.URLError:
 			msg = 'Could not contact whois HTTP service.'
 			self.wfile.write(msg + '\n')
 			log.exception(msg)
@@ -290,9 +293,9 @@ class Handler(SocketServer.StreamRequestHandler):
 
 class ConnectionClosed(Exception): pass
 
-class Listener(SocketServer.ThreadingTCPServer):
+class Listener(socketserver.ThreadingTCPServer):
 	def __init__(self):
-		SocketServer.ThreadingTCPServer.__init__(self, ('', 43), Handler)
+		socketserver.ThreadingTCPServer.__init__(self, ('', 43), Handler)
 
 	def serve_until_closed(self):
 		try:
@@ -309,7 +312,7 @@ class Listener(SocketServer.ThreadingTCPServer):
 		except socket.error as e:
 			if e[1].lower() == 'bad file descriptor':
 				raise ConnectionClosed
-		return SocketServer.ThreadingTCPServer.get_request(self)
+		return socketserver.ThreadingTCPServer.get_request(self)
 
 def serve():
 	init()

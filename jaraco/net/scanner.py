@@ -61,21 +61,21 @@ def _get_mask_host(host_spec, matcher):
 		log.warning('Bits lost in mask')
 	base = addr & mask
 	addrs = six.moves.range(1 << bits)
-	result = itertools.imap(operator.or_, addrs, itertools.repeat(base))
-	result = itertools.imap(lambda a: struct.pack('!L', a), result)
-	return itertools.imap(socket.inet_ntoa, result)
+	result = six.moves.map(operator.or_, addrs, itertools.repeat(base))
+	result = six.moves.map(lambda a: struct.pack('!L', a), result)
+	return six.moves.map(socket.inet_ntoa, result)
 
 def _get_range_host(host_spec, matcher):
 	"""
 
 	"""
 	#matcher = matcher.next()
-	rng = map(int, matcher.groups())
+	rng = list(map(int, matcher.groups()))
 	rng[1] += 1
 	rng = range(*rng)
 	beg = host_spec[:matcher.start()]
 	end = host_spec[matcher.end():]
-	addrs = itertools.chain(*itertools.imap(lambda n: get_hosts(beg + str(n) + end), rng))
+	addrs = itertools.chain(*six.moves.map(lambda n: get_hosts(beg + str(n) + end), rng))
 	return addrs
 
 def _get_ip_range_host(spec, matcher):
@@ -86,7 +86,7 @@ def _get_named_host(spec, matcher):
 	sockaddrs = [sockaddr for
 		family, socktype, proto, canonname, sockaddr in infos]
 	get_host = operator.itemgetter(0)
-	hosts = map(get_host, sockaddrs)
+	hosts = list(map(get_host, sockaddrs))
 	return hosts
 
 def get_hosts(host_spec):
@@ -108,7 +108,7 @@ def get_hosts(host_spec):
 	['192.168.0.1']
 
 	One may also specify named hosts
-	>>> '192.0.43.10' in get_hosts('www.example.com')
+	>>> '93.184.216.119' in get_hosts('www.example.com')
 	True
 	"""
 	_map = {

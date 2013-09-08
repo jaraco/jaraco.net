@@ -5,9 +5,13 @@ inspired by http://code.activestate.com/recipes/491261/
 
 import pickle
 import datetime
-import email
 import logging
 import io
+
+try:
+	import email.utils as email_utils
+except ImportError:
+	import email.Utils as email_utils
 
 from six.moves.urllib import request
 
@@ -293,7 +297,7 @@ def get_endpoint_headers(headers):
 	return set(headers.keys()) - set(intermediate_headers)
 
 def datetime_from_email(str):
-	parsed = email.Utils.parsedate_tz(str)
+	parsed = email_utils.parsedate_tz(str)
 	if not parsed:
 		raise ValueError("Unrecognized date %s" % str)
 	offset = datetime.timedelta(seconds=parsed[-1] or 0)
