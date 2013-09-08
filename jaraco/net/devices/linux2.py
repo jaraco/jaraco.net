@@ -95,7 +95,7 @@ def get_hardware_addresses(if_names):
 		if ifr.detail.flags & IFF_LOOPBACK: continue
 		res = ioctl(s.fileno(), SIOCGIFHWADDR, ctypes.byref(ifr))
 		if res != 0: continue
-		yield bytes(memoryview(ifr.detail.hardware_addr.data))[:6]
+		yield memoryview(ifr.detail.hardware_addr.data).tobytes()[:6]
 
 def get_ip_addresses(if_names):
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -103,7 +103,7 @@ def get_ip_addresses(if_names):
 		ifr = ifreq(name)
 		res = ioctl(s.fileno(), SIOCGIFADDR, ctypes.byref(ifr))
 		if res != 0: continue
-		yield bytes(memoryview(ifr.detail.addr.data))[2:6]
+		yield memoryview(ifr.detail.addr.data).tobytes()[2:6]
 
 class Manager(BaseManager):
 	def get_host_mac_addresses(self):
