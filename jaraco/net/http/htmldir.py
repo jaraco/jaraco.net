@@ -4,10 +4,10 @@ import os.path
 import datetime
 import cherrypy
 
-def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
+def htmldir(section="", dir="", path="", hdr=True, **kwargs):
     fh = ''
     url = "http://" + cherrypy.request.headers.get('Host', '') + \
-             cherrypy.request.path_info
+        cherrypy.request.path_info
 
     # preamble
     if hdr:
@@ -22,25 +22,25 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
 
     path = path.rstrip(r"\/")
     fh += '<h3>Directory listing for: <a href="' + url + '">' + url + \
-             '</a></h3><hr>\n'
-    for dpath, ddirs, dfiles in os.walk( path ):
+        '</a></h3><hr>\n'
+    for dpath, ddirs, dfiles in os.walk(path):
 
-        for dn in sorted( ddirs ):
-            fdn = os.path.join( dpath, dn )
-            dmtime = os.path.getmtime( fdn )
-            dtim = datetime.datetime.fromtimestamp( dmtime ).isoformat('-')
+        for dn in sorted(ddirs):
+            fdn = os.path.join(dpath, dn)
+            dmtime = os.path.getmtime(fdn)
+            dtim = datetime.datetime.fromtimestamp(dmtime).isoformat('-')
             fh += """<a href="%s" title="mod: %s">%s/</a><br>
-""" % ( dn + '/', dtim, dn, )
+""" % (dn + '/', dtim, dn,)
 
         del ddirs[:] # limit to one level
 
-        for fil in sorted( dfiles ):
-            fn = os.path.join( dpath, fil )
-            siz = os.path.getsize( fn )
-            fmtime = os.path.getmtime( fn )
-            ftim = datetime.datetime.fromtimestamp( fmtime ).isoformat('-')
+        for fil in sorted(dfiles):
+            fn = os.path.join(dpath, fil)
+            siz = os.path.getsize(fn)
+            fmtime = os.path.getmtime(fn)
+            ftim = datetime.datetime.fromtimestamp(fmtime).isoformat('-')
             fh += """<a href="%s" title="mod: %s  size: %s">%s</a><br>
-""" % ( fil, ftim, str( siz ), fil, )
+""" % (fil, ftim, str(siz), fil,)
 
     # postamble
     if hdr:

@@ -9,7 +9,8 @@ from cherrypy.lib import cptools, http
 # Undercover kludge to wrap staticdir
 from cherrypy.lib.static import staticdir
 
-def staticdirindex(section, dir, root="", match="", content_types=None, index="", indexlistermatch="", indexlister=None, **kwargs):
+def staticdirindex(section, dir, root="", match="", content_types=None,
+        index="", indexlistermatch="", indexlister=None, **kwargs):
     """Serve a directory index listing for a dir.
 
     Compatibility alert: staticdirindex is built on and is dependent on
@@ -31,7 +32,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
 
 """
     # first call old staticdir, and see if it does anything
-    sdret = staticdir( section, dir, root, match, content_types, index )
+    sdret = staticdir(section, dir, root, match, content_types, index)
     if sdret:
         return True
 
@@ -48,7 +49,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     # the following block of code directly copied from static.py staticdir
     if match and not re.search(match, cherrypy.request.path_info):
         return False
-    
+
     # Allow the use of '~' to refer to a user's home directory.
     dir = os.path.expanduser(dir)
 
@@ -58,7 +59,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
             msg = "Static dir requires an absolute dir (or root)."
             raise ValueError(msg)
         dir = os.path.join(root, dir)
-    
+
     # Determine where we are in the object tree relative to 'section'
     # (where the static tool was defined).
     if section == 'global':
@@ -66,10 +67,10 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     section = section.rstrip(r"\/")
     branch = cherrypy.request.path_info[len(section) + 1:]
     branch = urllib.unquote(branch.lstrip(r"\/"))
-    
+
     # If branch is "", filename will end in a slash
     filename = os.path.join(dir, branch)
-    
+
     # There's a chance that the branch pulled from the URL might
     # have ".." or similar uplevel attacks in it. Check that the final
     # filename is a child of dir.
@@ -90,7 +91,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     # paths become absolute by supplying a value for "tools.static.root".
     if not os.path.isabs(path):
         raise ValueError("'%s' is not an absolute path." % path)
-    
+
     try:
         st = os.stat(path)
     except OSError:
@@ -104,8 +105,8 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
         # modified-since validation code can work.
         response.headers['Last-Modified'] = http.HTTPDate(st.st_mtime)
         cptools.validate_since()
-        response.body = indexlister( section=section, dir=dir, path=path,
-                                     **kwargs )
+        response.body = indexlister(section=section, dir=dir, path=path,
+            **kwargs)
         response.headers['Content-Type'] = 'text/html'
         req.is_index = True
         return True
@@ -113,4 +114,4 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     return False
 
 # Replace the real staticdir with our version
-cherrypy.tools.staticdir = cherrypy._cptools.HandlerTool( staticdirindex )
+cherrypy.tools.staticdir = cherrypy._cptools.HandlerTool(staticdirindex)
