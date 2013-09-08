@@ -5,7 +5,14 @@ Network Manager for Linux
 import ctypes
 import socket
 
-from base import BaseManager
+import six
+
+from .base import BaseManager
+
+try:
+	memoryview
+except NameError:
+	memoryview = buffer
 
 # select constants
 IFNAMSIZ = 16
@@ -75,7 +82,7 @@ def get_interfaces():
 	ifc.req = ctypes.cast(buf, p_ifreq)
 	ioctl(s.fileno(), SIOCGIFCONF, ctypes.byref(ifc))
 	n_records = ifc.length / ctypes.sizeof(ifreq)
-	for index in xrange(n_records):
+	for index in six.moves.range(n_records):
 		rec = ifc.req[index]
 		yield str(rec.name)
 
@@ -88,7 +95,7 @@ def get_hardware_addresses(if_names):
 		if ifr.detail.flags & IFF_LOOPBACK: continue
 		res = ioctl(s.fileno(), SIOCGIFHWADDR, ctypes.byref(ifr))
 		if res != 0: continue
-		yield str(buffer(ifr.detail.hardware_addr.data))[:6]
+		yield bytes(memoryview(ifr.detail.hardware_addr.data))[:6]
 
 def get_ip_addresses(if_names):
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -96,7 +103,7 @@ def get_ip_addresses(if_names):
 		ifr = ifreq(name)
 		res = ioctl(s.fileno(), SIOCGIFADDR, ctypes.byref(ifr))
 		if res != 0: continue
-		yield str(buffer(ifr.detail.addr.data))[2:6]
+		yield bytes(memoryview(ifr.detail.addr.data))[2:6]
 
 class Manager(BaseManager):
 	def get_host_mac_addresses(self):

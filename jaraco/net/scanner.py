@@ -14,6 +14,7 @@ import itertools
 import logging.handlers
 import argparse
 
+import six
 import jaraco.util.logging
 
 from . import inet
@@ -59,7 +60,7 @@ def _get_mask_host(host_spec, matcher):
 	if (0xFFFFFFFF ^ mask) & addr:
 		log.warning('Bits lost in mask')
 	base = addr & mask
-	addrs = xrange(1 << bits)
+	addrs = six.moves.range(1 << bits)
 	result = itertools.imap(operator.or_, addrs, itertools.repeat(base))
 	result = itertools.imap(lambda a: struct.pack('!L', a), result)
 	return itertools.imap(socket.inet_ntoa, result)

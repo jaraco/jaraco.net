@@ -9,8 +9,6 @@ Objects:
 	PortScanner: scans a range of ports
 	PortListener: listens on a port
 	PortRangeListener: listens on a range of ports
-
-Copyright © 2004-2011 Jason R. Coombs
 """
 
 from __future__ import division
@@ -21,6 +19,9 @@ import sys
 import operator
 import time
 import logging
+import functools
+
+import six
 
 from . import icmp
 
@@ -72,7 +73,7 @@ class ScanThread(threading.Thread):
 			None: log.error
 		}
 		log_method = log_method_map[getattr(self, 'result', None)]
-		log_method(unicode(self))
+		log_method(six.text_type(self))
 
 	@staticmethod
 	def wait_for_testers_to_finish():
@@ -109,7 +110,7 @@ class PortListener(threading.Thread):
 					.format(**vars())
 				)
 				conn.close()
-		except socket.error, e:
+		except socket.error as e:
 			if e[0] == 10048:
 				self.output.write('Cannot listen on port %d: Address '
 					'already in use.\n' % self.port)
@@ -121,7 +122,7 @@ class PortRangeListener(object):
 		self.ranges = [range(1, 1024)]
 
 	def listen(self):
-		ports = reduce(operator.add, self.ranges)
+		ports = functools.reduce(operator.add, self.ranges)
 		ports.sort()
 		self.threads = map(PortListener, ports)
 		[t.start for t in self.threads]

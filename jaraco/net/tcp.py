@@ -18,7 +18,7 @@ def test_connect():
 	family, socktype, proto, canonname, sockaddr = socket.getaddrinfo(*addr)[0]
 	sock = socket.socket(family, socktype, proto)
 	try:
-		conn = sock.connect(sockaddr)
+		sock.connect(sockaddr)
 	except socket.error as e:
 		print(e)
 		raise SystemExit(1)

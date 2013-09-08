@@ -11,14 +11,10 @@ import datetime
 import argparse
 import httplib
 import cgi
-import cookielib
 
-try:
-	import urllib.parse as urllib_parse
-	import urllib.request as urllib_request
-except ImportError:
-	import urlparse as urllib_parse
-	import urllib2 as urllib_request
+import six
+from six.moves.urllib import request
+from six.moves.urllib import parse
 
 import jaraco.util.string
 from jaraco.filesystem import set_time
@@ -42,12 +38,12 @@ class Query(dict):
 	def __init__(self, query):
 		query = Query.__QueryFromURL__(query) or query
 		if not re.match(r'(\w+=\w+(&\w+=\w+)*)*$', query): query = ()
-		if isinstance(query, basestring):
+		if isinstance(query, six.text_types):
 			items = query.split('&')
 			# remove any empty values
 			items = filter(None, items)
 			itemPairs = map(jaraco.util.string.Splitter('='), items)
-			unquoteSequence = lambda l: map(urllib_parse.unquote, l)
+			unquoteSequence = lambda l: map(parse.unquote, l)
 			query = map(unquoteSequence, itemPairs)
 		if isinstance(query, (tuple, list)):
 			query = dict(query)
@@ -57,14 +53,14 @@ class Query(dict):
 		self.update(query)
 
 	def __repr__(self):
-		return urllib_parse.urlencode(self)
+		return parse.urlencode(self)
 
 	@staticmethod
 	def __QueryFromURL__(url):
 		"Return the query portion of a URL"
-		return urllib_parse.urlparse(url).query
+		return parse.urlparse(url).query
 
-class MethodRequest(urllib_request.Request):
+class MethodRequest(request.Request):
 	def __init__(self, *args, **kwargs):
 		"""
 		Construct a MethodRequest. Usage is the same as for
@@ -74,10 +70,10 @@ class MethodRequest(urllib_request.Request):
 		"""
 		if 'method' in kwargs:
 			self.method = kwargs.pop('method')
-		return urllib_request.Request.__init__(self, *args, **kwargs)
+		return request.Request.__init__(self, *args, **kwargs)
 
 	def get_method(self):
-		return getattr(self, 'method', urllib_request.Request.get_method(self))
+		return getattr(self, 'method', request.Request.get_method(self))
 
 class HeadRequest(MethodRequest):
 	method = 'HEAD'
@@ -108,18 +104,18 @@ def get_content_disposition_filename(url):
 	if not getattr(res, 'headers', None):
 		req = HeadRequest(url)
 		try:
-			res = urllib.request.urlopen(req)
-		except urllib.request.URLError:
+			res = request.urlopen(req)
+		except request.URLError:
 			return
 	header = res.headers.get('content-disposition', '')
 	value, params = cgi.parse_header(header)
 	return params.get('filename')
 
 def get_url_filename(url):
-	return os.path.basename(urllib_parse.urlparse(url).path)
+	return os.path.basename(parse.urlparse(url).path)
 
 def get_url(url, dest=None, replace_newer=False, touch_older=True):
-	src = urllib_request.urlopen(url)
+	src = request.urlopen(url)
 	log.debug(src.headers)
 	if 'last-modified' in src.headers:
 		mod_time = datetime.datetime.strptime(src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
@@ -135,7 +131,8 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 		log.debug('Remote last mod %s', mod_time)
 		log.debug('Local  size %d', previous_size)
 		log.debug('Remote size %d', content_length)
-		if not replace_newer and not touch_older: raise RuntimeError, "%s exists" % fname
+		if not replace_newer and not touch_older:
+			raise RuntimeError("%s exists" % fname)
 		if replace_newer and previous_mod_time >= mod_time and previous_size == content_length:
 			log.info('File is current')
 			return
@@ -154,7 +151,7 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	return fname
 
 def print_headers(url):
-	parsed = urllib_parse.urlparse(url)
+	parsed = parse.urlparse(url)
 	conn_class = dict(
 		http=httplib.HTTPConnection,
 		https=httplib.HTTPSConnection,

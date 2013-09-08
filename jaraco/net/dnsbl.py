@@ -4,9 +4,10 @@ dnsbl: DNS blocklist support
 
 from __future__ import print_function
 
-import sys
 import socket
 import argparse
+
+import six
 
 class BlocklistHit(object):
 	def __init__(self, host, blocklist, result):
@@ -17,7 +18,7 @@ class BlocklistHit(object):
 	def __str__(self):
 		return "{host} listed with {blocklist} as {result}".format(**vars(self))
 
-class Service(unicode):
+class Service(six.text_type):
 	"""
 	Blocklist service. Represents a blocklist service suitable for referencing
 	the reputation of potentially malicious or malfeasant hosts.

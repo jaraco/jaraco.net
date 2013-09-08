@@ -4,15 +4,16 @@ inspired by http://code.activestate.com/recipes/491261/
 """
 
 import pickle
-import urllib2
 import datetime
 import email
 import logging
-from StringIO import StringIO
+import io
+
+from six.moves.urllib import request
 
 log = logging.getLogger(__name__)
 
-class CacheHandler(urllib2.BaseHandler):
+class CacheHandler(request.BaseHandler):
 	"""
 	Stores responses in a httplib2-style cache object.
 	"""
@@ -45,7 +46,7 @@ class CacheHandler(urllib2.BaseHandler):
 		# get the cached response, or None if it's not found
 		cached_resp = CachedResponse.load(self.store.get(key))
 		if not cached_resp and 'only-if-cached' in cc:
-			raise urllib2.HTTPError(request.get_full_url(), 504,
+			raise request.HTTPError(request.get_full_url(), 504,
 				'content is not cached', hdrs=None, fp=None)
 
 		if cached_resp and not cached_resp.fresh_for(request.headers):
@@ -168,9 +169,9 @@ class CacheHandler(urllib2.BaseHandler):
 		return dict(parse_part(part) for part in cc_header.split(',') if part)
 
 
-class CachedResponse(StringIO):
+class CachedResponse(io.BytesIO):
 	"""
-	A response object compatible with urllib2.response objects but for
+	A response object compatible with urllib.request.response objects but for
 	cached responses.
 	"""
 	cached = True
@@ -187,7 +188,7 @@ class CachedResponse(StringIO):
 
 	def save(self):
 		"Produce a serialized version of this response"
-		self.headers['x-urllib2-cache'] = 'Stored'
+		self.headers['x-urllib-cache'] = 'Stored'
 		return pickle.dumps(vars(self))
 
 	@classmethod
@@ -197,7 +198,7 @@ class CachedResponse(StringIO):
 			return None
 		result = cls()
 		result.__dict__.update(pickle.loads(payload))
-		result.headers['x-urllib2-cache'] = 'Cached'
+		result.headers['x-urllib-cache'] = 'Cached'
 		return result
 
 	def info(self):
@@ -210,7 +211,7 @@ class CachedResponse(StringIO):
 		"""
 		Force a reload of this response
 		"""
-		opener = urllib2.build_opener()
+		opener = request.build_opener()
 		cr = self.from_response(opener.open(self.url))
 		self.__dict__.update(vars(cr))
 		store.set(self.url, self.save())
@@ -304,15 +305,15 @@ def quick_test():
 	from httplib2 import FileCache
 	logging.basicConfig(level=logging.DEBUG)
 	store = FileCache(".cache")
-	opener = urllib2.build_opener(CacheHandler(store))
-	urllib2.install_opener(opener)
-	response = urllib2.urlopen("http://www.google.com/")
-	print response.headers
-	print "Response:", response.read()[:100], '...\n'
+	opener = request.build_opener(CacheHandler(store))
+	request.install_opener(opener)
+	response = request.urlopen("http://www.google.com/")
+	print(response.headers)
+	print("Response:", response.read()[:100], '...\n')
 
 	response.reload(store)
-	print response.headers
-	print "After reload:", response.read()[:100], '...\n'
+	print(response.headers)
+	print("After reload:", response.read()[:100], '...\n')
 
 if __name__ == "__main__":
 	quick_test()

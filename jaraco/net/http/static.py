@@ -1,9 +1,9 @@
 import os
 import argparse
+import importlib
 
 import cherrypy
 
-from . import staticdirindex
 from . import htmldir
 
 def get_args():
@@ -15,6 +15,7 @@ def serve_local():
 	"""
 	Serve the current directory as static files.
 	"""
+	importlib.import_module('jaraoc.net.http.staticdirindex')
 	args = get_args()
 	config = {
 		'global': {

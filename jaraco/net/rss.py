@@ -7,16 +7,15 @@ from __future__ import print_function, absolute_import
 import itertools
 import subprocess
 import os
-import functools
 import re
 import operator
 import datetime
 import sys
 import mimetypes
-import urllib2
 import logging
 import argparse
 
+import six
 import feedparser
 import jaraco.util.logging
 from dateutil import parser as date_parser
@@ -88,10 +87,10 @@ def load_feed_enclosure(url, filter_=None, index=None):
 
 	if index is None:
 		for i, entry in enumerate(filtered_entries):
-			fmt = unicode('{0:4d} {1}')
+			fmt = six.text_type('{0:4d} {1}')
 			print(fmt.format(i, entry.title))
 		try:
-			index = int(raw_input('Which one? '))
+			index = int(six.moves.input('Which one? '))
 		except ValueError:
 			print("Nothing selected")
 			sys.exit(0)

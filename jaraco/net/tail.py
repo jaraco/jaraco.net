@@ -1,6 +1,5 @@
 import sys
 import time
-import functools
 
 import cherrypy.process.plugins
 

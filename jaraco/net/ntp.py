@@ -1,6 +1,5 @@
 import socket
 import struct
-import sys
 import time
 import logging
 import argparse
@@ -10,7 +9,7 @@ import jaraco.util.logging
 
 log = logging.getLogger(__name__)
 
-TIME1970 = 2208988800L		# Thanks to F.Lundh
+TIME1970 = 0x83aa7e80
 
 def query(server, force_ipv6=False):
 	"""

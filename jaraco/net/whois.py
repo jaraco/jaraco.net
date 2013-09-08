@@ -7,8 +7,6 @@ HTTP scraper for nic servers who only offer whois service via web only.
 Run the script from the command line and it will service port 43 as a whois
 server, passing the query to the appropriate web form and parsing the results
 into a textual format.
-
-Copyright © 2005-2011 Jason R. Coombs
 """
 
 import os
@@ -25,6 +23,7 @@ import socket
 import select
 import SocketServer
 
+import six
 import jaraco.util.logging
 from ClientForm import ParseResponse, ItemNotFoundError
 from BeautifulSoup import BeautifulSoup, UnicodeDammit
@@ -230,7 +229,7 @@ class BoliviaWhoisHandler(WhoisHandler):
 	def ParseResponse(self, s_out):
 		soup = BeautifulSoup(self._response)
 		#self._response = unicode(soup.strong.parent.div).encode('latin-1')
-		self._response = unicode(soup.strong.parent.div)
+		self._response = six.text_type(soup.strong.parent.div)
 		return super(self.__class__, self).ParseResponse(s_out)
 
 class SourceWhoisHandler(WhoisHandler):
@@ -285,7 +284,7 @@ class Handler(SocketServer.StreamRequestHandler):
 			msg = 'Could not contact whois HTTP service.'
 			self.wfile.write(msg + '\n')
 			log.exception(msg)
-		except ValueError, e:
+		except ValueError as e:
 			log.info('%s response %s', self.client_address, e)
 			self.wfile.write('%s\n' % e)
 
@@ -307,7 +306,7 @@ class Listener(SocketServer.ThreadingTCPServer):
 		#  object is closed.
 		try:
 			select.select((self.socket,), (), ())
-		except socket.error, e:
+		except socket.error as e:
 			if e[1].lower() == 'bad file descriptor':
 				raise ConnectionClosed
 		return SocketServer.ThreadingTCPServer.get_request(self)

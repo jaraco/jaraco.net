@@ -3,9 +3,9 @@ Utilities for working with networking devices defined based upon the platform
 being run upon
 """
 
-import itertools
 import sys
 
+from six.moves import map
 
 class BaseManager(object):
 	"""
@@ -35,7 +35,7 @@ class BaseManager(object):
 		Iterate over the MAC address strings for the host.	These are
 		strings of six pairs of hex digits separated by colons.
 		"""
-		return itertools.imap(self.hardware_address_to_string, self.get_host_mac_addresses())
+		return map(self.hardware_address_to_string, self.get_host_mac_addresses())
 
 	def get_host_mac_addresses(self):
 		"""
@@ -49,7 +49,7 @@ class BaseManager(object):
 		strings of four integers in the range [0, 255] separated by
 		periods.
 		"""
-		return itertools.imap(self.ip_address_to_string, self.get_host_ip_addresses())
+		return map(self.ip_address_to_string, self.get_host_ip_addresses())
 
 	def get_host_ip_addresses(self):
 		"""

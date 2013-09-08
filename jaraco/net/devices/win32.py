@@ -2,7 +2,12 @@ import ctypes
 import struct
 from ctypes.wintypes import DWORD, BYTE, WCHAR
 
-from base import BaseManager
+from .base import BaseManager
+
+try:
+	memoryview
+except NameError:
+	memoryview = buffer
 
 # select constants
 # error.h
@@ -49,7 +54,7 @@ class MIB_IFROW(ctypes.Structure):
 	def get_variable_length_property(self, name):
 		val = getattr(self, name+'_raw')
 		length = getattr(self, name+'_length')
-		return str(buffer(val))[:length]
+		return str(memoryview(val))[:length]
 
 	def physical_address(self):
 		return self.get_variable_length_property('physical_address')

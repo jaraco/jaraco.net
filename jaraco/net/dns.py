@@ -3,11 +3,12 @@
 import os
 import sys
 import socket
-import _winreg as winreg
 
+from six.moves import winreg
+
+import six
 import win32serviceutil
 import win32service
-from win32com.client import constants
 
 port = socket.getservbyname('domain')
 
@@ -42,10 +43,10 @@ class Forwarder(object):
 	def relay_message(self):
 		try:
 			mesg, requester = self.socket.recvfrom(2**16)
-			print 'received %(mesg)r from %(requester)s' % vars()
+			print('received %(mesg)r from %(requester)s' % vars())
 			self.dest.sendto(mesg, self.dest_addr)
 			resp, src = self.dest.recvfrom(2**16)
-			print 'response %(resp)r' % vars()
+			print('response %(resp)r' % vars())
 			self.socket.sendto(resp, requester)
 		except socket.timeout:
 			pass
@@ -62,7 +63,7 @@ class RegConfig(object):
 	def infer_key_type(value):
 		if isinstance(value, int):
 			return winreg.REG_DWORD
-		if isinstance(value, basestring):
+		if isinstance(value, six.string_types):
 			if '%' in value:
 				return winreg.REG_EXPAND_SZ
 			return winreg.REG_SZ

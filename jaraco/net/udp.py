@@ -1,4 +1,5 @@
-import sys
+from __future__ import print_function
+
 import socket
 import argparse
 
@@ -26,7 +27,7 @@ class EchoServer(object):
 		while True:
 			try:
 				res, addr = s.recvfrom(1024)
-				print res, addr
+				print(res, addr)
 			except socket.timeout:
 				pass
 			except KeyboardInterrupt:
@@ -42,7 +43,7 @@ class Sender(object):
 		infos = socket.getaddrinfo(host, port)
 		(family, socktype, proto, canonname, sockaddr) = infos[0]
 		self.sockaddr = sockaddr
-		s = socket(family, sock.SOCK_DGRAM)
+		s = socket(family, socket.SOCK_DGRAM)
 		s.connect(sockaddr)
 		s.send(self.args.message)
 		s.close()

@@ -66,6 +66,7 @@ setup_params = dict(
 		'lxml',
 		'requests',
 		'feedparser',
+		'six>=1.4',
 	] + py26reqs,
 	extras_require = {
 	},
