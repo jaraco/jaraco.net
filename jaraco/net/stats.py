@@ -129,6 +129,8 @@ class Server(object):
 		g = time_series.Plot({})
 		g.timescale_divisions = '4 hours'
 		g.x_label_format = '%H:%M'
+		g.width=1400
+		g.height=800
 		g.add_data(dict(
 			data=data,
 			title='Network Quality',
