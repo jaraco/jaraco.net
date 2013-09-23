@@ -1,0 +1,93 @@
+import re
+import datetime
+import itertools
+import argparse
+
+import dateutil.parser
+
+class PingResult(object):
+	def __init__(self, text):
+		pattern = re.compile('time: (?P<time>.*), host: (?P<host>.*), '
+			'res: (?P<result>.*)\n')
+		res = pattern.match(text).groupdict()
+		res['time'] = dateutil.parser.parse(res['time'])
+		self.__dict__.update(res)
+		if self.result == 'None':
+			self.result = None
+
+	@property
+	def latency(self):
+		if not self:
+			return
+		hours, minutes, seconds = self.result.split(':')
+		return datetime.timedelta(
+			hours=float(hours),
+			minutes=float(minutes),
+			seconds=float(seconds),
+		)
+
+	@property
+	def type(self):
+		if self.result is None:
+			return 'loss'
+		if 'transmission failure' in self.result:
+			return 'error'
+		if 'Network is unreachable' in self.result:
+			return 'environment'
+		return 'success'
+
+	def success(self):
+		return self.type == 'success'
+
+	__bool__ = success
+
+class Reader(object):
+	def __init__(self, filename):
+		self.filename = filename
+		self.file = open(filename)
+
+	def get_stats(self):
+		return map(PingResult, self.file)
+
+	def __del__(self):
+		self.file.close()
+
+def windows(seq, n=2):
+	"""
+	Return a sliding window (of width n) over data from the iterable
+	s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
+	"""
+	it = iter(seq)
+	result = tuple(itertools.islice(it, n))
+	if len(result) == n:
+		yield result
+	for elem in it:
+		result = result[1:] + (elem,)
+		yield result
+
+def get_loss_stats(window):
+	total = len(window)
+	loss = len([ping for ping in window if ping.type=='loss'])
+	errors = len([ping for ping in window if ping.type=='error'])
+	slow_ping = datetime.timedelta(milliseconds=50)
+	slow = len([ping for ping in window if ping and ping.latency > slow_ping])
+	quality = (total-loss)/total
+	return dict(time=window[-1].time, quality=quality, errors=errors,
+		loss=loss, slow=slow)
+
+def get_windows(stats):
+	"Construct rolling windows"
+	windows_ = itertools.islice(windows(stats, n=20), None, None, 10)
+	return map(get_loss_stats, windows_)
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('filename')
+	args = parser.parse_args()
+	reader = Reader(args.filename)
+	stats = reader.get_stats()
+	for window in get_windows(stats):
+		print(window['time'], window['quality'])
+
+if __name__ == '__main__':
+	main()
