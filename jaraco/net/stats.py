@@ -125,7 +125,7 @@ class Server(object):
 		))
 		g = time_series.Plot({})
 		g.timescale_divisions = '4 hours'
-		g.title = 'foo'
+		g.x_label_format = '%H:%M'
 		g.add_data({'data': data})
 		cherrypy.response.headers['Content-Type'] = 'image/svg+xml'
 		return g.burn()
