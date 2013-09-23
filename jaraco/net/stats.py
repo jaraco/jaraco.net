@@ -4,6 +4,8 @@ import itertools
 import argparse
 import importlib
 
+import six
+
 import jaraco.util.itertools
 import dateutil.parser
 from svg.charts import time_series
@@ -46,7 +48,7 @@ class PingResult(object):
 	def success(self):
 		return self.type == 'success'
 
-	__bool__ = success
+	__bool__ = __nonzero__ = success
 
 class Reader(object):
 	def __init__(self, filename):
@@ -54,7 +56,7 @@ class Reader(object):
 		self.file = open(filename)
 
 	def get_stats(self):
-		return map(PingResult, self.file)
+		return six.moves.map(PingResult, self.file)
 
 	def __del__(self):
 		self.file.close()
@@ -95,7 +97,7 @@ def get_loss_stats(window):
 def get_windows(stats):
 	"Construct rolling windows"
 	windows_ = itertools.islice(windows(stats, n=20), None, None, 10)
-	return map(get_loss_stats, windows_)
+	return six.moves.map(get_loss_stats, windows_)
 
 def main():
 	parser = argparse.ArgumentParser()
