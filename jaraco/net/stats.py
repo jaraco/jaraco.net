@@ -2,8 +2,11 @@ import re
 import datetime
 import itertools
 import argparse
+import importlib
 
+import jaraco.util.itertools
 import dateutil.parser
+from svg.charts import time_series
 
 class PingResult(object):
 	def __init__(self, text):
@@ -89,5 +92,28 @@ def main():
 	for window in get_windows(stats):
 		print(window['time'], window['quality'])
 
+cherrypy = None
+
+class Server(object):
+	@classmethod
+	def handle_command_line(cls):
+		globals().update(cherrypy=importlib.import_module('cherrypy'))
+		cherrypy.quickstart(cls())
+
+	def index(self):
+		reader = Reader('ping-results.txt')
+		stats = reader.get_stats()
+		# timeseries likes date/value pairs flattened
+		data = list(jaraco.util.itertools.flatten(
+			[str(window['time']), window['quality']]
+			for window in get_windows(stats)
+		))
+		g = time_series.Plot({})
+		g.timescale_divisions = '4 hours'
+		g.add_data({'data': data})
+		cherrypy.response.headers['Content-Type'] = 'image/svg+xml'
+		return g.burn()
+	index.exposed = True
+
 if __name__ == '__main__':
-	main()
+	Server.handle_command_line()
