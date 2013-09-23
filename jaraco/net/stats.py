@@ -128,7 +128,10 @@ class Server(object):
 		g = time_series.Plot({})
 		g.timescale_divisions = '4 hours'
 		g.x_label_format = '%H:%M'
-		g.add_data({'data': data})
+		g.add_data(dict(
+			data=data,
+			title='Network Quality',
+		))
 		cherrypy.response.headers['Content-Type'] = 'image/svg+xml'
 		return g.burn()
 	index.exposed = True
