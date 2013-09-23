@@ -19,6 +19,10 @@ class PingResult(object):
 			self.result = None
 
 	@property
+	def date(self):
+		return self.time.date()
+
+	@property
 	def latency(self):
 		if not self:
 			return
@@ -54,6 +58,16 @@ class Reader(object):
 
 	def __del__(self):
 		self.file.close()
+
+def single_day(stats, day):
+	"skip day-1 days then return only results from the next day"
+	days_seen = set()
+	for ping in stats:
+		days_seen.add(ping.date)
+		if len(days_seen) == day:
+			yield ping
+		if len(days_seen) > day:
+			return
 
 def windows(seq, n=2):
 	"""
@@ -100,9 +114,10 @@ class Server(object):
 		globals().update(cherrypy=importlib.import_module('cherrypy'))
 		cherrypy.quickstart(cls())
 
-	def index(self):
+	def index(self, day=1):
 		reader = Reader('ping-results.txt')
 		stats = reader.get_stats()
+		stats = single_day(stats, day)
 		# timeseries likes date/value pairs flattened
 		data = list(jaraco.util.itertools.flatten(
 			[str(window['time']), window['quality']]
@@ -110,6 +125,7 @@ class Server(object):
 		))
 		g = time_series.Plot({})
 		g.timescale_divisions = '4 hours'
+		g.title = 'foo'
 		g.add_data({'data': data})
 		cherrypy.response.headers['Content-Type'] = 'image/svg+xml'
 		return g.burn()
