@@ -117,6 +117,7 @@ class Server(object):
 		cherrypy.quickstart(cls())
 
 	def index(self, day=1):
+		day = int(day)
 		reader = Reader('ping-results.txt')
 		stats = reader.get_stats()
 		stats = single_day(stats, day)
