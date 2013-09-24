@@ -3,6 +3,7 @@ import datetime
 import itertools
 import argparse
 import importlib
+import textwrap
 
 import six
 
@@ -116,11 +117,26 @@ class Server(object):
 		globals().update(cherrypy=importlib.import_module('cherrypy'))
 		cherrypy.quickstart(cls())
 
-	def index(self, day=1):
-		day = int(day)
+	def index(self):
+		return textwrap.dedent("""
+			<!DOCTYPE html>
+			<html>
+			<body>
+
+			{images}
+
+			</body>
+			</html>
+			""").format(images='<br/>'.join(self.get_images())).encode('utf-8')
+	index.exposed = True
+
+	def get_images(self):
 		reader = Reader('ping-results.txt')
 		stats = reader.get_stats()
-		stats = single_day(stats, day)
+		for day, day_stats in itertools.groupby(stats, lambda res: res.date):
+			yield self.make_image(day, day_stats)
+
+	def make_image(self, day, stats):
 		# timeseries likes date/value pairs flattened
 		data = list(jaraco.util.itertools.flatten(
 			[str(window['time']), window['quality']]
@@ -135,9 +151,7 @@ class Server(object):
 			data=data,
 			title='Network Quality',
 		))
-		cherrypy.response.headers['Content-Type'] = 'image/svg+xml'
-		return g.burn()
-	index.exposed = True
+		return g.burn().decode('utf-8')
 
 if __name__ == '__main__':
 	Server.handle_command_line()
