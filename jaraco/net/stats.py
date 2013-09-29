@@ -115,7 +115,12 @@ class Server(object):
 	@classmethod
 	def handle_command_line(cls):
 		globals().update(cherrypy=importlib.import_module('cherrypy'))
-		cherrypy.quickstart(cls())
+		config = {
+			'global': {
+				'server.socket_host': '::0',
+			}
+		}
+		cherrypy.quickstart(cls(), config=config)
 
 	def index(self):
 		return textwrap.dedent("""
