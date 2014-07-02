@@ -74,9 +74,11 @@ setup_params = dict(
 	dependency_links = [
 	],
 	tests_require=[
+		'pytest',
 	],
 	setup_requires = [
-		'hgtools>=0.6.4',
+		'hgtools',
+		'pytest-runner',
 	],
 )
 
