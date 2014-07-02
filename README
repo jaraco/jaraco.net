@@ -45,6 +45,11 @@ Changes
 * Removed ``http.MethodRequest``. Use `backports.method_request
   <https://pypi.python.org/pypi/backports.method_request/>`_ instead.
 
+3.0
+~~~
+
+* Removed ``wget`` command except on Windows.
+
 2.1
 ~~~
 
