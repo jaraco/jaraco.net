@@ -14,6 +14,7 @@ import cgi
 import six
 from six.moves import urllib
 from six.moves import http_client
+from backports.method_request import Request
 
 import jaraco.util.string
 from jaraco.filesystem import set_time
@@ -59,27 +60,6 @@ class Query(dict):
 		"Return the query portion of a URL"
 		return urllib.parse.urlparse(url).query
 
-class MethodRequest(urllib.request.Request):
-	method = None
-
-	def __init__(self, *args, **kwargs):
-		"""
-		Construct a MethodRequest. Usage is the same as for
-		`urllib.request.Request` except it also takes an optional `method`
-		keyword argument. If supplied, `method` will be used instead of
-		the default.
-		"""
-		method = kwargs.pop('method', self.method)
-		urllib.request.Request.__init__(self, *args, **kwargs)
-		# write the method after __init__ as Python 3.3 overrides the value
-		self.method = method
-
-	def get_method(self):
-		return getattr(self, 'method') or urllib.request.Request.get_method(self)
-
-class HeadRequest(MethodRequest):
-	method = 'HEAD'
-
 def get_content_disposition_filename(url):
 	"""
 	Get the content disposition filename from a URL.
@@ -104,7 +84,7 @@ def get_content_disposition_filename(url):
 
 	res = url
 	if not getattr(res, 'headers', None):
-		req = HeadRequest(url)
+		req = Request(url, method='HEAD')
 		try:
 			res = urllib.request.urlopen(req)
 		except urllib.error.URLError:

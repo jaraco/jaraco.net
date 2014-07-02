@@ -67,6 +67,7 @@ setup_params = dict(
 		'requests',
 		'feedparser',
 		'six>=1.4',
+		'backports.method_request',
 	] + py26reqs,
 	extras_require = {
 	},

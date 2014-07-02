@@ -39,6 +39,12 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+4.0
+~~~
+
+* Removed ``http.MethodRequest``. Use `backports.method_request
+  <https://pypi.python.org/pypi/backports.method_request/>`_ instead.
+
 2.1
 ~~~
 
