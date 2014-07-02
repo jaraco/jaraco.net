@@ -70,10 +70,9 @@ class MethodRequest(urllib.request.Request):
 		the default.
 		"""
 		method = kwargs.pop('method', self.method)
-		req = urllib.request.Request.__init__(self, *args, **kwargs)
+		urllib.request.Request.__init__(self, *args, **kwargs)
 		# write the method after __init__ as Python 3.3 overrides the value
-		req.method = method
-		return req
+		self.method = method
 
 	def get_method(self):
 		return getattr(self, 'method') or urllib.request.Request.get_method(self)
