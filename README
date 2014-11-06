@@ -39,6 +39,11 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+4.0.1
+~~~~~
+
+* Fixed encoding issue in SMTPNotifier.
+
 4.0
 ~~~
 
