@@ -12,8 +12,6 @@ import setuptools
 
 name = 'jaraco.net'
 
-py26reqs = ['argparse'] if sys.version_info < (2, 7) else []
-
 windows_scripts = [
 	'whois-bridge-service = jaraco.net.whois:Service.handle_command_line',
 	'wget = jaraco.net.http:wget',
@@ -68,7 +66,7 @@ setup_params = dict(
 		'feedparser',
 		'six>=1.4',
 		'backports.method_request',
-	] + py26reqs,
+	],
 	extras_require = {
 	},
 	dependency_links = [
