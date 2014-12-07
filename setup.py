@@ -73,12 +73,12 @@ setup_params = dict(
 	],
 	tests_require=[
 		'pytest',
+		'cherrypy',
+		'svg.charts',
 	],
 	setup_requires = [
 		'hgtools',
 		'pytest-runner',
-		'cherrypy',
-		'svg.charts',
 	],
 )
 
