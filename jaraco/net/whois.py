@@ -52,13 +52,13 @@ def init():
 	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
 	urllib.request.install_opener(opener)
 
+
+@six.add_metaclass(LeafClassesMeta)
 class WhoisHandler(object):
 	"""
 	WhoisHandler is an abstract class for defining whois interfaces for
 	web-based nic servers.
 	"""
-
-	__metaclass__ = LeafClassesMeta
 
 	@abc.abstractproperty
 	def services(self):
