@@ -289,7 +289,8 @@ class Handler(socketserver.StreamRequestHandler):
 			log.exception(msg)
 		except ValueError as e:
 			log.info('%s response %s', self.client_address, e)
-			self.wfile.write('%s\n' % e)
+			out = '%s\n' % e
+			self.wfile.write(out.encode('utf-8'))
 
 class ConnectionClosed(Exception): pass
 
