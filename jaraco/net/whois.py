@@ -275,7 +275,7 @@ class Handler(socketserver.StreamRequestHandler):
 			log.exception('unhandled exception')
 
 	def _handle(self):
-		query = self.rfile.readline().strip()
+		query = self.rfile.readline().decode('utf-8').strip()
 		log.info('%s requests %s', self.client_address, query)
 		try:
 			handler = WhoisHandler.GetHandler(query)
