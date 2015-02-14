@@ -7,7 +7,7 @@ import textwrap
 
 import six
 
-import jaraco.util.itertools
+from more_itertools import recipes
 import dateutil.parser
 from svg.charts import time_series
 
@@ -143,7 +143,7 @@ class Server(object):
 
 	def make_image(self, day, stats):
 		# timeseries likes date/value pairs flattened
-		data = list(jaraco.util.itertools.flatten(
+		data = list(recipes.flatten(
 			[str(window['time']), window['quality']]
 			for window in get_windows(stats)
 		))
