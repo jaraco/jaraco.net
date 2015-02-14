@@ -22,6 +22,7 @@ import logging
 import functools
 
 import six
+from more_itertools.recipes import consume
 
 from . import icmp
 
@@ -80,7 +81,7 @@ class ScanThread(threading.Thread):
 		map(lambda x: x.join(), ScanThread.all_testers)
 
 def portscan_hosts(hosts, *args, **kargs):
-	map(lambda h: portscan(h, *args, **kargs), hosts)
+	consume(map(lambda h: portscan(h, *args, **kargs), hosts))
 
 def portscan(host, ports = range(1024), frequency = 20):
 	make_address = lambda port: (host, port)

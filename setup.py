@@ -59,6 +59,7 @@ setup_params = dict(
 	},
 	install_requires=[
 		'jaraco.util>=5.0',
+		'more_itertools',
 		'BeautifulSoup4',
 		'keyring>=0.6',
 		'lxml',
