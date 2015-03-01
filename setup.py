@@ -39,10 +39,9 @@ setup_params = dict(
 		'feedparser',
 		'six>=1.4',
 		'backports.method_request',
-		'jaraco.timing',
 		'jaraco.text',
-		'jaraco.collections',
 		'jaraco.logging',
+		'jaraco.email',
 	],
 	setup_requires=[
 		'setuptools_scm',

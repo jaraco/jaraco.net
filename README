@@ -39,6 +39,11 @@ that the service must be restarted to recognize an updated bind address.
 Changes
 -------
 
+5.1
+~~~
+
+Deprecated email modules and moved them to jaraco.email.
+
 5.0
 ~~~
 
