@@ -3,7 +3,7 @@ from __future__ import print_function
 import argparse
 
 from path import path
-from jaraco.util.string import local_format as lf
+from jaraco.text import local_format as lf
 
 def make_index_cmd():
 	"""

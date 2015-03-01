@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 import socket
 import argparse
 
-from jaraco.util.string import local_format as lf
+from jaraco.text import local_format as lf
 
 def get_connect_options():
 	parser = argparse.ArgumentParser(conflict_handler="resolve")

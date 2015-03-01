@@ -24,13 +24,13 @@ from six.moves import urllib
 from six.moves import http_cookiejar
 from six.moves import socketserver
 
-import jaraco.util.logging
+import jaraco.logging
 try:
 	from ClientForm import ParseResponse, ItemNotFoundError
 except ImportError:
 	"Disabled for Python 3 compatibility"
 from bs4 import BeautifulSoup, UnicodeDammit
-from jaraco.util.meta import LeafClassesMeta
+from jaraco.classes.meta import LeafClassesMeta
 
 try:
 	import win32service
@@ -359,14 +359,14 @@ if 'win32serviceutil' in globals():
 
 		def _setup_logging(self):
 			logfile = os.path.join(os.environ['WINDIR'], 'system32', 'LogFiles', self._svc_display_name_, 'events.log')
-			handler = jaraco.util.logging.TimestampFileHandler(logfile)
+			handler = jaraco.logging.TimestampFileHandler(logfile)
 			handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] %(message)s'
 			handler.setFormatter(logging.Formatter(handlerFormat))
 			logging.root.addHandler(handler)
 			# if I don't redirect stdoutput and stderr, when the stdio flushes,
 			#  an exception will be thrown and the service will bail
-			sys.stdout = jaraco.util.logging.LogFileWrapper('stdout')
-			sys.stderr = jaraco.util.logging.LogFileWrapper('stderr')
+			sys.stdout = jaraco.logging.LogFileWrapper('stdout')
+			sys.stderr = jaraco.logging.LogFileWrapper('stderr')
 			logging.root.level = logging.INFO
 
 		@classmethod

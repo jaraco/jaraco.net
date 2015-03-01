@@ -15,7 +15,7 @@ import logging.handlers
 import argparse
 
 import six
-import jaraco.util.logging
+import jaraco.logging
 
 from . import inet
 
@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 def get_args():
 	parser = argparse.ArgumentParser()
-	jaraco.util.logging.add_arguments(parser)
+	jaraco.logging.add_arguments(parser)
 	parser.add_argument('-o', '--host-spec',
 		help="The host range or host range to scan",
 		default = r'localhost')

@@ -4,8 +4,8 @@ import time
 import logging
 import argparse
 
-from jaraco.util.string import trim, local_format as lf
-import jaraco.util.logging
+from jaraco.text import trim, local_format as lf
+import jaraco.logging
 
 log = logging.getLogger(__name__)
 
@@ -49,9 +49,9 @@ def handle_command_line():
 	parser = argparse.ArgumentParser(usage=trim(handle_command_line.__doc__))
 	parser.add_argument('-6', '--ipv6', help="Force IPv6", action="store_true", default=False)
 	parser.add_argument('server', help="IP Address of server to query")
-	jaraco.util.logging.add_arguments(parser)
+	jaraco.logging.add_arguments(parser)
 	args = parser.parse_args()
-	jaraco.util.logging.setup(args)
+	jaraco.logging.setup(args)
 	logging.root.handlers[0].setFormatter(logging.Formatter("%(message)s"))
 	query(args.server, args.ipv6)
 

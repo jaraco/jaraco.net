@@ -1,7 +1,7 @@
 import struct
 import socket
 
-from jaraco.util.string import local_format as lf
+from jaraco.text import local_format as lf
 
 def wake_on_lan(self, addr='00:00:00:00:00:00'):
 	"Wake up a computer on the network"

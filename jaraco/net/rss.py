@@ -17,7 +17,7 @@ import argparse
 
 import six
 import feedparser
-import jaraco.util.logging
+import jaraco.logging
 from dateutil import parser as date_parser
 from jaraco.util.filesystem import encode as encode_filename
 
@@ -46,9 +46,9 @@ def _parse_args(parser=None):
 	parser.add_argument('-f', '--date-filter',
 		help="add a date filter such as 'before 2006'",
 		default=CombinedFilter(), action="append", type=parse_filter)
-	jaraco.util.logging.add_arguments(parser)
+	jaraco.logging.add_arguments(parser)
 	args = parser.parse_args()
-	jaraco.util.logging.setup(args)
+	jaraco.logging.setup(args)
 	return args
 
 def download_enclosures():

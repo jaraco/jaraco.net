@@ -10,7 +10,7 @@ import random
 import datetime
 import functools
 
-from jaraco.util.timing import Stopwatch
+from jaraco.timing import Stopwatch
 
 def calculate_checksum(bytes):
 	r"""
