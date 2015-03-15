@@ -9,7 +9,7 @@ import argparse
 import functools
 import traceback
 
-from jaraco.util.string import local_format as lf
+from jaraco.text import local_format as lf
 
 class Simple(object):
 	def __init__(self, host, port, timeout, response_delay, outfile):
