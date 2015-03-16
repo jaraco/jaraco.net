@@ -30,7 +30,6 @@ setup_params = dict(
 	url="https://bitbucket.org/jaraco/jaraco.net",
 	packages=setuptools.find_packages(),
 	install_requires=[
-		'jaraco.util>=5.0',
 		'more_itertools',
 		'BeautifulSoup4',
 		'keyring>=0.6',
@@ -42,6 +41,7 @@ setup_params = dict(
 		'jaraco.text',
 		'jaraco.logging',
 		'jaraco.email',
+		'jaraco.path',
 	],
 	setup_requires=[
 		'setuptools_scm',

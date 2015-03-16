@@ -17,7 +17,7 @@ from six.moves import http_client
 from backports.method_request import Request
 
 import jaraco.text
-from jaraco.filesystem import set_time
+import jaraco.path
 
 log = logging.getLogger(__name__)
 
@@ -121,7 +121,7 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 		just_needs_touching = touch_older and previous_mod_time > mod_time and previous_size == content_length
 		if just_needs_touching:
 			log.info('Local file appears newer than remote - updating mod time')
-			set_time(fname, mod_time)
+			jaraco.path.set_time(fname, mod_time)
 			return
 	log.info('Downloading %s (last mod %s)', url, str(mod_time))
 	dest = open(fname, 'wb')
@@ -129,7 +129,7 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 		dest.write(line)
 	dest.close()
 	if mod_time:
-		set_time(fname, mod_time)
+		jaraco.path.set_time(fname, mod_time)
 	return fname
 
 def print_headers(url):

@@ -19,7 +19,7 @@ import six
 import feedparser
 import jaraco.logging
 from dateutil import parser as date_parser
-from jaraco.util.filesystem import encode as encode_filename
+from jaraco.path import encode as encode_filename
 
 from jaraco.net.http import get_url
 
