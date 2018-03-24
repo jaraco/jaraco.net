@@ -1,16 +1,16 @@
-.. image:: https://img.shields.io/pypi/v/skeleton.svg
-   :target: https://pypi.org/project/skeleton
+.. image:: https://img.shields.io/pypi/v/jaraco.net.svg
+   :target: https://pypi.org/project/jaraco.net
 
-.. image:: https://img.shields.io/pypi/pyversions/skeleton.svg
+.. image:: https://img.shields.io/pypi/pyversions/jaraco.net.svg
 
-.. image:: https://img.shields.io/travis/jaraco/skeleton/master.svg
-   :target: https://travis-ci.org/jaraco/skeleton
+.. image:: https://img.shields.io/travis/jaraco/jaraco.net/master.svg
+   :target: https://travis-ci.org/jaraco/jaraco.net
 
-.. .. image:: https://img.shields.io/appveyor/ci/jaraco/skeleton/master.svg
-..    :target: https://ci.appveyor.com/project/jaraco/skeleton/branch/master
+.. .. image:: https://img.shields.io/appveyor/ci/jaraco/jaraco.net/master.svg
+..    :target: https://ci.appveyor.com/project/jaraco/jaraco.net/branch/master
 
-.. .. image:: https://readthedocs.org/projects/skeleton/badge/?version=latest
-..    :target: https://skeleton.readthedocs.io/en/latest/?badge=latest
+.. .. image:: https://readthedocs.org/projects/jaraconet/badge/?version=latest
+..    :target: https://jaraconet.readthedocs.io/en/latest/?badge=latest
 
 ``jaraco.net`` provides miscellaneous utility functions used across
 projects developed by the author.
