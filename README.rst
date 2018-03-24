@@ -1,23 +1,19 @@
-.. -*- restructuredtext -*-
+.. image:: https://img.shields.io/pypi/v/skeleton.svg
+   :target: https://pypi.org/project/skeleton
 
-jaraco.net
-==========
+.. image:: https://img.shields.io/pypi/pyversions/skeleton.svg
 
-.. contents::
+.. image:: https://img.shields.io/travis/jaraco/skeleton/master.svg
+   :target: https://travis-ci.org/jaraco/skeleton
 
-Status and License
-------------------
+.. .. image:: https://img.shields.io/appveyor/ci/jaraco/skeleton/master.svg
+..    :target: https://ci.appveyor.com/project/jaraco/skeleton/branch/master
+
+.. .. image:: https://readthedocs.org/projects/skeleton/badge/?version=latest
+..    :target: https://skeleton.readthedocs.io/en/latest/?badge=latest
 
 ``jaraco.net`` provides miscellaneous utility functions used across
 projects developed by the author.
-
-``jaraco.net`` is written by Jason R. Coombs.  It is licensed under an
-`MIT-style permissive license
-<http://www.opensource.org/licenses/mit-license.php>`_.
-
-You can install it with ``easy_install jaraco.net`` or check out the source
-from
-`the mercurial repository <https://bitbucket.org/jaraco/jaraco.net>`_.
 
 DNS Forwarding Service
 ----------------------
