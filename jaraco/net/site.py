@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import argparse
 
-from path import path
+from path import Path
 from jaraco.text import local_format as lf
 
 
@@ -12,7 +12,7 @@ def make_index_cmd():
 	index.htm file
 	"""
 	parser = argparse.ArgumentParser()
-	parser.add_argument('root', default=path('.'), type=path)
+	parser.add_argument('root', default=Path('.'), type=Path)
 	args = parser.parse_args()
 	print('<ul>')
 	for dir in sorted(args.root.dirs()):
