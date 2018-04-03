@@ -43,6 +43,7 @@ from .http import mechanize
 
 log = logging.getLogger(__name__)
 
+
 def init():
 	"""
 	Initialize HTTP functionality to support cookies, which are necessary
@@ -71,7 +72,7 @@ class WhoisHandler(object):
 		capable of parsing the response and outputting the textual result.
 		"""
 
-	def __init__(self, query = None):
+	def __init__(self, query=None):
 		self._query = query
 
 	@classmethod
@@ -89,7 +90,7 @@ class WhoisHandler(object):
 			error = [
 				'Domain for %s is not serviced by this server.',
 				'Server error, ambiguous nic server resolution for %s.',
-				][bool(len(matches))]
+			][bool(len(matches))]
 			raise ValueError(error % query)
 		return matches[0](query)
 
@@ -106,6 +107,7 @@ class WhoisHandler(object):
 		writer = MyWriter(s_out)
 		self._parser(formatter.AbstractFormatter(writer)).feed(response)
 
+
 class ArgentinaWhoisHandler(WhoisHandler):
 	services = r'\.ar$'
 
@@ -120,7 +122,7 @@ class ArgentinaWhoisHandler(WhoisHandler):
 		except ItemNotFoundError:
 			raise ValueError('Invalid domain (%s)' % domain)
 		req = form.click()
-		#req.data = 'nombre=%s&dominio=.com.ar' % query
+		# req.data = 'nombre=%s&dominio=.com.ar' % query
 		req.add_header('referer', pageURL)
 		resp = urllib.request.urlopen(req)
 		self._response = resp.read()
@@ -131,6 +133,7 @@ class ArgentinaWhoisHandler(WhoisHandler):
 
 		def end_tr(self):
 			self.formatter.add_line_break()
+
 
 class CoZaWhoisHandler(WhoisHandler):
 	services = r'\.co\.za$'
@@ -145,6 +148,7 @@ class CoZaWhoisHandler(WhoisHandler):
 		self._response = resp.read()
 
 	_parser = html_parser.HTMLParser
+
 
 class GovWhoisHandler(WhoisHandler):
 	services = r'(\.fed\.us|\.gov)$'
@@ -194,14 +198,20 @@ class GovWhoisHandler(WhoisHandler):
 			if not isinstance(self.formatter, formatter.NullFormatter):
 				self.formatter = formatter.NullFormatter()
 
+
 mozilla_headers = {
 	'referer': 'http://www.nic.bo/buscar.php',
-	'accept': 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
+	'accept':
+		'text/xml,application/xml,application/xhtml+xml,text/html;'
+		'q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
 	'accept-encoding': 'gzip,deflate',
-	'user-agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8) Gecko/20051111 Firefox/1.5',
+	'user-agent':
+		'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8) '
+		'Gecko/20051111 Firefox/1.5',
 	'accept-charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
 	'accept-language': 'en-us,en;q=0.5',
 }
+
 
 class BoliviaWhoisHandler(WhoisHandler):
 	services = r'\.bo$'
@@ -231,34 +241,40 @@ class BoliviaWhoisHandler(WhoisHandler):
 
 	def ParseResponse(self, s_out):
 		soup = BeautifulSoup(self._response)
-		#self._response = unicode(soup.strong.parent.div).encode('latin-1')
+		# self._response = unicode(soup.strong.parent.div).encode('latin-1')
 		self._response = six.text_type(soup.strong.parent.div)
 		return super(self.__class__, self).ParseResponse(s_out)
+
 
 class SourceWhoisHandler(WhoisHandler):
 	"""This is not a typical Whois handler, but rather a special
 	handler that returns the source of this file"""
 	services = r'^source$'
 
-	def LoadHTTP(self): pass
+	def LoadHTTP(self):
+		pass
 
 	def ParseResponse(self, s_out):
 		filename = os.path.splitext(__file__)[0] + '.py'
 		s_out.write(open(filename).read())
 
+
 class DebugHandler(WhoisHandler):
 	services = r'^debug (.*)$'
 	authorized_addresses = ['127.0.0.1']
 
-	def LoadHTTP(self): pass
+	def LoadHTTP(self):
+		pass
 
 	def ParseResponse(self, s_out):
 		if self.client_address[0] in self.authorized_addresses:
 			match = re.match(self.services, self._query)
 			s_out.write('result: %s' % eval(match.group(1)))
 
+
 # disable the debug handler
 del DebugHandler
+
 
 class MyWriter(formatter.DumbWriter):
 	def send_flowing_data(self, data):
@@ -267,11 +283,12 @@ class MyWriter(formatter.DumbWriter):
 		data = data.replace(u'\xa0', u' ')
 		formatter.DumbWriter.send_flowing_data(self, data)
 
+
 class Handler(socketserver.StreamRequestHandler):
 	def handle(self):
 		try:
 			self._handle()
-		except:
+		except Exception:
 			log.exception('unhandled exception')
 
 	def _handle(self):
@@ -292,7 +309,10 @@ class Handler(socketserver.StreamRequestHandler):
 			out = '%s\n' % e
 			self.wfile.write(out.encode('utf-8'))
 
-class ConnectionClosed(Exception): pass
+
+class ConnectionClosed(Exception):
+	pass
+
 
 class Listener(socketserver.ThreadingTCPServer):
 	def __init__(self):
@@ -300,7 +320,8 @@ class Listener(socketserver.ThreadingTCPServer):
 
 	def serve_until_closed(self):
 		try:
-			while True: self.handle_request()
+			while True:
+				self.handle_request()
 		except ConnectionClosed:
 			pass
 
@@ -315,10 +336,11 @@ class Listener(socketserver.ThreadingTCPServer):
 				raise ConnectionClosed
 		return socketserver.ThreadingTCPServer.get_request(self)
 
+
 def serve():
 	init()
-	l = Listener()
-	l.serve_forever()
+	Listener().serve_forever()
+
 
 # On Windows, run as a service
 if 'win32serviceutil' in globals():
@@ -341,7 +363,7 @@ if 'win32serviceutil' in globals():
 				servicemanager.EVENTLOG_INFORMATION_TYPE,
 				servicemanager.PYS_SERVICE_STARTED,
 				(self._svc_name_, '')
-				)
+			)
 
 			self.run()
 
@@ -349,7 +371,7 @@ if 'win32serviceutil' in globals():
 				servicemanager.EVENTLOG_INFORMATION_TYPE,
 				servicemanager.PYS_SERVICE_STOPPED,
 				(self._svc_name_, '')
-				)
+			)
 			log.info('%s service is stopped.', self._svc_display_name_)
 
 		def run(self):
@@ -358,7 +380,9 @@ if 'win32serviceutil' in globals():
 			self.listener.serve_until_closed()
 
 		def _setup_logging(self):
-			logfile = os.path.join(os.environ['WINDIR'], 'system32', 'LogFiles', self._svc_display_name_, 'events.log')
+			logfile = os.path.join(
+				os.environ['WINDIR'], 'system32', 'LogFiles',
+				self._svc_display_name_, 'events.log')
 			handler = jaraco.logging.TimestampFileHandler(logfile)
 			handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] %(message)s'
 			handler.setFormatter(logging.Formatter(handlerFormat))

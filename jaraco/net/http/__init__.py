@@ -37,13 +37,16 @@ class Query(dict):
 	"""
 	def __init__(self, query):
 		query = Query.__QueryFromURL__(query) or query
-		if not re.match(r'(\w+=\w+(&\w+=\w+)*)*$', query): query = ()
+		if not re.match(r'(\w+=\w+(&\w+=\w+)*)*$', query):
+			query = ()
 		if isinstance(query, six.string_types):
 			items = query.split('&')
 			# remove any empty values
 			items = filter(None, items)
 			itemPairs = map(jaraco.text.Splitter('='), items)
-			unquoteSequence = lambda l: map(urllib.parse.unquote, l)
+
+			def unquoteSequence(seq):
+				return map(urllib.parse.unquote, seq)
 			query = map(unquoteSequence, itemPairs)
 		if not isinstance(query, dict):
 			query = dict(query)
@@ -60,6 +63,7 @@ class Query(dict):
 		"Return the query portion of a URL"
 		return urllib.parse.urlparse(url).query
 
+
 def get_content_disposition_filename(url):
 	"""
 	Get the content disposition filename from a URL.
@@ -68,7 +72,8 @@ def get_content_disposition_filename(url):
 	If `url` is already a response object, it will use its headers.
 	Otherwise, urllib.request is used to retrieve the headers.
 
-	>>> url = 'http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?file=pythonutils-0.3.0.zip'
+	>>> url = 'http://www.voidspace.org.uk/cgi-bin'
+	>>> url += '/voidspace/downman.py?file=pythonutils-0.3.0.zip'
 	>>> get_content_disposition_filename(url) in (None, 'pythonutils-0.3.0.zip')
 	True
 
@@ -93,18 +98,26 @@ def get_content_disposition_filename(url):
 	value, params = cgi.parse_header(header)
 	return params.get('filename')
 
+
 def get_url_filename(url):
 	return os.path.basename(urllib.parse.urlparse(url).path)
+
 
 def get_url(url, dest=None, replace_newer=False, touch_older=True):
 	src = urllib.request.urlopen(url)
 	log.debug(src.headers)
 	if 'last-modified' in src.headers:
-		mod_time = datetime.datetime.strptime(src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
+		mod_time = datetime.datetime.strptime(
+			src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z')
 	else:
 		mod_time = None
 	content_length = int(src.headers['content-length'])
-	fname = dest or get_content_disposition_filename(src) or get_url_filename(url) or 'result.dat'
+	fname = (
+		dest
+		or get_content_disposition_filename(src)
+		or get_url_filename(url)
+		or 'result.dat'
+	)
 	if mod_time and os.path.exists(fname):
 		stat = os.lstat(fname)
 		previous_size = stat.st_size
@@ -115,10 +128,17 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 		log.debug('Remote size %d', content_length)
 		if not replace_newer and not touch_older:
 			raise RuntimeError("%s exists" % fname)
-		if replace_newer and previous_mod_time >= mod_time and previous_size == content_length:
+		current = (
+			replace_newer and previous_mod_time >= mod_time
+			and previous_size == content_length
+		)
+		if current:
 			log.info('File is current')
 			return
-		just_needs_touching = touch_older and previous_mod_time > mod_time and previous_size == content_length
+		just_needs_touching = (
+			touch_older and previous_mod_time > mod_time
+			and previous_size == content_length
+		)
 		if just_needs_touching:
 			log.info('Local file appears newer than remote - updating mod time')
 			jaraco.path.set_time(fname, mod_time)
@@ -132,19 +152,22 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
 		jaraco.path.set_time(fname, mod_time)
 	return fname
 
+
 def print_headers(url):
 	parsed = urllib.parse.urlparse(url)
 	conn_class = dict(
 		http=http_client.HTTPConnection,
 		https=http_client.HTTPSConnection,
-		)
+	)
 	conn = conn_class[parsed.scheme](parsed.netloc)
 	selector = parsed.path or '/'
-	if parsed.query: selector += '?' + parsed.query
+	if parsed.query:
+		selector += '?' + parsed.query
 	conn.request('HEAD', selector)
 	response = conn.getresponse()
 	if response.status == 200:
 		print(response.msg)
+
 
 def _get_url_from_command_line():
 	parser = argparse.ArgumentParser()
@@ -152,8 +175,10 @@ def _get_url_from_command_line():
 	args = parser.parse_args()
 	return args.url
 
+
 def wget():
 	get_url(_get_url_from_command_line())
+
 
 def headers():
 	print_headers(_get_url_from_command_line())

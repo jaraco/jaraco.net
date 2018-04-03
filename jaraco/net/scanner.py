@@ -21,24 +21,30 @@ from . import inet
 
 log = logging.getLogger(__name__)
 
+
 def get_args():
 	parser = argparse.ArgumentParser()
 	jaraco.logging.add_arguments(parser)
-	parser.add_argument('-o', '--host-spec',
+	parser.add_argument(
+		'-o', '--host-spec',
 		help="The host range or host range to scan",
-		default = r'localhost')
-	parser.add_argument('-p', '--port-range',
+		default=r'localhost')
+	parser.add_argument(
+		'-p', '--port-range',
 		help="Port range to scan",
-		default = '[25,80]')
-	parser.add_argument('-f', '--frequency', default = 20, type=int,
+		default='[25,80]')
+	parser.add_argument(
+		'-f', '--frequency', default=20, type=int,
 		help="Frequency (Hz) of connection attempt")
 	return parser.parse_args()
+
 
 def setup_logger(output_level):
 	outputHandler = logging.StreamHandler(sys.stdout)
 	outputHandler.level = output_level
 	logging.root.handlers.append(outputHandler)
-	logdir = os.path.join(os.environ['SystemRoot'], 'system32',
+	logdir = os.path.join(
+		os.environ['SystemRoot'], 'system32',
 		'logfiles', 'portscan')
 	logbase = os.path.join(logdir, 'scan.log')
 	if not os.path.isdir(logdir):
@@ -46,12 +52,14 @@ def setup_logger(output_level):
 	logfilehandler = logging.handlers.TimedRotatingFileHandler(
 		logbase, when='d')
 	logfilehandler.level = logging.INFO
-	handlerFormat = ('[%(asctime)s] - %(levelname)s - [%(name)s] '
+	handlerFormat = (
+		'[%(asctime)s] - %(levelname)s - [%(name)s] '
 		'%(message)s')
 	formatter = logging.Formatter(handlerFormat)
 	logfilehandler.setFormatter(formatter)
 	logging.root.handlers.append(logfilehandler)
 	logging.root.level = 0
+
 
 def _get_mask_host(host_spec, matcher):
 	addr = struct.unpack('!L', socket.inet_aton(matcher.group(1)))[0]
@@ -65,29 +73,35 @@ def _get_mask_host(host_spec, matcher):
 	result = six.moves.map(lambda a: struct.pack('!L', a), result)
 	return six.moves.map(socket.inet_ntoa, result)
 
+
 def _get_range_host(host_spec, matcher):
 	"""
 
 	"""
-	#matcher = matcher.next()
+	# matcher = matcher.next()
 	rng = list(map(int, matcher.groups()))
 	rng[1] += 1
 	rng = range(*rng)
 	beg = host_spec[:matcher.start()]
 	end = host_spec[matcher.end():]
-	addrs = itertools.chain(*six.moves.map(lambda n: get_hosts(beg + str(n) + end), rng))
+	addrs = itertools.chain(
+		*six.moves.map(lambda n: get_hosts(beg + str(n) + end), rng))
 	return addrs
+
 
 def _get_ip_range_host(spec, matcher):
 	raise NotImplementedError
 
+
 def _get_named_host(spec, matcher):
 	infos = iter(socket.getaddrinfo(spec, None))
-	sockaddrs = [sockaddr for
+	sockaddrs = [
+		sockaddr for
 		family, socktype, proto, canonname, sockaddr in infos]
 	get_host = operator.itemgetter(0)
 	hosts = list(map(get_host, sockaddrs))
 	return hosts
+
 
 def get_hosts(host_spec):
 	"""
@@ -117,13 +131,14 @@ def get_hosts(host_spec):
 		r'(\d+)-(\d+)$': ('search', _get_range_host),
 		r'(\d+\.){3}\d+$': ('match', lambda spec, match: [spec]),
 		r'((\d+\.){3}\d+)-((\d+\.){3}\d+)$': ('match', _get_ip_range_host),
-		}
+	}
 	for pattern in _map:
 		test, func = _map[pattern]
 		matcher = getattr(re, test)(pattern, host_spec)
 		if matcher:
 			return func(host_spec, matcher)
 	raise ValueError("Could not recognize host spec %s" % host_spec)
+
 
 def scan():
 	args = get_args()
@@ -135,8 +150,9 @@ def scan():
 		inet.ScanThread.wait_for_testers_to_finish()
 	except KeyboardInterrupt:
 		log.info('Terminated by user')
-	except:
+	except Exception:
 		log.exception('Fatal error occured.  Terminating.')
+
 
 if __name__ == '__main__':
 	scan()

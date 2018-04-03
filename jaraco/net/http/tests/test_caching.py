@@ -2,6 +2,7 @@ import email
 
 from jaraco.net.http import caching
 
+
 class TestCachedResponse(object):
 	def test_no_max_age(self):
 		"""

@@ -6,6 +6,8 @@ form = """
 	<input type="submit" />
 </form>
 """
+
+
 class ContentTypeReporter(object):
 	@cherrypy.expose
 	def index(self, file=None):

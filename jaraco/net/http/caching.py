@@ -17,6 +17,7 @@ from six.moves.urllib import request
 
 log = logging.getLogger(__name__)
 
+
 class CacheHandler(request.BaseHandler):
 	"""
 	Stores responses in a httplib2-style cache object.
@@ -50,7 +51,8 @@ class CacheHandler(request.BaseHandler):
 		# get the cached response, or None if it's not found
 		cached_resp = CachedResponse.load(self.store.get(key))
 		if not cached_resp and 'only-if-cached' in cc:
-			raise request.HTTPError(request.get_full_url(), 504,
+			raise request.HTTPError(
+				request.get_full_url(), 504,
 				'content is not cached', hdrs=None, fp=None)
 
 		if cached_resp and not cached_resp.fresh_for(request.headers):
@@ -70,16 +72,16 @@ class CacheHandler(request.BaseHandler):
 
 		if (
 			'last-modified' in cached_resp.headers and
-			not 'if-modified-since' in request.headers
-			):
+			'if-modified-since' not in request.headers
+		):
 			lm = cached_resp.headers['last-modified']
 			request.headers['if-modified-since'] = lm
 
 		if (
 			'etag' in cached_resp.headers
-			#and not self.ignore_etag
-			and not 'if-none-match' in request.headers
-			):
+			# and not self.ignore_etag
+			and 'if-none-match' not in request.headers
+		):
 			et = cached_resp.headers['etag']
 			request.headers['if-none-match'] = et
 
@@ -99,7 +101,7 @@ class CacheHandler(request.BaseHandler):
 			'pragma' in headers
 			and 'no-cache' in headers['pragma'].lower()
 			and 'cache-control' not in headers
-			):
+		):
 			headers['cache-control'] = 'no-cache'
 
 	def _update_cache(self, request, response):
@@ -119,7 +121,8 @@ class CacheHandler(request.BaseHandler):
 			return response
 		cached_response_codes = [200, 203]
 		cacheable_response = response.code in cached_response_codes
-		if not is_get or not cacheable_response: return response
+		if not is_get or not cacheable_response:
+			return response
 
 		if self.should_cache(response):
 			response = CachedResponse.from_response(response)
@@ -165,8 +168,8 @@ class CacheHandler(request.BaseHandler):
 			>>> parse_part('No-Cache')
 			('no-cache', None)
 			"""
-			name, sep, val = map(str.lower, map(str.strip,
-				part.partition('=')))
+			name, sep, val = map(
+				str.lower, map(str.strip, part.partition('=')))
 			return name, (val or None)
 
 		cc_header = headers.get('cache-control', '')
@@ -260,14 +263,14 @@ class CachedResponse(io.BytesIO):
 		if 'max-age' not in cache_control:
 			# If max-age is not indicated, it can't be exceeded
 			return False
-		if not 'date' in self.headers:
+		if 'date' not in self.headers:
 			return True
 		# user-agent might have a 'min-fresh' directive indicating the
 		#  client will only accept a cached request if it will still be
 		#  fresh min-fresh seconds from now.
 		try:
 			min_fresh = datetime.timedelta(
-				seconds = int(cache_control['min-fresh']))
+				seconds=int(cache_control['min-fresh']))
 		except (KeyError, ValueError):
 			min_fresh = datetime.timedelta()
 		try:
@@ -283,18 +286,22 @@ class CachedResponse(io.BytesIO):
 		for header in get_endpoint_headers(new_headers):
 			self.headers[header] = new_headers[header]
 
+
 def get_endpoint_headers(headers):
 	"""
 	Given a dictionary-like headers object, return the names of all
 	headers in that set which represent end-to-end (and not intermediate
 	or connection headers).
 	"""
-	intermediate_headers = ['connection', 'keep-alive',
+	intermediate_headers = [
+		'connection', 'keep-alive',
 		'proxy-authenticate', 'proxy-authorization', 'te', 'trailers',
 		'transfer-encoding', 'upgrade']
-	intermediate_headers.extend(header.strip()
+	intermediate_headers.extend(
+		header.strip()
 		for header in headers.get('connection', ''))
 	return set(headers.keys()) - set(intermediate_headers)
+
 
 def datetime_from_email(str):
 	parsed = email_utils.parsedate_tz(str)
@@ -303,6 +310,7 @@ def datetime_from_email(str):
 	offset = datetime.timedelta(seconds=parsed[-1] or 0)
 	naive_date = datetime.datetime(*parsed[:6])
 	return naive_date - offset
+
 
 def quick_test():
 	"""Quick test/example of CacheHandler"""
@@ -318,6 +326,7 @@ def quick_test():
 	response.reload(store)
 	print(response.headers)
 	print("After reload:", response.read()[:100], '...\n')
+
 
 if __name__ == "__main__":
 	quick_test()

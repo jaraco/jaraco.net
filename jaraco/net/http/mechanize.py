@@ -5,6 +5,7 @@ import lxml
 
 log = logging.getLogger(__name__)
 
+
 class PageGetter(object):
 	"""
 	PageGetter

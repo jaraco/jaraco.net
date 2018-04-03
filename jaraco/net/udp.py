@@ -3,6 +3,7 @@ from __future__ import print_function
 import socket
 import argparse
 
+
 class EchoServer(object):
 	def __init__(self):
 		args = self._get_args()
@@ -11,7 +12,8 @@ class EchoServer(object):
 	@staticmethod
 	def _get_args():
 		parser = argparse.ArgumentParser()
-		parser.add_argument("-p", "--port",
+		parser.add_argument(
+			"-p", "--port",
 			help="listen on this port", type=int,
 			default=9999)
 		return parser.parse_args()
@@ -33,6 +35,7 @@ class EchoServer(object):
 			except KeyboardInterrupt:
 				break
 
+
 class Sender(object):
 	def __init__(self):
 		self.args = self._get_args()
@@ -51,9 +54,11 @@ class Sender(object):
 	@staticmethod
 	def _get_args():
 		parser = argparse.ArgumentParser()
-		parser.add_option("-m", "--message",
+		parser.add_option(
+			"-m", "--message",
 			help="send this message", default="message!")
-		parser.add_option('-c', '--connect',
+		parser.add_option(
+			'-c', '--connect',
 			help="host:port to connect to",
 			default="localhost:9999")
 		return parser.parse_args()

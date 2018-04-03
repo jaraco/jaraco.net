@@ -5,12 +5,14 @@ import argparse
 
 from jaraco.text import local_format as lf
 
+
 def get_connect_options():
 	parser = argparse.ArgumentParser(conflict_handler="resolve")
 	parser.add_argument('-h', '--host', default='localhost')
 	parser.add_argument('-p', '--port', default=80, type=int)
 	args = parser.parse_args()
 	return args
+
 
 def test_connect():
 	args = get_connect_options()
@@ -24,6 +26,7 @@ def test_connect():
 		raise SystemExit(1)
 	print(lf("Successfully connected to {args.host} on port {args.port}"))
 
+
 def start_echo_server():
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.bind(('', 8099))
@@ -33,5 +36,6 @@ def start_echo_server():
 		print('connected from', addr)
 		while True:
 			dat = conn.recv(4096)
-			if not dat: break
+			if not dat:
+				break
 			conn.send(dat)

@@ -9,6 +9,7 @@ import argparse
 
 import six
 
+
 class BlocklistHit(object):
 	def __init__(self, host, blocklist, result):
 		self.host = host
@@ -17,6 +18,7 @@ class BlocklistHit(object):
 
 	def __str__(self):
 		return "{host} listed with {blocklist} as {result}".format(**vars(self))
+
 
 class Service(six.text_type):
 	"""
@@ -61,11 +63,12 @@ class Service(six.text_type):
 		services = cls.get_services()
 		for service in services:
 			res = service.lookup(host)
-			if res: print(res)
+			if res:
+				print(res)
 
 	@classmethod
 	def get_services(cls):
 		return map(cls, cls.service_domains)
 
-if __name__ == '__main__':
-	Service.handle_command_line()
+
+__name__ == '__main__' and Service.handle_command_line()

@@ -7,8 +7,11 @@ from six.moves.urllib import request
 
 log = logging.getLogger(__name__)
 
+
 class HeadRequest(request.Request):
-	def get_method(self): return 'HEAD'
+	def get_method(self):
+		return 'HEAD'
+
 
 class URLLoader(str):
 	def load_module(self, fullname):
@@ -21,6 +24,7 @@ class URLLoader(str):
 		exec(co, module.__dict__)
 		return sys.modules[fullname]
 
+
 class URLImporter(str):
 	"""
 	Simple Importer that imports from the network
@@ -31,7 +35,7 @@ class URLImporter(str):
 		log.debug("Finding %s in %s", fullname, self)
 		if not self.endswith('/'):
 			return
-		req = HeadRequest(self+fullname+'.py')
+		req = HeadRequest(self + fullname + '.py')
 		try:
 			request.urlopen(req)
 			log.debug("Found at %s", self)

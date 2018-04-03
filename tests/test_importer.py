@@ -4,6 +4,7 @@ import sys
 
 from jaraco.net import importer
 
+
 @contextlib.contextmanager
 def logging_context(**kwargs):
 	"""
@@ -16,6 +17,7 @@ def logging_context(**kwargs):
 		yield
 	finally:
 		logging.root.handlers[:] = orig_handlers
+
 
 def test_importer():
 	with logging_context(level=logging.DEBUG):

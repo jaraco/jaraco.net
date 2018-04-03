@@ -4,6 +4,7 @@ import os.path
 import datetime
 import cherrypy
 
+
 def htmldir(section="", dir="", path="", hdr=True, **kwargs):
 	fh = ''
 	url = "http://" + cherrypy.request.headers.get('Host', '') + \
@@ -32,7 +33,7 @@ def htmldir(section="", dir="", path="", hdr=True, **kwargs):
 			fh += """<a href="%s" title="mod: %s">%s/</a><br>
 """ % (dn + '/', dtim, dn,)
 
-		del ddirs[:] # limit to one level
+		del ddirs[:]  # limit to one level
 
 		for fil in sorted(dfiles):
 			fn = os.path.join(dpath, fil)

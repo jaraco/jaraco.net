@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 
 TIME1970 = 0x83aa7e80
 
+
 def query(server, force_ipv6=False):
 	"""
 	>>> query('us.pool.ntp.org')
@@ -39,15 +40,17 @@ def query(server, force_ipv6=False):
 	log.info(lf('Response received from: {address}'))
 	t = struct.unpack('!12I', data)[10]
 	t -= TIME1970
-	time_s = time.ctime(t)
+	time_s = time.ctime(t)  # noqa
 	log.info(lf('\tTime={time_s}'))
+
 
 def handle_command_line():
 	"""
 	Query the NTP server for the current time.
 	"""
 	parser = argparse.ArgumentParser(usage=trim(handle_command_line.__doc__))
-	parser.add_argument('-6', '--ipv6', help="Force IPv6", action="store_true", default=False)
+	parser.add_argument(
+		'-6', '--ipv6', help="Force IPv6", action="store_true", default=False)
 	parser.add_argument('server', help="IP Address of server to query")
 	jaraco.logging.add_arguments(parser)
 	args = parser.parse_args()
@@ -55,4 +58,6 @@ def handle_command_line():
 	logging.root.handlers[0].setFormatter(logging.Formatter("%(message)s"))
 	query(args.server, args.ipv6)
 
-if __name__ == '__main__': handle_command_line()
+
+if __name__ == '__main__':
+	handle_command_line()

@@ -11,9 +11,11 @@ from more_itertools import recipes
 import dateutil.parser
 from svg.charts import time_series
 
+
 class PingResult(object):
 	def __init__(self, text):
-		pattern = re.compile('time: (?P<time>.*), host: (?P<host>.*), '
+		pattern = re.compile(
+			'time: (?P<time>.*), host: (?P<host>.*), '
 			'res: (?P<result>.*)\n')
 		res = pattern.match(text).groupdict()
 		res['time'] = dateutil.parser.parse(res['time'])
@@ -51,6 +53,7 @@ class PingResult(object):
 
 	__bool__ = __nonzero__ = success
 
+
 class Reader(object):
 	def __init__(self, filename):
 		self.filename = filename
@@ -62,6 +65,7 @@ class Reader(object):
 	def __del__(self):
 		self.file.close()
 
+
 def single_day(stats, day):
 	"skip day-1 days then return only results from the next day"
 	days_seen = set()
@@ -71,6 +75,7 @@ def single_day(stats, day):
 			yield ping
 		if len(days_seen) > day:
 			return
+
 
 def windows(seq, n=2):
 	"""
@@ -85,20 +90,24 @@ def windows(seq, n=2):
 		result = result[1:] + (elem,)
 		yield result
 
+
 def get_loss_stats(window):
 	total = len(window)
-	loss = len([ping for ping in window if ping.type=='loss'])
-	errors = len([ping for ping in window if ping.type=='error'])
+	loss = len([ping for ping in window if ping.type == 'loss'])
+	errors = len([ping for ping in window if ping.type == 'error'])
 	slow_ping = datetime.timedelta(milliseconds=50)
 	slow = len([ping for ping in window if ping and ping.latency > slow_ping])
-	quality = (total-loss)/total
-	return dict(time=window[-1].time, quality=quality, errors=errors,
+	quality = (total - loss) / total
+	return dict(
+		time=window[-1].time, quality=quality, errors=errors,
 		loss=loss, slow=slow)
+
 
 def get_windows(stats):
 	"Construct rolling windows"
 	windows_ = itertools.islice(windows(stats, n=20), None, None, 10)
 	return six.moves.map(get_loss_stats, windows_)
+
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -109,7 +118,9 @@ def main():
 	for window in get_windows(stats):
 		print(window['time'], window['quality'])
 
+
 cherrypy = None
+
 
 class Server(object):
 	@classmethod
@@ -149,17 +160,18 @@ class Server(object):
 		))
 		g = time_series.Plot({})
 		g.timescale_divisions = '4 hours'
-		g.show_x_guidelines=True
+		g.show_x_guidelines = True
 		g.x_label_format = '%H:%M'
-		g.width=1400
-		g.height=800
-		g.graph_title=str(day)
-		g.show_graph_title=True
+		g.width = 1400
+		g.height = 800
+		g.graph_title = str(day)
+		g.show_graph_title = True
 		g.add_data(dict(
 			data=data,
 			title='Network Quality',
 		))
 		return g.burn().decode('utf-8')
+
 
 if __name__ == '__main__':
 	Server.handle_command_line()

@@ -11,6 +11,7 @@ import traceback
 
 from jaraco.text import local_format as lf
 
+
 class Simple(object):
 	def __init__(self, host, port, timeout, response_delay, outfile):
 		self.__dict__.update(vars())
@@ -26,15 +27,21 @@ class Simple(object):
 	def get_args():
 		p = argparse.ArgumentParser(conflict_handler="resolve")
 		p.add_argument('-h', '--host', help="Bind to IP address", default='')
-		p.add_argument('-p', '--port', type=int, help="Bind to port",
+		p.add_argument(
+			'-p', '--port', type=int, help="Bind to port",
 			default=80)
-		p.add_argument('-t', '--timeout', type=int, help="Socket timeout",
+		p.add_argument(
+			'-t', '--timeout', type=int, help="Socket timeout",
 			default=3)
-		p.add_argument('-o', '--outfile', default=sys.stdout,
+		p.add_argument(
+			'-o', '--outfile', default=sys.stdout,
 			type=functools.partial(open, mode='wb'),
 			help='save output to file')
-		seconds = lambda seconds: datetime.timedelta(seconds=seconds)
-		p.add_argument('-d', '--delay', dest='response_delay', type=seconds,
+
+		def seconds(seconds):
+			return datetime.timedelta(seconds=seconds)
+		p.add_argument(
+			'-d', '--delay', dest='response_delay', type=seconds,
 			help="Artificial delay in response", default=datetime.timedelta())
 		return p.parse_args()
 
@@ -66,7 +73,8 @@ class Simple(object):
 
 	@staticmethod
 	def get_content_length(request):
-		match = re.search('^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
+		match = re.search(
+			'^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
 		if match:
 			return int(match.group(1))
 		print('no content length found', file=sys.stderr)
@@ -74,7 +82,7 @@ class Simple(object):
 	@staticmethod
 	def get_headers(conn):
 		res = b''
-		while not b'\r\n\r\n' in res:
+		while b'\r\n\r\n' not in res:
 			res += conn.recv(1024)
 		bytes = len(res)
 		headers, _sep, content = res.partition(b'\r\n\r\n')
@@ -101,7 +109,8 @@ class AuthRequest(Simple):
 			self.conn, addr = s.accept()
 			print(lf('Accepted connection from {addr}'))
 
-			if not self.check_auth_response(self.conn) == 'retry': break
+			if not self.check_auth_response(self.conn) == 'retry':
+				break
 	serve = serve_until_auth
 
 	def check_auth_response(self, conn):
@@ -110,7 +119,7 @@ class AuthRequest(Simple):
 			headers, content = self.get_headers(conn)
 			content_len = self.get_content_length(headers) or 0
 			content = self.get_content(self.conn, content, content_len)
-			user_pat = re.compile('^Authorization:\s+(.*)\s*$', re.I|re.MULTILINE)
+			user_pat = re.compile('^Authorization:\s+(.*)\s*$', re.I | re.MULTILINE)
 			matched_header = user_pat.search(headers)
 			if matched_header:
 				conn.send(b'HTTP/1.0 200 OK\r\n')

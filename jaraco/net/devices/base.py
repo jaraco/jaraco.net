@@ -7,6 +7,7 @@ import sys
 
 from six.moves import map
 
+
 class BaseManager(object):
 	"""
 	A base network manager class.

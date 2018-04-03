@@ -3,14 +3,16 @@ import time
 
 import cherrypy.process.plugins
 
+
 class TailedFile(object):
 	interval = 0.1
+
 	def __init__(self, filename):
 		self.file = open(filename)
 
 	def next(self):
+		# while hasattr(self, 'file'):
 		while True:
-		#while hasattr(self, 'file'):
 			where = self.file.tell()
 			line = self.file.readline()
 			if line:
@@ -24,6 +26,7 @@ class TailedFile(object):
 	def close(self):
 		self.file.close()
 		del self.file
+
 
 class TailedFileServer(object):
 	"""
@@ -40,6 +43,7 @@ class TailedFileServer(object):
 		cherrypy.request.source = TailedFile(self.filename)
 		cherrypy.engine.publish('register-tail')
 		return cherrypy.request.source
+
 
 class TailTracker(cherrypy.process.plugins.SimplePlugin, list):
 	def __init__(self, bus):
@@ -61,9 +65,11 @@ class TailTracker(cherrypy.process.plugins.SimplePlugin, list):
 	def __hash__(self):
 		return hash(id(self))
 
+
 def handle_command_line():
 	TailTracker(cherrypy.engine).subscribe()
 	cherrypy.quickstart(TailedFileServer(sys.argv[1]))
+
 
 if __name__ == '__main__':
 	handle_command_line()

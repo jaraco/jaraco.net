@@ -28,6 +28,7 @@ from . import icmp
 
 log = logging.getLogger(__name__)
 
+
 class PortScanner(object):
 	def __init__(self):
 		self.ranges = [range(1, 1024)]
@@ -38,6 +39,7 @@ class PortScanner(object):
 
 	def add_range(self, *r):
 		self.ranges.append(range(*r))
+
 
 class ScanThread(threading.Thread):
 	all_testers = []
@@ -80,17 +82,21 @@ class ScanThread(threading.Thread):
 	def wait_for_testers_to_finish():
 		map(lambda x: x.join(), ScanThread.all_testers)
 
+
 def portscan_hosts(hosts, *args, **kargs):
 	consume(map(lambda h: portscan(h, *args, **kargs), hosts))
 
-def portscan(host, ports = range(1024), frequency = 20):
-	make_address = lambda port: (host, port)
+
+def portscan(host, ports=range(1024), frequency=20):
+	def make_address(port):
+		return host, port
 	addresses = map(make_address, ports)
 	testers = map(ScanThread, addresses)
 	for tester in testers:
 		log.debug('starting tester')
 		tester.start()
-		time.sleep(1/frequency)
+		time.sleep(1 / frequency)
+
 
 class PortListener(threading.Thread):
 	def __init__(self, port):
@@ -113,10 +119,12 @@ class PortListener(threading.Thread):
 				conn.close()
 		except socket.error as e:
 			if e[0] == 10048:
-				self.output.write('Cannot listen on port %d: Address '
+				self.output.write(
+					'Cannot listen on port %d: Address '
 					'already in use.\n' % self.port)
 			else:
 				raise
+
 
 class PortRangeListener(object):
 	def __init__(self):
@@ -128,11 +136,13 @@ class PortRangeListener(object):
 		self.threads = map(PortListener, ports)
 		[t.start for t in self.threads]
 
+
 def ping_host(host):
 	try:
 		icmp.ping(host)
 		msg = "{host} is online"
 	except socket.error:
-		msg = ("Either {host} is offline or ping request has been "
+		msg = (
+			"Either {host} is offline or ping request has been "
 			"blocked.")
 	print(msg.format(**vars()))

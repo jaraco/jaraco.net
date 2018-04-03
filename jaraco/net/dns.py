@@ -12,6 +12,7 @@ import win32service
 
 port = socket.getservbyname('domain')
 
+
 class Forwarder(object):
 	"""
 	Windows Server 2008 and Windows Server 2008 R2 DNS Servers do not
@@ -23,6 +24,7 @@ class Forwarder(object):
 	and it will forward DNS requests to the IPv6 localhost address.
 	"""
 	dest_addr = ('::1', port)
+
 	def __init__(self, listen_address):
 		self.socket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 		address = (listen_address, port)
@@ -50,6 +52,7 @@ class Forwarder(object):
 			self.socket.sendto(resp, requester)
 		except socket.timeout:
 			pass
+
 
 class RegConfig(object):
 	def __init__(self, root_path, tree=winreg.HKEY_CURRENT_USER):
@@ -90,6 +93,7 @@ class RegConfig(object):
 			value = default
 		return value
 
+
 class ForwardingService(win32serviceutil.ServiceFramework):
 	"""
 	_svc_name_:			The name of the service (used in the Windows registry).
@@ -109,10 +113,11 @@ class ForwardingService(win32serviceutil.ServiceFramework):
 		'System32',
 		'LogFiles',
 		_svc_display_name_,
-		)
+	)
 	"The log directory for the stderr and stdout logs."
 
-	config = RegConfig(r'Software\jaraco.net\DNS Forwarding Service',
+	config = RegConfig(
+		r'Software\jaraco.net\DNS Forwarding Service',
 		winreg.HKEY_LOCAL_MACHINE)
 
 	def SvcDoRun(self):
@@ -144,13 +149,15 @@ class ForwardingService(win32serviceutil.ServiceFramework):
 			if '-b' in opts:
 				ForwardingService.config['Listen Address'] = opts['-b']
 		params = dict(
-			customInstallOptions = 'b:', # use -b to specify bind address
-			customOptionHandler = listen_setter,
+			customInstallOptions='b:',  # use -b to specify bind address
+			customOptionHandler=listen_setter,
 		)
 		win32serviceutil.HandleCommandLine(cls, **params)
+
 
 def main():
 	addr = ForwardingService.config['Listen Address']
 	Forwarder(addr).serve_forever()
 
-if __name__ == '__main__': main()
+
+__name__ == '__main__' and main()
