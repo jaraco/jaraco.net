@@ -9,8 +9,10 @@ from cherrypy.lib import cptools, httputil as http
 # Undercover kludge to wrap staticdir
 from cherrypy.lib.static import staticdir
 
-def staticdirindex(section, dir, root="", match="", content_types=None,
-		index="", indexlistermatch="", indexlister=None, **kwargs):
+
+def staticdirindex(
+	section, dir, root="", match="", content_types=None,
+	index="", indexlistermatch="", indexlister=None, **kwargs):
 	"""Serve a directory index listing for a dir.
 
 	Compatibility alert: staticdirindex is built on and is dependent on
@@ -75,7 +77,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None,
 	# have ".." or similar uplevel attacks in it. Check that the final
 	# filename is a child of dir.
 	if not os.path.normpath(filename).startswith(os.path.normpath(dir)):
-		raise cherrypy.HTTPError(403) # Forbidden
+		raise cherrypy.HTTPError(403)  # Forbidden
 	# the above block of code directly copied from static.py staticdir
 	# N.B. filename ending in a slash or not does not imply a directory
 
@@ -105,13 +107,15 @@ def staticdirindex(section, dir, root="", match="", content_types=None,
 		# modified-since validation code can work.
 		response.headers['Last-Modified'] = http.HTTPDate(st.st_mtime)
 		cptools.validate_since()
-		response.body = indexlister(section=section, dir=dir, path=path,
+		response.body = indexlister(
+			section=section, dir=dir, path=path,
 			**kwargs)
 		response.headers['Content-Type'] = 'text/html'
 		req.is_index = True
 		return True
 
 	return False
+
 
 # Replace the real staticdir with our version
 cherrypy.tools.staticdir = cherrypy._cptools.HandlerTool(staticdirindex)
