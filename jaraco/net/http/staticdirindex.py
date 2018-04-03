@@ -4,7 +4,7 @@ import re
 import stat
 import urllib
 import cherrypy
-from cherrypy.lib import cptools, http
+from cherrypy.lib import cptools, httputil as http
 
 # Undercover kludge to wrap staticdir
 from cherrypy.lib.static import staticdir
