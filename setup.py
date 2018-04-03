@@ -51,6 +51,7 @@ params = dict(
 		'jaraco.logging',
 		'jaraco.email',
 		'jaraco.path',
+		'path.py',
 	],
 	extras_require={
 		'testing': [
