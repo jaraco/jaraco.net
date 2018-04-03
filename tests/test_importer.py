@@ -2,6 +2,8 @@ import contextlib
 import logging
 import sys
 
+import pytest
+
 from jaraco.net import importer
 
 
@@ -19,6 +21,7 @@ def logging_context(**kwargs):
 		logging.root.handlers[:] = orig_handlers
 
 
+@pytest.mark.xfail(reason="Dropbox public folder taken away")
 def test_importer():
 	with logging_context(level=logging.DEBUG):
 		importer.URLImporter.install()
