@@ -1,7 +1,6 @@
 #!python
 
 import os
-import io
 
 import six
 
@@ -17,6 +16,5 @@ def test_bolivia_handler():
 	handler.client_address = '127.0.0.1'
 	test_result = os.path.join(test_dir, 'nic.bo.html')
 	handler._response = open(test_result).read()
-	result = io.StringIO()
-	handler.ParseResponse(result)
-	assert 'Microsoft Corporation' in result.getvalue()
+	result = handler.ParseResponse()
+	assert 'Microsoft Corporation' in result

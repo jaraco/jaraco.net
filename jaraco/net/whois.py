@@ -216,12 +216,6 @@ mozilla_headers = {
 class BoliviaWhoisHandler(WhoisHandler):
 	services = r'\.bo$'
 
-	class _parser(html_parser.HTMLParser):
-		def anchor_end(self):
-			if self.anchor:
-				self.handle_data('[%s]' % self.anchor)
-				self.anchor = None
-
 	def LoadHTTP(self):
 		name, domain = self._query.split('.', 1)
 		domain = '.' + domain
@@ -239,11 +233,9 @@ class BoliviaWhoisHandler(WhoisHandler):
 
 		self._response = resp.text
 
-	def ParseResponse(self, s_out):
+	def ParseResponse(self):
 		soup = BeautifulSoup(self._response)
-		# self._response = unicode(soup.strong.parent.div).encode('latin-1')
-		self._response = six.text_type(soup.strong.parent.div)
-		return super(self.__class__, self).ParseResponse(s_out)
+		return soup.strong.parent.div.text
 
 
 class SourceWhoisHandler(WhoisHandler):
@@ -298,7 +290,7 @@ class Handler(socketserver.StreamRequestHandler):
 			handler = WhoisHandler.GetHandler(query)
 			handler.client_address = self.client_address
 			handler.LoadHTTP()
-			handler.ParseResponse(self.wfile)
+			self.wfile.write(handler.ParseResponse())
 			log.info('%s success', self.client_address)
 		except urllib.error.URLError:
 			msg = 'Could not contact whois HTTP service.'
