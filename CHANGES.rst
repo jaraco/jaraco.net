@@ -1,37 +1,47 @@
+5.3
+===
+
+Refresh package metadata.
+
+5.2
+===
+
+Remove dependency on jaraco.util.
+
 5.1
-~~~
+===
 
 Deprecated email modules and moved them to jaraco.email.
 
 5.0
-~~~
+===
 
 Drop support for Python 2.6
 
 4.0.1
-~~~~~
+=====
 
 * Fixed encoding issue in SMTPNotifier.
 
 4.0
-~~~
+===
 
 * Removed ``http.MethodRequest``. Use `backports.method_request
   <https://pypi.python.org/pypi/backports.method_request/>`_ instead.
 
 3.0
-~~~
+===
 
 * Removed ``wget`` command except on Windows.
 
 2.1
-~~~
+===
 
 * Added '--outfile' parameter to fake-http.
 * Fixed bug in http caching support when max-age is not specified.
 
 2.0
-~~~
+===
 
 * Added `jaraco.net.http.MethodRequest`, a urllib2.Request subclass which takes
   a 'method' parameter.
@@ -46,25 +56,25 @@ Drop support for Python 2.6
 * Removed `html` module (it depends on htmllib, which was deprecated).
 
 1.7
-~~~
+===
 
 * Added web-tail command, which "tails" a file, serving the content over
   http to multiple clients (requires CherryPy).
 
 1.6
-~~~
+===
 
 * Added jaraco.net.importer, featuring URLImporter.
 * Added jaraco.net.http.content.ContentTypeReporter, a cherrypy app to
   report the content type of uploaded content.
 
 1.5.1
-~~~~~
+=====
 
 * Added directory listing support to serve-local.
 
 1.5
-~~~
+===
 
 * Added simple script for creating a directory index (used for legacy
   support).
@@ -72,7 +82,7 @@ Drop support for Python 2.6
   current directory on port 8080.
 
 1.4
-~~~
+===
 
 * Fixed issue where passing a numeric host to scanner would be detected
   as a named host.
@@ -84,7 +94,7 @@ Drop support for Python 2.6
 * Using argparse and enabling logging config in ntp module.
 
 1.3
-~~~
+===
 
 * Added jaraco.net.devices package. Includes a Manager class for
   retrieving MAC addresses and IP addresses on the host.
@@ -95,17 +105,17 @@ Drop support for Python 2.6
 * Added http-headers command.
 
 1.2
-~~~
+===
 
 * Added function wait_for_host to icmp lib
 * Added support for a custom bind address to the DNS Forwarding Service
 
 1.1
-~~~
+===
 
 * Added rss module (migrated from jaraco.util)
 
 1.0
-~~~
+===
 
 * Initial release.
