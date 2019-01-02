@@ -1,3 +1,12 @@
+6.0
+===
+
+Removed deprecated modules:
+
+ - ``jaraco.net.email``
+ - ``jaraco.net.smtp``
+ - ``jaraco.net.notification``
+
 5.3
 ===
 
