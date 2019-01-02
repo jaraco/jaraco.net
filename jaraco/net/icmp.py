@@ -57,14 +57,15 @@ def ping(dest_addr, timeout=2):
 	"""
 	Send an ICMP Echo request to a host and return how long it takes.
 
-	Raise socket.timeout if no response is received within timeout.
+	Raise socket.timeout if no response is received within timeout. Example::
 
-	>>> ping('127.0.0.1')
-	datetime.timedelta(...)
-	>>> ping('10.10.10.254') # expect this address not to respond
-	Traceback (most recent call last):
-	...
-	socket.timeout: timed out
+		> ping('127.0.0.1')
+		datetime.timedelta(...)
+
+		> ping('10.10.10.254')
+		Traceback (most recent call last):
+		...
+		socket.timeout: timed out
 	"""
 	icmp_proto = socket.getprotobyname('icmp')
 	icmp_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp_proto)
