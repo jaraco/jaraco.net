@@ -74,7 +74,7 @@ class Simple(object):
 	@staticmethod
 	def get_content_length(request):
 		match = re.search(
-			'^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
+			r'^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
 		if match:
 			return int(match.group(1))
 		print('no content length found', file=sys.stderr)
@@ -119,7 +119,7 @@ class AuthRequest(Simple):
 			headers, content = self.get_headers(conn)
 			content_len = self.get_content_length(headers) or 0
 			content = self.get_content(self.conn, content, content_len)
-			user_pat = re.compile('^Authorization:\s+(.*)\s*$', re.I | re.MULTILINE)
+			user_pat = re.compile(r'^Authorization:\s+(.*)\s*$', re.I | re.MULTILINE)
 			matched_header = user_pat.search(headers)
 			if matched_header:
 				conn.send(b'HTTP/1.0 200 OK\r\n')
