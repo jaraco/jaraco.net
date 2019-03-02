@@ -95,7 +95,7 @@ class RegConfig(object):
 
 
 class ForwardingService(win32serviceutil.ServiceFramework):
-	"""
+	r"""
 	_svc_name_:			The name of the service (used in the Windows registry).
 						DEFAULT: The capitalized name of the current directory.
 	_svc_display_name_: The name that will appear in the Windows Service Manager.

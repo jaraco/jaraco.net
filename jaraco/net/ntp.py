@@ -31,7 +31,7 @@ def query(server, force_ipv6=False):
 	client = socket.socket(family=family, type=sock_type, proto=proto)
 	client.settimeout(timeout)
 
-	data = b'\x1b' + 47 * b'\0'
+	data = b'\x1b' + 47 * br'\0'
 	client.sendto(data, sockaddr)
 	data, address = client.recvfrom(1024)
 	if not data:
