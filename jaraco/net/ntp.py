@@ -1,8 +1,8 @@
 import socket
 import struct
-import time
 import logging
 import argparse
+import datetime
 
 from jaraco.text import trim, local_format as lf
 import jaraco.logging
@@ -14,7 +14,14 @@ TIME1970 = 0x83aa7e80
 
 def query(server, force_ipv6=False):
 	"""
-	>>> query('us.pool.ntp.org')
+	Return current time from NTP server as a Unix timestamp
+
+	>>> import time
+	>>> res = query('us.pool.ntp.org')
+	>>> type(res)
+	<class 'int'>
+	>>> res > time.time() - 5
+	True
 	"""
 	timeout = 3
 	ntp_port = 123
@@ -39,9 +46,7 @@ def query(server, force_ipv6=False):
 
 	log.info(lf('Response received from: {address}'))
 	t = struct.unpack('!12I', data)[10]
-	t -= TIME1970
-	time_s = time.ctime(t)  # noqa
-	log.info(lf('\tTime={time_s}'))
+	return t - TIME1970
 
 
 def handle_command_line():
@@ -56,7 +61,9 @@ def handle_command_line():
 	args = parser.parse_args()
 	jaraco.logging.setup(args)
 	logging.root.handlers[0].setFormatter(logging.Formatter("%(message)s"))
-	query(args.server, args.ipv6)
+	val = query(args.server, args.ipv6)
+	dt = datetime.datetime.fromtimestamp(val)  # noqa
+	log.info(lf('\tTime={dt}'))
 
 
 if __name__ == '__main__':
