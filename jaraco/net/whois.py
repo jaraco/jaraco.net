@@ -14,12 +14,10 @@ import re
 import sys
 import logging
 import abc
-import formatter
 import socket
 import select
 
 import six
-from six.moves import html_parser
 from six.moves import urllib
 from six.moves import http_cookiejar
 from six.moves import socketserver
@@ -29,7 +27,7 @@ try:
 	from ClientForm import ParseResponse, ItemNotFoundError
 except ImportError:
 	"Disabled for Python 3 compatibility"
-from bs4 import BeautifulSoup, UnicodeDammit
+from bs4 import BeautifulSoup
 from jaraco.classes.meta import LeafClassesMeta
 
 try:
@@ -98,14 +96,9 @@ class WhoisHandler(object):
 		return hasattr(ob, '__bases__') and WhoisHandler in ob.__bases__
 	_IsWhoisHandler_ = staticmethod(_IsWhoisHandler_)
 
-	def ParseResponse(self, s_out):
-		# fix the response; the parser doesn't understand tags that have a slash
-		# immediately following the tag name (part of the XHTML 1.0 spec).
-		# Alternatively, one could use tidylib with 'drop-empty-paras' set to False
-		# response = str(tidy.parseString(response, drop_empty_paras = False))
-		response = re.sub(r'<(\w+)/>', r'<\1 />', self._response)
-		writer = MyWriter(s_out)
-		self._parser(formatter.AbstractFormatter(writer)).feed(response)
+	def ParseResponse(self):
+		soup = BeautifulSoup(self._response)
+		return soup.get_text()
 
 
 class ArgentinaWhoisHandler(WhoisHandler):
@@ -127,13 +120,6 @@ class ArgentinaWhoisHandler(WhoisHandler):
 		resp = urllib.request.urlopen(req)
 		self._response = resp.read()
 
-	class _parser(html_parser.HTMLParser):
-		def start_tr(self, attrs):
-			"One must define start_tr for end_tr to be called."
-
-		def end_tr(self):
-			self.formatter.add_line_break()
-
 
 class CoZaWhoisHandler(WhoisHandler):
 	services = r'\.co\.za$'
@@ -146,8 +132,6 @@ class CoZaWhoisHandler(WhoisHandler):
 		req = form.click()
 		resp = urllib.request.urlopen(req)
 		self._response = resp.read()
-
-	_parser = html_parser.HTMLParser
 
 
 class GovWhoisHandler(WhoisHandler):
@@ -178,25 +162,10 @@ class GovWhoisHandler(WhoisHandler):
 		u2 = urllib.request.urlopen(agree_req)
 		u2.read()
 
-	class _parser(html_parser.HTMLParser):
-		def __init__(self, formatter):
-			self.__formatter__ = formatter
-			# Use the null formatter to start; we'll switch to the outputting
-			#  formatter when we find the right point in the HTML.
-			html_parser.HTMLParser.__init__(self, formatter.NullFormatter())
-
-		def start_td(self, attrs):
-			attrs = dict(attrs)
-			# I identify the important content by the tag with the ID 'TD1'.
-			# When this tag is found, switch the formatter to begin outputting
-			#  the response.
-			if 'id' in attrs and attrs['id'] == 'TD1':
-				self.formatter = self.__formatter__
-
-		def end_td(self):
-			# switch back to the NullFormatter
-			if not isinstance(self.formatter, formatter.NullFormatter):
-				self.formatter = formatter.NullFormatter()
+	def ParseResponse(self):
+		soup = BeautifulSoup(self._response)
+		target = soup.select('#TD1')
+		return target.get_text()
 
 
 mozilla_headers = {
@@ -246,9 +215,9 @@ class SourceWhoisHandler(WhoisHandler):
 	def LoadHTTP(self):
 		pass
 
-	def ParseResponse(self, s_out):
+	def ParseResponse(self):
 		filename = os.path.splitext(__file__)[0] + '.py'
-		s_out.write(open(filename).read())
+		return open(filename).read()
 
 
 class DebugHandler(WhoisHandler):
@@ -258,22 +227,15 @@ class DebugHandler(WhoisHandler):
 	def LoadHTTP(self):
 		pass
 
-	def ParseResponse(self, s_out):
-		if self.client_address[0] in self.authorized_addresses:
-			match = re.match(self.services, self._query)
-			s_out.write('result: %s' % eval(match.group(1)))
+	def ParseResponse(self):
+		if self.client_address[0] not in self.authorized_addresses:
+			return
+		match = re.match(self.services, self._query)
+		return 'result: %s' % eval(match.group(1))
 
 
 # disable the debug handler
 del DebugHandler
-
-
-class MyWriter(formatter.DumbWriter):
-	def send_flowing_data(self, data):
-		data = UnicodeDammit(data).unicode
-		# convert non-breaking spaces to regular spaces
-		data = data.replace(u'\xa0', u' ')
-		formatter.DumbWriter.send_flowing_data(self, data)
 
 
 class Handler(socketserver.StreamRequestHandler):
