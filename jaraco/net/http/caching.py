@@ -35,7 +35,7 @@ class CacheHandler(request.BaseHandler):
 		if request.get_method() not in ('GET', 'HEAD'):
 			# invalate this item if cached (RFC 2616 Section 13.10)
 			self.store.delete(key)
-		if request.get_method() is not 'GET':
+		if request.get_method() != 'GET':
 			# defer to other handlers
 			return None
 
