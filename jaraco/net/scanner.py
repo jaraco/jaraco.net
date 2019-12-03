@@ -4,9 +4,7 @@ scanner.py
 TCP port scanning utility
 """
 
-import os
 import operator
-import sys
 import re
 import struct
 import socket
@@ -44,20 +42,7 @@ def get_args():
 
 
 def setup_logger(output_level):
-    outputHandler = logging.StreamHandler(sys.stdout)
-    outputHandler.level = output_level
-    logging.root.handlers.append(outputHandler)
-    logdir = os.path.join(os.environ['SystemRoot'], 'system32', 'logfiles', 'portscan')
-    logbase = os.path.join(logdir, 'scan.log')
-    if not os.path.isdir(logdir):
-        os.makedirs(logdir)
-    logfilehandler = logging.handlers.TimedRotatingFileHandler(logbase, when='d')
-    logfilehandler.level = logging.INFO
-    handlerFormat = '[%(asctime)s] - %(levelname)s - [%(name)s] ' '%(message)s'
-    formatter = logging.Formatter(handlerFormat)
-    logfilehandler.setFormatter(formatter)
-    logging.root.handlers.append(logfilehandler)
-    logging.root.level = 0
+    logging.basicConfig(level=output_level)
 
 
 def _get_mask_host(host_spec, matcher):
