@@ -1,3 +1,8 @@
+7.0
+===
+
+Drop support for Python 3.5 and earlire.
+
 6.0
 ===
 
