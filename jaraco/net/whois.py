@@ -15,11 +15,9 @@ import logging
 import abc
 import socket
 import select
-
-import six
-from six.moves import urllib
-from six.moves import http_cookiejar
-from six.moves import socketserver
+import urllib
+import http.cookiejar as http_cookiejar
+import socketserver
 
 try:
     from ClientForm import ParseResponse, ItemNotFoundError
@@ -43,8 +41,7 @@ def init():
     urllib.request.install_opener(opener)
 
 
-@six.add_metaclass(LeafClassesMeta)
-class WhoisHandler(object):
+class WhoisHandler(metaclass=LeafClassesMeta):
     """
     WhoisHandler is an abstract class for defining whois interfaces for
     web-based nic servers.

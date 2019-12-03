@@ -2,14 +2,12 @@
 
 import os
 
-import six
-
 import pytest
 
 test_dir = os.path.dirname(__file__)
 
 
-@pytest.mark.skipif(six.PY3, reason="Test can't run on Python 3")
+@pytest.mark.skipif(True, reason="Test can't run on Python 3")
 def test_bolivia_handler():
     from jaraco.net.whois import BoliviaWhoisHandler
 

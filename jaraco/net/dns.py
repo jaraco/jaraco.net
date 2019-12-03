@@ -3,10 +3,8 @@
 import os
 import sys
 import socket
+import winreg
 
-from six.moves import winreg
-
-import six
 import win32serviceutil
 import win32service
 
@@ -67,7 +65,7 @@ class RegConfig(object):
     def infer_key_type(value):
         if isinstance(value, int):
             return winreg.REG_DWORD
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             if '%' in value:
                 return winreg.REG_EXPAND_SZ
             return winreg.REG_SZ

@@ -5,8 +5,6 @@ import argparse
 import importlib
 import textwrap
 
-import six
-
 from more_itertools import recipes
 import dateutil.parser
 from svg.charts import time_series
@@ -58,7 +56,7 @@ class Reader(object):
         self.file = open(filename)
 
     def get_stats(self):
-        return six.moves.map(PingResult, self.file)
+        return map(PingResult, self.file)
 
     def __del__(self):
         self.file.close()
@@ -104,7 +102,7 @@ def get_loss_stats(window):
 def get_windows(stats):
     "Construct rolling windows"
     windows_ = itertools.islice(windows(stats, n=20), None, None, 10)
-    return six.moves.map(get_loss_stats, windows_)
+    return map(get_loss_stats, windows_)
 
 
 def main():

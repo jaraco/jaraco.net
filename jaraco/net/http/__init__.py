@@ -10,10 +10,9 @@ import re
 import datetime
 import argparse
 import cgi
+import urllib
+import http.client as http_client
 
-import six
-from six.moves import urllib
-from six.moves import http_client
 from backports.method_request import Request
 
 import jaraco.text
@@ -40,7 +39,7 @@ class Query(dict):
         query = Query.__QueryFromURL__(query) or query
         if not re.match(r'(\w+=\w+(&\w+=\w+)*)*$', query):
             query = ()
-        if isinstance(query, six.string_types):
+        if isinstance(query, str):
             items = query.split('&')
             # remove any empty values
             items = filter(None, items)

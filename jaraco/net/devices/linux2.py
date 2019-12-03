@@ -5,14 +5,7 @@ Network Manager for Linux
 import ctypes
 import socket
 
-import six
-
 from .base import BaseManager
-
-try:
-    memoryview
-except NameError:
-    memoryview = buffer
 
 # select constants
 IFNAMSIZ = 16
@@ -81,7 +74,7 @@ def get_interfaces():
     ifc.req = ctypes.cast(buf, p_ifreq)
     ioctl(s.fileno(), SIOCGIFCONF, ctypes.byref(ifc))
     n_records = ifc.length / ctypes.sizeof(ifreq)
-    for index in six.moves.range(n_records):
+    for index in range(n_records):
         rec = ifc.req[index]
         yield str(rec.name)
 

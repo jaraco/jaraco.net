@@ -1,9 +1,8 @@
 import types
 import sys
 import logging
+from urllib import parse, request
 
-from six.moves.urllib import parse
-from six.moves.urllib import request
 
 log = logging.getLogger(__name__)
 

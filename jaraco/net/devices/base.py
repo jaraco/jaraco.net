@@ -5,8 +5,6 @@ being run upon
 
 import sys
 
-from six.moves import map
-
 
 class BaseManager(object):
     """

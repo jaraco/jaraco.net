@@ -21,7 +21,6 @@ import time
 import logging
 import functools
 
-import six
 from more_itertools.recipes import consume
 
 from . import icmp
@@ -72,7 +71,7 @@ class ScanThread(threading.Thread):
     def report(self):
         log_method_map = {True: log.info, False: log.debug, None: log.error}
         log_method = log_method_map[getattr(self, 'result', None)]
-        log_method(six.text_type(self))
+        log_method(str(self))
 
     @staticmethod
     def wait_for_testers_to_finish():

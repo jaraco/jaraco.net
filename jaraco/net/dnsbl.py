@@ -7,8 +7,6 @@ from __future__ import print_function
 import socket
 import argparse
 
-import six
-
 
 class BlocklistHit(object):
     def __init__(self, host, blocklist, result):
@@ -20,7 +18,7 @@ class BlocklistHit(object):
         return "{host} listed with {blocklist} as {result}".format(**vars(self))
 
 
-class Service(six.text_type):
+class Service(str):
     """
     Blocklist service. Represents a blocklist service suitable for referencing
     the reputation of potentially malicious or malfeasant hosts.

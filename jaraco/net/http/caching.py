@@ -7,13 +7,12 @@ import pickle
 import datetime
 import logging
 import io
+from urllib import request
 
 try:
     import email.utils as email_utils
 except ImportError:
     import email.Utils as email_utils
-
-from six.moves.urllib import request
 
 log = logging.getLogger(__name__)
 
