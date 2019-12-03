@@ -24,12 +24,14 @@ from pyparsing import *
        <">            = <US-ASCII double-quote mark (34)>
 """
 
+
 def One(chars):
-	return Word(chars, max=1)
+    return Word(chars, max=1)
+
 
 _chars = ''.join(map(chr, range(128)))
 CHAR = One(_chars)
-_ctl_chars = ''.join(map(chr, range(0,32))+[chr(127)])
+_ctl_chars = ''.join(map(chr, range(0, 32)) + [chr(127)])
 CTL = One(_ctl_chars)
 SP = ' '
 HT = '\t'
@@ -53,24 +55,25 @@ token = CharsNotIn(_ctl_chars + separators)
 
 qdtext = CharsNotIn('"')
 quoted_pair = "\\" + CHAR
-quoted_string = '"' + ZeroOrMore( qdtext | quoted_pair ) + '"'
+quoted_string = '"' + ZeroOrMore(qdtext | quoted_pair) + '"'
 
 """
-	auth-scheme    = token
-	auth-param     = token "=" ( token | quoted-string )
+    auth-scheme    = token
+    auth-param     = token "=" ( token | quoted-string )
 """
 
 auth_scheme = token
-auth_param = token + "=" + ( token | quoted_string )
+auth_param = token + "=" + (token | quoted_string)
 
 """
-	challenge   = auth-scheme 1*SP 1#auth-param
+    challenge   = auth-scheme 1*SP 1#auth-param
 """
 
 # need something for n#m(expr) syntax
 def ListOfElements(expr, min=0, max=float('Inf')):
-	"List of elements separated by commas (and whitespace robust)"
-	# todo: implement this
+    "List of elements separated by commas (and whitespace robust)"
+    # todo: implement this
+
 
 # challenge is auth-scheme followed by one or more spaces followed by
 #  one or more auth-params separated by commas.
