@@ -3,7 +3,6 @@ from __future__ import print_function
 import argparse
 
 from path import Path
-from jaraco.text import local_format as lf
 
 
 def make_index_cmd():
@@ -19,5 +18,5 @@ def make_index_cmd():
         if not ((dir / 'index.htm').exists() or (dir / 'index.html').exists()):
             continue
         dir = dir.basename()
-        print(lf('<li><a href="{dir}/index.htm">{dir}</a></li>'))
+        print(f'<li><a href="{dir}/index.htm">{dir}</a></li>')
     print('</ul>')

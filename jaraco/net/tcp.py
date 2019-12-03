@@ -3,8 +3,6 @@ from __future__ import print_function, unicode_literals
 import socket
 import argparse
 
-from jaraco.text import local_format as lf
-
 
 def get_connect_options():
     parser = argparse.ArgumentParser(conflict_handler="resolve")
@@ -24,7 +22,7 @@ def test_connect():
     except socket.error as e:
         print(e)
         raise SystemExit(1)
-    print(lf("Successfully connected to {args.host} on port {args.port}"))
+    print(f"Successfully connected to {args.host} on port {args.port}")
 
 
 def start_echo_server():

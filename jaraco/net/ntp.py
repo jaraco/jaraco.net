@@ -4,7 +4,7 @@ import logging
 import argparse
 import datetime
 
-from jaraco.text import trim, local_format as lf
+from jaraco.text import trim
 import jaraco.logging
 
 log = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ def query(server, force_ipv6=False):
     log.debug(infos)
     family, socktype, proto, canonname, sockaddr = infos[0]
 
-    log.info(lf('Requesting time from {sockaddr}'))
+    log.info(f'Requesting time from {sockaddr}')
     client = socket.socket(family=family, type=sock_type, proto=proto)
     client.settimeout(timeout)
 
@@ -44,7 +44,7 @@ def query(server, force_ipv6=False):
     if not data:
         return
 
-    log.info(lf('Response received from: {address}'))
+    log.info(f'Response received from: {address}')
     t = struct.unpack('!12I', data)[10]
     return t - TIME1970
 
@@ -64,7 +64,7 @@ def handle_command_line():
     logging.root.handlers[0].setFormatter(logging.Formatter("%(message)s"))
     val = query(args.server, args.ipv6)
     dt = datetime.datetime.fromtimestamp(val)  # noqa
-    log.info(lf('\tTime={dt}'))
+    log.info(f'\tTime={dt}')
 
 
 if __name__ == '__main__':

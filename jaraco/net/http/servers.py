@@ -9,8 +9,6 @@ import argparse
 import functools
 import traceback
 
-from jaraco.text import local_format as lf
-
 
 class Simple(object):
     def __init__(self, host, port, timeout, response_delay, outfile):
@@ -112,7 +110,7 @@ class AuthRequest(Simple):
         s.listen(1)
         while True:
             self.conn, addr = s.accept()
-            print(lf('Accepted connection from {addr}'))
+            print(f'Accepted connection from {addr}')
 
             if not self.check_auth_response(self.conn) == 'retry':
                 break
