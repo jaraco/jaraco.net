@@ -13,8 +13,6 @@ import cgi
 import urllib
 import http.client as http_client
 
-from backports.method_request import Request
-
 import jaraco.text
 import jaraco.path
 
@@ -90,7 +88,7 @@ def get_content_disposition_filename(url):
 
     res = url
     if not getattr(res, 'headers', None):
-        req = Request(url, method='HEAD')
+        req = urllib.request.Request(url, method='HEAD')
         try:
             res = urllib.request.urlopen(req)
         except urllib.error.URLError:
