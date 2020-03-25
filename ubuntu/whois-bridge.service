@@ -1,0 +1,9 @@
+[Unit]
+Description=whois bridge
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+ExecStart=/opt/whois-bridge/bin/python -m jaraco.net.whois
