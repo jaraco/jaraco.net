@@ -103,7 +103,7 @@ def get_hosts(host_spec):
     ['192.168.0.1']
 
     One may also specify named hosts
-    >>> '2001:4802:7800:1:be76:4eff:fe20:21d9' in get_hosts('www.jaraco.com')
+    >>> '2600:1f18:111:8a0a:61fa:e3e6:ce25:5a31' in get_hosts('www.jaraco.com')
     True
     """
     _map = {
