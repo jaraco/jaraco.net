@@ -4,9 +4,15 @@ constants are defined. This module restores some of those constants until
 such issues can be resolved.
 See http://mail.python.org/pipermail/python-list/2008-May/489377.html
 and http://bugs.python.org/issue6926
+and https://bugs.python.org/issue29515
 """
 
+import sys
+import platform
 import socket
+
+from jaraco.functools import call_aside
+
 
 constants = dict(
     # From Python 2.5 Intel x86 Windows
@@ -256,5 +262,13 @@ constants.update(
     TCP_NODELAY=1,
 )
 
-for item in constants.items():
-    socket.__dict__.setdefault(*item)
+
+@call_aside
+def patch():
+    if platform.system() != 'Windows':
+        return
+    if sys.version_info < (3, 8):
+        return
+
+    for item in constants.items():
+        socket.__dict__.setdefault(*item)
