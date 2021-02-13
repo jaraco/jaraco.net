@@ -94,7 +94,7 @@ class MIB_IPADDRTABLE(ctypes.Structure):
 ip_helper = ctypes.windll.iphlpapi
 
 
-class AllocatingTable(object):
+class AllocatingTable:
     """
     Microsoft uses a consistent interface to retrieve arrays of structures of
     unknown length. This class abstracts that functionality so that it

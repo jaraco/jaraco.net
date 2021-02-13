@@ -2,13 +2,11 @@
 dnsbl: DNS blocklist support
 """
 
-from __future__ import print_function
-
 import socket
 import argparse
 
 
-class BlocklistHit(object):
+class BlocklistHit:
     def __init__(self, host, blocklist, result):
         self.host = host
         self.blocklist = blocklist

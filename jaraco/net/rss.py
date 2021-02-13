@@ -2,8 +2,6 @@
 Routines for handling RSS feeds
 """
 
-from __future__ import print_function, absolute_import
-
 import itertools
 import subprocess
 import os

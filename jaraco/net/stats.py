@@ -10,7 +10,7 @@ import dateutil.parser
 from svg.charts import time_series
 
 
-class PingResult(object):
+class PingResult:
     def __init__(self, text):
         pattern = re.compile(
             'time: (?P<time>.*), host: (?P<host>.*), ' 'res: (?P<result>.*)\n'
@@ -50,7 +50,7 @@ class PingResult(object):
     __bool__ = __nonzero__ = success
 
 
-class Reader(object):
+class Reader:
     def __init__(self, filename):
         self.filename = filename
         self.file = open(filename)
@@ -118,7 +118,7 @@ def main():
 cherrypy = None
 
 
-class Server(object):
+class Server:
     @classmethod
     def handle_command_line(cls):
         globals().update(cherrypy=importlib.import_module('cherrypy'))

@@ -8,7 +8,7 @@ form = """
 """
 
 
-class ContentTypeReporter(object):
+class ContentTypeReporter:
     @cherrypy.expose
     def index(self, file=None):
         if not file:

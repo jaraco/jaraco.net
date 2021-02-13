@@ -11,8 +11,6 @@ Objects:
     PortRangeListener: listens on a range of ports
 """
 
-from __future__ import division
-
 import threading
 import socket
 import sys
@@ -29,7 +27,7 @@ from . import icmp
 log = logging.getLogger(__name__)
 
 
-class PortScanner(object):
+class PortScanner:
     def __init__(self):
         self.ranges = [range(1, 1024)]
         self.n_threads = 100
@@ -122,7 +120,7 @@ class PortListener(threading.Thread):
                 raise
 
 
-class PortRangeListener(object):
+class PortRangeListener:
     def __init__(self):
         self.ranges = [range(1, 1024)]
 

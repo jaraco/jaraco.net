@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import socket
 import sys
 import re
@@ -10,7 +8,7 @@ import functools
 import traceback
 
 
-class Simple(object):
+class Simple:
     def __init__(self, host, port, timeout, response_delay, outfile):
         self.__dict__.update(vars())
         del self.self

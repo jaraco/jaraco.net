@@ -4,7 +4,7 @@ import time
 import cherrypy.process.plugins
 
 
-class TailedFile(object):
+class TailedFile:
     interval = 0.1
 
     def __init__(self, filename):
@@ -28,7 +28,7 @@ class TailedFile(object):
         del self.file
 
 
-class TailedFileServer(object):
+class TailedFileServer:
     """
     A simple CherryPy controller that will tail a file and stream it to a
     browser.

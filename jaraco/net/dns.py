@@ -11,7 +11,7 @@ import win32service
 port = socket.getservbyname('domain')
 
 
-class Forwarder(object):
+class Forwarder:
     """
     Windows Server 2008 and Windows Server 2008 R2 DNS Servers do not
     support listening on tunneled IPv6 addresses.  See
@@ -53,7 +53,7 @@ class Forwarder(object):
             pass
 
 
-class RegConfig(object):
+class RegConfig:
     def __init__(self, root_path, tree=winreg.HKEY_CURRENT_USER):
         self.root_path = root_path
         self.tree = tree

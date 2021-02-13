@@ -3,7 +3,7 @@ import email
 from jaraco.net.http import caching
 
 
-class TestCachedResponse(object):
+class TestCachedResponse:
     def test_no_max_age(self):
         """
         If there's no max age in the header, that should not exclude it

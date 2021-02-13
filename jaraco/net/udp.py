@@ -1,10 +1,8 @@
-from __future__ import print_function
-
 import socket
 import argparse
 
 
-class EchoServer(object):
+class EchoServer:
     def __init__(self):
         args = self._get_args()
         self.serve(args)
@@ -35,7 +33,7 @@ class EchoServer(object):
                 break
 
 
-class Sender(object):
+class Sender:
     def __init__(self):
         self.args = self._get_args()
         self.send_message()

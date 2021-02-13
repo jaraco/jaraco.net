@@ -6,7 +6,7 @@ being run upon
 import sys
 
 
-class BaseManager(object):
+class BaseManager:
     """
     A base network manager class.
 
