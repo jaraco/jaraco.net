@@ -95,13 +95,14 @@ class RegConfig(object):
 
 class ForwardingService(win32serviceutil.ServiceFramework):
     r"""
-    _svc_name_:			The name of the service (used in the Windows registry).
-        				DEFAULT: The capitalized name of the current directory.
+    _svc_name_: The name of the service (used in the Windows registry).
+    DEFAULT: The capitalized name of the current directory.
+
     _svc_display_name_: The name that will appear in the Windows Service Manager.
-        				DEFAULT: The capitalized name of the current directory.
-    log_dir:			The desired location of the stdout and stderr
-        				log files.
-        				DEFAULT: %system%\LogFiles\%(_svc_display_name_)s
+    DEFAULT: The capitalized name of the current directory.
+
+    log_dir: The desired location of the stdout and stderr log files.
+    DEFAULT: %system%\LogFiles\%(_svc_display_name_)s
     """
     _svc_name_ = 'dns_forward'
     "The name of the service"

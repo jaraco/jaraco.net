@@ -97,7 +97,7 @@ ip_helper = ctypes.windll.iphlpapi
 class AllocatingTable(object):
     """
     Microsoft uses a consistent interface to retrieve arrays of structures of
-    unknown length.	 This class abstracts that functionality so that it
+    unknown length. This class abstracts that functionality so that it
     can be used to retrieve table entries using different API calls.
     """
 

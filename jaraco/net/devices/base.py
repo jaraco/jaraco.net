@@ -31,7 +31,7 @@ class BaseManager(object):
 
     def get_host_mac_address_strings(self):
         """
-        Iterate over the MAC address strings for the host.	These are
+        Iterate over the MAC address strings for the host. These are
         strings of six pairs of hex digits separated by colons.
         """
         return map(self.hardware_address_to_string, self.get_host_mac_addresses())

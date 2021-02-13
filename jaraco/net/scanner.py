@@ -59,9 +59,7 @@ def _get_mask_host(host_spec, matcher):
 
 
 def _get_range_host(host_spec, matcher):
-    """
-
-    """
+    """"""
     # matcher = matcher.next()
     rng = list(map(int, matcher.groups()))
     rng[1] += 1

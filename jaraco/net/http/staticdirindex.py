@@ -39,8 +39,7 @@ def staticdirindex(
 
     Should use priorty > than that of staticdir, so that only directories not
     served by staticdir, call staticdirindex.
-
-"""
+    """
     # first call old staticdir, and see if it does anything
     sdret = staticdir(section, dir, root, match, content_types, index)
     if sdret:
