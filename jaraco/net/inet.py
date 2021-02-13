@@ -20,6 +20,7 @@ import operator
 import time
 import logging
 import functools
+from typing import List
 
 from more_itertools.recipes import consume
 
@@ -41,7 +42,7 @@ class PortScanner(object):
 
 
 class ScanThread(threading.Thread):
-    all_testers = []
+    all_testers: List[threading.Thread] = []
 
     def __init__(self, address):
         threading.Thread.__init__(self)

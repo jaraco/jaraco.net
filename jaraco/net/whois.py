@@ -80,10 +80,9 @@ class WhoisHandler(metaclass=LeafClassesMeta):
             raise ValueError(error % query)
         return matches[0](query)
 
+    @staticmethod
     def _IsWhoisHandler_(ob):
         return hasattr(ob, '__bases__') and WhoisHandler in ob.__bases__
-
-    _IsWhoisHandler_ = staticmethod(_IsWhoisHandler_)
 
     def ParseResponse(self):
         soup = BeautifulSoup(self._response)

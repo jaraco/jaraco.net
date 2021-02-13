@@ -8,8 +8,7 @@ and http://bugs.python.org/issue6926
 
 import socket
 
-constants = dict()
-constants.update(
+constants = dict(
     # From Python 2.5 Intel x86 Windows
     AF_APPLETALK=16,
     AF_DECnet=12,

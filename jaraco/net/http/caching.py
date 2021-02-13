@@ -10,9 +10,9 @@ import io
 from urllib import request
 
 try:
-    import email.utils as email_utils
+    import email.utils as email_utils  # type: ignore
 except ImportError:
-    import email.Utils as email_utils
+    import email.Utils as email_utils  # type: ignore
 
 log = logging.getLogger(__name__)
 

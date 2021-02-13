@@ -143,7 +143,7 @@ class Server(object):
             .encode('utf-8')
         )
 
-    index.exposed = True
+    index.exposed = True  # type: ignore
 
     def get_images(self):
         reader = Reader('ping-results.txt')
