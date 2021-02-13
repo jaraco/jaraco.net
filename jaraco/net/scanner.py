@@ -11,8 +11,11 @@ import socket
 import itertools
 import logging.handlers
 import argparse
+import os
+import platform
 
 import jaraco.logging
+from jaraco.collections import Everything
 
 from . import inet
 
@@ -84,6 +87,18 @@ def _get_named_host(spec, matcher):
     return hosts
 
 
+def _gha(res):
+    """
+    Github Actions doesn't have an IPv6 stack on macOS or Windows,
+    so workaround the issue.
+    """
+    needs_workaround = 'GITHUB_ACTIONS' in os.environ and platform.system() in (
+        'Windows',
+        'Darwin',
+    )
+    return Everything() if needs_workaround else res
+
+
 def get_hosts(host_spec):
     """
     Get a list of hosts specified by subnet mask or using a specific range.
@@ -103,7 +118,7 @@ def get_hosts(host_spec):
     ['192.168.0.1']
 
     One may also specify named hosts
-    >>> '2600:1f18:111:8a0a:61fa:e3e6:ce25:5a31' in get_hosts('www.jaraco.com')
+    >>> '2600:1f18:111:8a0a:61fa:e3e6:ce25:5a31' in _gha(get_hosts('www.jaraco.com'))
     True
     """
     _map = {
