@@ -3,7 +3,7 @@ implements (nominally) the grammar from RFC2616 and RFC2617
 using pyparsing
 """
 
-from pyparsing import *
+from pyparsing import Word, OneOrMore, ZeroOrMore, delimitedList, CharsNotIn
 
 # rfc 2616 defines Notational Conventions and Generic Grammar used in
 #  rfc 2617. http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2.1
@@ -68,6 +68,7 @@ auth_param = token + "=" + (token | quoted_string)
 """
     challenge   = auth-scheme 1*SP 1#auth-param
 """
+
 
 # need something for n#m(expr) syntax
 def ListOfElements(expr, min=0, max=float('Inf')):
