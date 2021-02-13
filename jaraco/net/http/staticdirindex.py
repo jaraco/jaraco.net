@@ -10,7 +10,7 @@ from cherrypy.lib import cptools, httputil as http
 from cherrypy.lib.static import staticdir
 
 
-def staticdirindex(
+def staticdirindex(  # noqa: C901
     section,
     dir,
     root="",
