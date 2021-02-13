@@ -3,6 +3,7 @@ implements (nominally) the grammar from RFC2616 and RFC2617
 using pyparsing
 """
 
+import itertools
 from pyparsing import Word, OneOrMore, ZeroOrMore, delimitedList, CharsNotIn
 
 # rfc 2616 defines Notational Conventions and Generic Grammar used in
@@ -31,7 +32,7 @@ def One(chars):
 
 _chars = ''.join(map(chr, range(128)))
 CHAR = One(_chars)
-_ctl_chars = ''.join(map(chr, range(0, 32)) + [chr(127)])
+_ctl_chars = ''.join(map(chr, itertools.chain(range(0, 32), [127])))
 CTL = One(_ctl_chars)
 SP = ' '
 HT = '\t'
