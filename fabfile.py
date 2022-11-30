@@ -5,11 +5,10 @@ To install on a clean Ubuntu Bionic box, simply run
 fab bootstrap
 """
 
-from fabric.api import sudo, run, task, env
-from fabric.contrib import files
+from fabric import task
+from jaraco.fabric import files
 
-if not env.hosts:
-    env.hosts = ['spidey']
+hosts = ['spidey']
 
 install_root = '/opt/whois-bridge'
 
@@ -17,60 +16,60 @@ install_root = '/opt/whois-bridge'
 python = 'python3.8'
 
 
-@task
-def bootstrap():
-    install_dependencies()
-    install_env()
-    install_service()
-    update()
+@task(hosts=hosts)
+def bootstrap(c):
+    install_dependencies(c)
+    install_env(c)
+    install_service(c)
+    update(c)
 
 
 @task
-def install_dependencies():
-    sudo('apt install -y software-properties-common')
-    sudo('add-apt-repository -y ppa:deadsnakes/ppa')
-    sudo('apt update -y')
-    sudo(f'apt install -y {python} {python}-venv')
+def install_dependencies(c):
+    c.sudo('apt install -y software-properties-common')
+    c.sudo('add-apt-repository -y ppa:deadsnakes/ppa')
+    c.sudo('apt update -y')
+    c.sudo(f'apt install -y {python} {python}-venv')
 
 
 @task
-def install_env():
-    user = run('whoami')
-    sudo(f'rm -R {install_root} || echo -n')
-    sudo(f'mkdir -p {install_root}')
-    sudo(f'chown {user} {install_root}')
-    run(f'{python} -m venv {install_root}')
-    run(f'{install_root}/bin/python -m pip install -U pip')
+def install_env(c):
+    user = c.run('whoami')
+    c.sudo(f'rm -R {install_root} || echo -n')
+    c.sudo(f'mkdir -p {install_root}')
+    c.sudo(f'chown {user} {install_root}')
+    c.run(f'{python} -m venv {install_root}')
+    c.run(f'{install_root}/bin/python -m pip install -U pip')
 
 
 @task
-def install_service():
+def install_service(c):
     files.upload_template(
+        c,
         "ubuntu/whois-bridge.service",
         "/etc/systemd/system",
-        use_sudo=True,
         context=globals(),
     )
-    sudo('systemctl enable whois-bridge')
+    c.sudo('systemctl enable whois-bridge')
 
 
 @task
-def update():
-    install()
-    sudo('systemctl restart whois-bridge')
+def update(c):
+    install(c)
+    c.sudo('systemctl restart whois-bridge')
 
 
-def install():
+def install(c):
     """
     Install jaraco.net to environment at root.
     """
-    run('git clone https://github.com/jaraco/jaraco.net || echo -n')
-    run('git -C jaraco.net pull')
-    run(f'{install_root}/bin/python -m pip install -U ./jaraco.net')
+    c.run('git clone https://github.com/jaraco/jaraco.net || echo -n')
+    c.run('git -C jaraco.net pull')
+    c.run(f'{install_root}/bin/python -m pip install -U ./jaraco.net')
 
 
 @task
-def remove_all():
-    sudo('stop whois-bridge || echo -n')
-    sudo('rm /etc/systemd/system/whois-bridge.service || echo -n')
-    sudo('rm -Rf /opt/whois-bridge')
+def remove_all(c):
+    c.sudo('stop whois-bridge || echo -n')
+    c.sudo('rm /etc/systemd/system/whois-bridge.service || echo -n')
+    c.sudo('rm -Rf /opt/whois-bridge')

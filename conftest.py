@@ -1,3 +1,4 @@
+import sys
 import platform
 
 
@@ -12,3 +13,7 @@ collect_ignore = [
     'jaraco/net/devices/linux2.py',
     'jaraco/net/devices/win32.py',
 ] + windows_ignore
+
+
+# fabric fails on Python 3.11
+collect_ignore += ['fabfile.py'] * (sys.version_info > (3, 11))
