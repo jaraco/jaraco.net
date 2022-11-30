@@ -9,10 +9,11 @@ import datetime
 import argparse
 import cgi
 import urllib
+import email.utils
 import http.client as http_client
 
+import path
 import jaraco.text
-import jaraco.path
 
 log = logging.getLogger(__name__)
 
@@ -104,20 +105,18 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
     src = urllib.request.urlopen(url)
     log.debug(src.headers)
     if 'last-modified' in src.headers:
-        mod_time = datetime.datetime.strptime(
-            src.headers['last-modified'], '%a, %d %b %Y %H:%M:%S %Z'
-        )
+        mod_time = email.utils.parsedate_to_datetime(src.headers['last-modified'])
     else:
         mod_time = None
     content_length = int(src.headers['content-length'])
-    fname = (
+    fname = path.Path(
         dest
         or get_content_disposition_filename(src)
         or get_url_filename(url)
         or 'result.dat'
     )
-    if mod_time and os.path.exists(fname):
-        stat = os.lstat(fname)
+    if mod_time and fname.exists():
+        stat = fname.lstat()
         previous_size = stat.st_size
         previous_mod_time = datetime.datetime.utcfromtimestamp(stat.st_mtime)
         log.debug('Local  last mod %s', previous_mod_time)
@@ -141,15 +140,14 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
         )
         if just_needs_touching:
             log.info('Local file appears newer than remote - updating mod time')
-            jaraco.path.set_time(fname, mod_time)
+            fname.mtime = mod_time
             return
     log.info('Downloading %s (last mod %s)', url, str(mod_time))
-    dest = open(fname, 'wb')
-    for line in src:
-        dest.write(line)
-    dest.close()
+    with fname.open('wb') as dest:
+        for line in src:
+            dest.write(line)
     if mod_time:
-        jaraco.path.set_time(fname, mod_time)
+        fname.mtime = mod_time
     return fname
 
 
