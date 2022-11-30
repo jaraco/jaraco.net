@@ -1,4 +1,4 @@
-from importlib import resources
+from importlib_resources import files
 
 
 def test_bolivia_handler():
@@ -6,7 +6,7 @@ def test_bolivia_handler():
 
     handler = BoliviaWhoisHandler('microsoft.com.bo')
     handler.client_address = '127.0.0.1'
-    saved_resp = resources.files('tests') / 'nic.bo.html'
+    saved_resp = files('tests') / 'nic.bo.html'
     handler._response = saved_resp.read_bytes()
     result = handler.ParseResponse()
     assert 'Microsoft Corporation' in result
