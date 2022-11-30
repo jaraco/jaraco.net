@@ -7,7 +7,6 @@ import textwrap
 
 from more_itertools import recipes
 import dateutil.parser
-from svg.charts import time_series
 
 
 class PingResult:
@@ -116,12 +115,16 @@ def main():
 
 
 cherrypy = None
+time_series = None
 
 
 class Server:
     @classmethod
     def handle_command_line(cls):
-        globals().update(cherrypy=importlib.import_module('cherrypy'))
+        globals().update(
+            cherrypy=importlib.import_module('cherrypy'),
+            time_series=importlib.import_module('svg.charts.time_series'),
+        )
         config = {'global': {'server.socket_host': '::0'}}
         cherrypy.quickstart(cls(), config=config)
 
