@@ -16,7 +16,6 @@ import abc
 import socket
 import select
 import urllib
-import http.cookiejar as http_cookiejar
 import socketserver
 
 import mechanize
@@ -25,16 +24,6 @@ from jaraco.classes.meta import LeafClassesMeta
 
 
 log = logging.getLogger(__name__)
-
-
-def init():
-    """
-    Initialize HTTP functionality to support cookies, which are necessary
-    to use the HTTP interface.
-    """
-    cj = http_cookiejar.CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
-    urllib.request.install_opener(opener)
 
 
 class ABCLeafClassesMeta(abc.ABCMeta, LeafClassesMeta):
@@ -281,7 +270,6 @@ class Listener(socketserver.ThreadingTCPServer):
 
 
 def serve():
-    init()
     Listener().serve_forever()
 
 
