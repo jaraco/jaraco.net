@@ -15,8 +15,8 @@ import argparse
 
 import feedparser
 import jaraco.logging
+from pathvalidate import sanitize_filename
 from dateutil import parser as date_parser
-from jaraco.path import encode as encode_filename
 
 from jaraco.net.http import get_url
 
@@ -69,12 +69,12 @@ def download_enclosures():
         ext = mimetypes.guess_extension(enclosure.type) or '.mp3'
         filename = title + ext
         log.info('Getting %s', filename)
-        filename = encode_filename(filename)
+        sanitized = sanitize_filename(filename, replacement_text='_')
         try:
-            get_url(enclosure.url, filename, replace_newer=True)
+            get_url(enclosure.url, sanitized, replace_newer=True)
         except KeyboardInterrupt:
-            if os.path.exists(filename):
-                os.remove(filename)
+            if os.path.exists(sanitized):
+                os.remove(sanitized)
             log.info('Quitting')
             break
 
