@@ -43,10 +43,10 @@ class Forwarder:
 
     def relay_message(self):
         try:
-            mesg, requester = self.socket.recvfrom(2 ** 16)
+            mesg, requester = self.socket.recvfrom(2**16)
             print('received %(mesg)r from %(requester)s' % vars())
             self.dest.sendto(mesg, self.dest_addr)
-            resp, src = self.dest.recvfrom(2 ** 16)
+            resp, src = self.dest.recvfrom(2**16)
             print('response %(resp)r' % vars())
             self.socket.sendto(resp, requester)
         except socket.timeout:
@@ -118,7 +118,7 @@ class ForwardingService(win32serviceutil.ServiceFramework):
     )
 
     def SvcDoRun(self):
-        """ Called when the Windows Service runs. """
+        """Called when the Windows Service runs."""
         self.init_logging()
         self.ReportServiceStatus(win32service.SERVICE_START_PENDING)
         self.forwarder = Forwarder(self.config.get('Listen Address', '::0'))
