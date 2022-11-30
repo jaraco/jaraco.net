@@ -1,7 +1,12 @@
 import logging
 
 import requests
-import lxml
+
+try:
+    import lxml
+except ImportError:
+    pass
+
 
 log = logging.getLogger(__name__)
 
