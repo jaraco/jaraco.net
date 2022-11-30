@@ -89,7 +89,7 @@ class WhoisHandler(metaclass=LeafClassesMeta):
         return soup.get_text()
 
 
-class ArgentinaWhoisHandler(WhoisHandler):
+class ArgentinaWhoisHandler(WhoisHandler):  # type: ignore
     services = r'\.ar$'
 
     def LoadHTTP(self):
@@ -109,7 +109,7 @@ class ArgentinaWhoisHandler(WhoisHandler):
         self._response = resp.read()
 
 
-class CoZaWhoisHandler(WhoisHandler):
+class CoZaWhoisHandler(WhoisHandler):  # type: ignore
     services = r'\.co\.za$'
 
     def LoadHTTP(self):
@@ -122,7 +122,7 @@ class CoZaWhoisHandler(WhoisHandler):
         self._response = resp.read()
 
 
-class GovWhoisHandler(WhoisHandler):
+class GovWhoisHandler(WhoisHandler):  # type: ignore
     services = r'(\.fed\.us|\.gov)$'
 
     def LoadHTTP(self):
@@ -168,7 +168,7 @@ mozilla_headers = {
 }
 
 
-class BoliviaWhoisHandler(WhoisHandler):
+class BoliviaWhoisHandler(WhoisHandler):  # type: ignore
     services = r'\.bo$'
 
     def LoadHTTP(self):
@@ -193,7 +193,7 @@ class BoliviaWhoisHandler(WhoisHandler):
         return soup.strong.parent.div.text
 
 
-class SourceWhoisHandler(WhoisHandler):
+class SourceWhoisHandler(WhoisHandler):  # type: ignore
     """This is not a typical Whois handler, but rather a special
     handler that returns the source of this file"""
 
@@ -207,7 +207,7 @@ class SourceWhoisHandler(WhoisHandler):
         return open(filename).read()
 
 
-class DebugHandler(WhoisHandler):
+class DebugHandler(WhoisHandler):  # type: ignore
     services = r'^debug (.*)$'
     authorized_addresses = ['127.0.0.1']
 
