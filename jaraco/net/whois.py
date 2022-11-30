@@ -37,7 +37,11 @@ def init():
     urllib.request.install_opener(opener)
 
 
-class WhoisHandler(metaclass=LeafClassesMeta):
+class ABCLeafClassesMeta(abc.ABCMeta, LeafClassesMeta):
+    pass
+
+
+class WhoisHandler(metaclass=ABCLeafClassesMeta):
     """
     WhoisHandler is an abstract class for defining whois interfaces for
     web-based nic servers.
@@ -85,7 +89,7 @@ class WhoisHandler(metaclass=LeafClassesMeta):
         return soup.get_text()
 
 
-class ArgentinaWhoisHandler(WhoisHandler):  # type: ignore
+class ArgentinaWhoisHandler(WhoisHandler):
     services = r'\.ar$'
 
     def LoadHTTP(self):
@@ -104,7 +108,7 @@ class ArgentinaWhoisHandler(WhoisHandler):  # type: ignore
         self._response = resp.read()
 
 
-class CoZaWhoisHandler(WhoisHandler):  # type: ignore
+class CoZaWhoisHandler(WhoisHandler):
     services = r'\.co\.za$'
 
     def LoadHTTP(self):
@@ -118,7 +122,7 @@ class CoZaWhoisHandler(WhoisHandler):  # type: ignore
         self._response = resp.read()
 
 
-class GovWhoisHandler(WhoisHandler):  # type: ignore
+class GovWhoisHandler(WhoisHandler):
     services = r'(\.fed\.us|\.gov)$'
 
     def LoadHTTP(self):
@@ -164,7 +168,7 @@ mozilla_headers = {
 }
 
 
-class BoliviaWhoisHandler(WhoisHandler):  # type: ignore
+class BoliviaWhoisHandler(WhoisHandler):
     services = r'\.bo$'
 
     def LoadHTTP(self):
@@ -191,7 +195,7 @@ class BoliviaWhoisHandler(WhoisHandler):  # type: ignore
         return soup.strong.parent.div.text
 
 
-class SourceWhoisHandler(WhoisHandler):  # type: ignore
+class SourceWhoisHandler(WhoisHandler):
     """This is not a typical Whois handler, but rather a special
     handler that returns the source of this file"""
 
@@ -205,7 +209,7 @@ class SourceWhoisHandler(WhoisHandler):  # type: ignore
         return open(filename).read()
 
 
-class DebugHandler(WhoisHandler):  # type: ignore
+class DebugHandler(WhoisHandler):
     services = r'^debug (.*)$'
     authorized_addresses = ['127.0.0.1']
 
