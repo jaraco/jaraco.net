@@ -74,7 +74,7 @@ class WhoisHandler(metaclass=ABCLeafClassesMeta):
         return hasattr(ob, '__bases__') and WhoisHandler in ob.__bases__
 
     def ParseResponse(self):
-        soup = BeautifulSoup(self._response)
+        soup = BeautifulSoup(self._response, 'html.parser')
         return soup.get_text()
 
 
@@ -140,7 +140,7 @@ class GovWhoisHandler(WhoisHandler):
         br.submit().read()
 
     def ParseResponse(self):
-        soup = BeautifulSoup(self._response)
+        soup = BeautifulSoup(self._response, 'html.parser')
         target = soup.select('#TD1')
         return target.get_text()
 
@@ -180,7 +180,7 @@ class BoliviaWhoisHandler(WhoisHandler):
         self._response = resp.text
 
     def ParseResponse(self):
-        soup = BeautifulSoup(self._response)
+        soup = BeautifulSoup(self._response, 'html.parser')
         return soup.strong.parent.div.text
 
 
