@@ -19,14 +19,10 @@ import urllib
 import http.cookiejar as http_cookiejar
 import socketserver
 
-try:
-    from ClientForm import ParseResponse, ItemNotFoundError
-except ImportError:
-    "Disabled for Python 3 compatibility"
+import mechanize
 from bs4 import BeautifulSoup
 from jaraco.classes.meta import LeafClassesMeta
 
-from .http import mechanize
 
 log = logging.getLogger(__name__)
 
@@ -95,17 +91,16 @@ class ArgentinaWhoisHandler(WhoisHandler):  # type: ignore
     def LoadHTTP(self):
         query = self._query
         pageURL = 'http://www.nic.ar/consdom.html'
-        form = ParseResponse(urllib.request.urlopen(pageURL))[0]
-        form['nombre'] = query[: query.find('.')]
+        br = mechanize.Browser()
+        br.open(pageURL)
+        br.select_form()
+        br['nombre'] = query[: query.find('.')]
         try:
             domain = query[query.find('.') :]
-            form['dominio'] = [domain]
-        except ItemNotFoundError:
-            raise ValueError('Invalid domain (%s)' % domain)
-        req = form.click()
-        # req.data = 'nombre=%s&dominio=.com.ar' % query
-        req.add_header('referer', pageURL)
-        resp = urllib.request.urlopen(req)
+            br['dominio'] = domain
+        except ValueError as exc:
+            raise ValueError('Invalid domain (%s)' % domain) from exc
+        resp = br.submit()
         self._response = resp.read()
 
 
@@ -115,10 +110,11 @@ class CoZaWhoisHandler(WhoisHandler):  # type: ignore
     def LoadHTTP(self):
         query = self._query
         pageURL = 'http://whois.co.za/'
-        form = ParseResponse(urllib.request.urlopen(pageURL))[0]
-        form['Domain'] = query[: query.find('.')]
-        req = form.click()
-        resp = urllib.request.urlopen(req)
+        br = mechanize.Browser()
+        br.open(pageURL)
+        br.select_form()
+        br['Domain'] = query[: query.find('.')]
+        resp = br.submit()
         self._response = resp.read()
 
 
@@ -128,27 +124,27 @@ class GovWhoisHandler(WhoisHandler):  # type: ignore
     def LoadHTTP(self):
         query = self._query
         # Perform an whois query on the dotgov server.
-        url = urllib.request.urlopen('http://dotgov.gov/whois.aspx')
-        forms = ParseResponse(url)
-        assert len(forms) == 1
-        form = forms[0]
-        if form.attrs['action'] == 'agree.aspx':
+        br = mechanize.Browser()
+        br.open('http://dotgov.gov/whois.aspx')
+        try:
+            br.select_form(action='agree.aspx')
             # we've been redirected to a different form
             # need to agree to license agreement
-            self.Agree(form)
+            self.Agree(br)
             # note this could get to an infinite loop if cookies aren't working
             # or for whatever reason we're always being redirected to the
             # agree.aspx page.
             return self.LoadHTTP()
-        form['who_search'] = query
-        resp = urllib.request.urlopen(forms[0].click())
+        except mechanize.FormNotFoundError:
+            pass
+        br.select_form()
+        br['who_search'] = query
+        resp = br.submit()
         self._response = resp.read()
 
-    def Agree(self, form):
+    def Agree(self, br):
         "agree to the dotgov agreement"
-        agree_req = form.click()
-        u2 = urllib.request.urlopen(agree_req)
-        u2.read()
+        br.submit().read()
 
     def ParseResponse(self):
         soup = BeautifulSoup(self._response)
@@ -174,17 +170,19 @@ class BoliviaWhoisHandler(WhoisHandler):  # type: ignore
     def LoadHTTP(self):
         name, domain = self._query.split('.', 1)
         domain = '.' + domain
-        getter = mechanize.PageGetter()
-        search_page = getter.load('http://www.nic.bo/')
-        form_items = {'subdominio': [domain], 'dominio': name}
-        resp = getter.process_form(search_page, form_items)
+        br = mechanize.Browser()
+        br.open('http://www.nic.bo/')
+        br.select_form()
+        br['subdominio'] = domain
+        br['dominio'] = name
+        resp = br.submit()
 
         # now that we've submitted the request, we've got a response.
         # This page returns 'available' or 'not available'
         # If it's not available, we need to know who owns it.
         if re.search('Dominio %s registrado' % self._query, resp.text):
             info_url = urllib.parse.basejoin(resp.url, 'informacion.php')
-            resp = getter.load(info_url)
+            resp = br.open(info_url)
 
         self._response = resp.text
 
