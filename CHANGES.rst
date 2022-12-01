@@ -1,7 +1,10 @@
-v7.2.0
+v8.0.0
 ======
 
 #1: Added ``http.cookies`` module with a persistent ``ShelvedCookieJar``.
+
+Substantial cleanup with some functionality removed. Removed dependencies
+on expensive packages (``pyobjc``, ``pywin32``).
 
 v7.1.0
 ======
