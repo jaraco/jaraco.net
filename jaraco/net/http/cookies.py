@@ -1,6 +1,8 @@
 import http.cookiejar
 import shelve
 
+from . import py38compat
+
 
 class FlushableShelf(shelve.DbfilenameShelf):
     """
@@ -18,10 +20,10 @@ class FlushableShelf(shelve.DbfilenameShelf):
     """
 
     def __init__(self, filename, *args, **kwargs):
-        self.filename = filename
+        self.filename = py38compat.fspath(filename)
         self.args = args
         self.kwargs = kwargs
-        super().__init__(filename, *args, **kwargs)
+        super().__init__(self.filename, *args, **kwargs)
 
     def flush(self):
         self.close()
