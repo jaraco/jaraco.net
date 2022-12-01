@@ -34,3 +34,12 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
         if path is not None or name is not None:
             # Mark key as dirty.
             self._cookies[domain] = self._cookies[domain]
+
+    def get(self, name, default=None):
+        matches = (
+            cookie
+            for domain in self._cookies
+            for cookie in self._cookies[domain]
+            if cookie.name == name
+        )
+        return next(matches, default)
