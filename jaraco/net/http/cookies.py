@@ -39,6 +39,10 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
         super().__init__(**kwargs)
         self._cookies = self.shelf = shelf
 
+    @classmethod
+    def create(cls, root, name='cookies', **kwargs):
+        return cls(FlushableShelf(root / name), **kwargs)
+
     def set_cookie(self, cookie):
         with self._cookies_lock:
             # Force persistence
