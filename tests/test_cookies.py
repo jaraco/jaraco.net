@@ -1,5 +1,3 @@
-import platform
-
 import requests
 
 from jaraco.net.http.cookies import ShelvedCookieJar, FlushableShelf
@@ -14,8 +12,7 @@ def test_cookie_shelved(requests_mock, tmp_path):
     session.get('http://any/')
     assert session.cookies
 
-    if platform.system() == "Windows":
-        # need to detach original jar before a new one can connect
-        shelf.close()
+    # need to detach original jar before a new one can connect
+    shelf.close()
 
     assert ShelvedCookieJar(FlushableShelf(cookies))
