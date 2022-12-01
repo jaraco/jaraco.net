@@ -1,3 +1,5 @@
+import jaraco.context
+
 import http.cookiejar
 import shelve
 
@@ -44,10 +46,9 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
         return self.shelf
 
     @_cookies.setter  # type: ignore
+    # bypass during initialization
+    @jaraco.context.suppress(AttributeError)
     def _cookies(self, value):
-        if not hasattr(self, 'shelf'):
-            # bypass during initialization
-            return
         self.shelf.clear()
         self.shelf.update(value)
         self.shelf.flush()
