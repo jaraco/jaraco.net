@@ -1,6 +1,9 @@
 import sys
 import importlib
+import os
+import dbm
 
+import pytest
 from jaraco.context import ExceptionTrap
 
 
@@ -29,3 +32,18 @@ collect_ignore = (
     ]
     * (sys.version_info > (3, 11))
 )
+
+
+@pytest.fixture(scope='session')
+def check_concurrent_dbm(tmp_path_factory):
+    """
+    Some environments dissallow concurrent access on DBM files.
+
+    Detect such environments and skip those tests.
+    """
+    name = tmp_path_factory.mktemp("dbm check") / 'data'
+    orig = dbm.open(os.fspath(name), flag='c')  # noqa: F841
+    try:
+        dbm.open(os.fspath(name))
+    except Exception:
+        pytest.skip("Unable to open dbm concurrently")
