@@ -1,14 +1,12 @@
 import http.cookiejar
 import shelve
 
-from . import py38compat
+from . import py310compat
 
 
 class FlushableShelf(shelve.DbfilenameShelf):
     """
-    >>> import platform, pytest
-    >>> if platform.system() == 'Linux': pytest.skip("Disallowed concurrent access")
-
+    >>> getfixture('check_concurrent_dbm')
     >>> fn = getfixture('tmp_path') / 'shelf'
     >>> shelf = FlushableShelf(fn)
     >>> shelf['foo'] = 'bar'
@@ -23,7 +21,7 @@ class FlushableShelf(shelve.DbfilenameShelf):
     """
 
     def __init__(self, filename, *args, **kwargs):
-        self.filename = py38compat.fspath(filename)
+        self.filename = py310compat.fspath(filename)
         self.args = args
         self.kwargs = kwargs
         super().__init__(self.filename, *args, **kwargs)
