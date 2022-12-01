@@ -1,3 +1,8 @@
+v7.2.0
+======
+
+Added ``http.cookies`` module with a persistent ``ShelvedCookieJar``.
+
 v7.1.0
 ======
 
