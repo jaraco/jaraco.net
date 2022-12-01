@@ -6,6 +6,9 @@ from . import py38compat
 
 class FlushableShelf(shelve.DbfilenameShelf):
     """
+    >>> import platform, pytest
+    >>> if platform.system() == 'Linux': pytest.skip("Disallowed concurrent access")
+
     >>> fn = getfixture('tmp_path') / 'shelf'
     >>> shelf = FlushableShelf(fn)
     >>> shelf['foo'] = 'bar'
