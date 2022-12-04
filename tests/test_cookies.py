@@ -11,16 +11,12 @@ def session(tmp_path):
     return session
 
 
-def test_cookie_shelved(requests_mock, tmp_path):
+def test_cookie_shelved(requests_mock, session):
     requests_mock.get('/', cookies={'foo': 'bar'})
-    session = requests.Session()
-    cookies = tmp_path / 'cookies.json'
-    shelf = Shelf(cookies)
-    session.cookies = ShelvedCookieJar(shelf)
     session.get('http://any/')
     assert session.cookies
 
-    assert ShelvedCookieJar(Shelf(cookies))
+    assert ShelvedCookieJar(Shelf(session.cookies._cookies.filename))
 
 
 def test_cookie_get(requests_mock, session):
