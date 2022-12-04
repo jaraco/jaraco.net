@@ -1,34 +1,55 @@
+import pathlib
+import collections
 import http.cookiejar
-import shelve
+import contextlib
 
-from . import py310compat
+import jsonpickle
 
 
-class FlushableShelf(shelve.DbfilenameShelf):
+class Shelf(collections.abc.MutableMapping):
     """
-    >>> getfixture('check_concurrent_dbm')
-    >>> fn = getfixture('tmp_path') / 'shelf'
-    >>> shelf = FlushableShelf(fn)
+    Similar to Python's shelve.Shelf, implements a persistent
+    dictionary using jsonpickle.
+
+    >>> fn = getfixture('tmp_path') / 'shelf.json'
+    >>> shelf = Shelf(fn)
     >>> shelf['foo'] = 'bar'
-    >>> shelf.flush()
-    >>> copy = FlushableShelf(fn)
+    >>> copy = Shelf(fn)
     >>> copy['foo']
     'bar'
     >>> shelf['bar'] = 'baz'
-    >>> shelf.flush()
-    >>> FlushableShelf(fn)['bar']
+    >>> Shelf(fn)['bar']
     'baz'
     """
 
-    def __init__(self, filename, *args, **kwargs):
-        self.filename = py310compat.fspath(filename)
-        self.args = args
-        self.kwargs = kwargs
-        super().__init__(self.filename, *args, **kwargs)
+    def __init__(self, filename):
+        self.filename = pathlib.Path(filename)
+        self.store = dict()
+        with contextlib.suppress(Exception):
+            self._load()
 
-    def flush(self):
-        self.close()
-        super().__init__(self.filename, *self.args, **self.kwargs)
+    def _load(self):
+        self.store = jsonpickle.decode(self.filename.read_text())
+
+    def _save(self):
+        self.filename.write_text(jsonpickle.encode(self.store))
+
+    def __getitem__(self, *args, **kwargs):
+        return self.store.__getitem__(*args, **kwargs)
+
+    def __setitem__(self, *args, **kwargs):
+        self.store.__setitem__(*args, **kwargs)
+        self._save()
+
+    def __delitem__(self, *args, **kwargs):
+        self.store.__delitem__(*args, **kwargs)
+        self._save()
+
+    def __iter__(self):
+        return self.store.__iter__()
+
+    def __len__(self):
+        return self.store.__len__()
 
 
 class ShelvedCookieJar(http.cookiejar.CookieJar):
@@ -38,28 +59,25 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
     Automatically persists cookies to disk.
     """
 
-    def __init__(self, shelf: FlushableShelf, **kwargs):
+    def __init__(self, shelf: Shelf, **kwargs):
         super().__init__(**kwargs)
-        self._cookies = self.shelf = shelf
+        self._cookies = shelf
 
     @classmethod
-    def create(cls, root, name='cookies', **kwargs):
-        return cls(FlushableShelf(root / name), **kwargs)
+    def create(cls, root, name='cookies.json', **kwargs):
+        return cls(Shelf(root / name), **kwargs)
 
     def set_cookie(self, cookie):
         with self._cookies_lock:
-            # Force persistence
-            d = self._cookies.setdefault(cookie.domain, {})
-            d.setdefault(cookie.path, {})[cookie.name] = cookie
-            self._cookies[cookie.domain] = d
-            self.shelf.flush()
+            self._cookies.setdefault(cookie.domain, {}).setdefault(cookie.path, {})[
+                cookie.name
+            ] = cookie
+            self._cookies._save()
 
     def clear(self, domain=None, path=None, name=None):
         super().clear(domain, path, name)
         if path is not None or name is not None:
-            # Mark key as dirty.
-            self._cookies[domain] = self._cookies[domain]
-        self.shelf.flush()
+            self._cookies._save()
 
     def get(self, name, default=None):
         matches = (

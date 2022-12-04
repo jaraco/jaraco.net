@@ -1,3 +1,10 @@
+v9.0.0
+======
+
+#2: ``http.cookies`` no longer relies on ``shelve.Shelf``, but instead
+provides its own ``Shelf`` implementation that automatically persists
+any cookies.
+
 v8.0.0
 ======
 
