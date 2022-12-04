@@ -61,7 +61,7 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
 
     def __init__(self, shelf: Shelf, **kwargs):
         super().__init__(**kwargs)
-        self._cookies = shelf
+        self._cookies = self.shelf = shelf
 
     @classmethod
     def create(cls, root, name='cookies.json', **kwargs):
@@ -69,22 +69,22 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
 
     def set_cookie(self, cookie):
         with self._cookies_lock:
-            self._cookies.setdefault(cookie.domain, {}).setdefault(cookie.path, {})[
+            self.shelf.setdefault(cookie.domain, {}).setdefault(cookie.path, {})[
                 cookie.name
             ] = cookie
-            self._cookies._save()
+            self.shelf._save()
 
     def clear(self, domain=None, path=None, name=None):
         super().clear(domain, path, name)
         if path is not None or name is not None:
-            self._cookies._save()
+            self.shelf._save()
 
     def get(self, name, default=None):
         matches = (
             cookie.value
-            for domain in self._cookies
-            for path in self._cookies[domain]
-            for cookie in self._cookies[domain][path].values()
+            for domain in self.shelf
+            for path in self.shelf[domain]
+            for cookie in self.shelf[domain][path].values()
             if cookie.name == name
         )
         return next(matches, default)

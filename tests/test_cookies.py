@@ -16,7 +16,7 @@ def test_cookie_shelved(requests_mock, session):
     session.get('http://any/')
     assert session.cookies
 
-    assert ShelvedCookieJar(Shelf(session.cookies._cookies.filename))
+    assert ShelvedCookieJar(Shelf(session.cookies.shelf.filename))
 
 
 def test_cookie_get(requests_mock, session):
