@@ -1,3 +1,8 @@
+v9.0.1
+======
+
+Fixed ``AttributeError`` in ``ShelvedCookieJar.get``.
+
 v9.0.0
 ======
 

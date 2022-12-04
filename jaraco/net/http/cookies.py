@@ -81,9 +81,10 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
 
     def get(self, name, default=None):
         matches = (
-            cookie
+            cookie.value
             for domain in self._cookies
-            for cookie in self._cookies[domain]
+            for path in self._cookies[domain]
+            for cookie in self._cookies[domain][path].values()
             if cookie.name == name
         )
         return next(matches, default)
