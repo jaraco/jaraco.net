@@ -30,6 +30,7 @@ def staticdirindex(  # noqa: C901
 
     indexlister must be configured, or no function is performed.
     indexlister should be a callable that accepts the following parameters:
+
         section: same as for staticdir (and implicitly calculated for it)
         dir: same as for staticdir, but already combined with root
         path: combination of section and dir
