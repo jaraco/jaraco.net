@@ -57,15 +57,13 @@ class MIB_IFROW(ctypes.Structure):
         length = getattr(self, name + '_length')
         return memoryview(val).tobytes()[:length]
 
+    @property
     def physical_address(self):
         return self.get_variable_length_property('physical_address')
 
-    physical_address = property(physical_address)
-
+    @property
     def description(self):
         return self.get_variable_length_property('description')
-
-    description = property(description)
 
 
 class MIB_IFTABLE(ctypes.Structure):
