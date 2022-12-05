@@ -85,7 +85,7 @@ def ping(dest_addr, timeout=2):
     header = packet[20:28]
     type, code, checksum, recv_id, sequence = struct.unpack('bbHHh', header)
     if recv_id != id:
-        raise socket.error('transmission failure ({recv_id} != {id})'.format(**vars()))
+        raise OSError('transmission failure ({recv_id} != {id})'.format(**vars()))
     return delay
 
 
@@ -98,7 +98,7 @@ def wait_for_host(host):
         try:
             ping(host)
             break
-        except socket.error:
+        except OSError:
             pass
     return datetime.datetime.utcnow()
 
@@ -117,7 +117,7 @@ def monitor_hosts(hosts):
                 delay = ping(host)
             except socket.timeout:
                 delay = None
-            except socket.error as exc:
+            except OSError as exc:
                 delay = str(exc)
             save_result(host, delay)
         time.sleep(3)

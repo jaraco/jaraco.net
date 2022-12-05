@@ -35,8 +35,8 @@ def htmldir(section="", dir="", path="", hdr=True, **kwargs):
             fdn = os.path.join(dpath, dn)
             dmtime = os.path.getmtime(fdn)
             dtim = datetime.datetime.fromtimestamp(dmtime).isoformat('-')
-            fh += """<a href="%s" title="mod: %s">%s/</a><br>
-""" % (
+            fh += """<a href="{}" title="mod: {}">{}/</a><br>
+""".format(
                 dn + '/',
                 dtim,
                 dn,
@@ -49,8 +49,8 @@ def htmldir(section="", dir="", path="", hdr=True, **kwargs):
             siz = os.path.getsize(fn)
             fmtime = os.path.getmtime(fn)
             ftim = datetime.datetime.fromtimestamp(fmtime).isoformat('-')
-            fh += """<a href="%s" title="mod: %s  size: %s">%s</a><br>
-""" % (
+            fh += """<a href="{}" title="mod: {}  size: {}">{}</a><br>
+""".format(
                 fil,
                 ftim,
                 str(siz),

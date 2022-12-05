@@ -17,7 +17,7 @@ def test_connect():
     sock = socket.socket(family, socktype, proto)
     try:
         sock.connect(sockaddr)
-    except socket.error as e:
+    except OSError as e:
         print(e)
         raise SystemExit(1)
     print(f"Successfully connected to {args.host} on port {args.port}")

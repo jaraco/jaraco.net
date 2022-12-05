@@ -1,5 +1,3 @@
-#! -*- coding: UTF-8 -*-
-
 """whois_bridge.py
 
 HTTP scraper for nic servers who only offer whois service via web only.
@@ -263,7 +261,7 @@ class Listener(socketserver.ThreadingTCPServer):
         #  object is closed.
         try:
             select.select((self.socket,), (), ())
-        except socket.error as e:
+        except OSError as e:
             if e[1].lower() == 'bad file descriptor':
                 raise ConnectionClosed
         return socketserver.ThreadingTCPServer.get_request(self)

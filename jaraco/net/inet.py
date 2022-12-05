@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 """
 inet.py
 
@@ -53,7 +51,7 @@ class ScanThread(threading.Thread):
             s.connect(self.address)
             s.close()
             self.result = True
-        except socket.error:
+        except OSError:
             self.result = False
 
         self.report()
@@ -111,7 +109,7 @@ class PortListener(threading.Thread):
                     'Received connection on {self.port} from {addr}.\n'.format(**vars())
                 )
                 conn.close()
-        except socket.error as e:
+        except OSError as e:
             if e[0] == 10048:
                 self.output.write(
                     'Cannot listen on port %d: Address ' 'already in use.\n' % self.port
@@ -135,6 +133,6 @@ def ping_host(host):
     try:
         icmp.ping(host)
         msg = "{host} is online"
-    except socket.error:
+    except OSError:
         msg = "Either {host} is offline or ping request has been " "blocked."
     print(msg.format(**vars()))

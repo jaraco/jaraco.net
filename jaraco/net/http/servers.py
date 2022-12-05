@@ -65,7 +65,7 @@ class Simple:
             self.conn.send(b'HTTP/1.0 200 OK\r\n')
             time.sleep(self.response_delay.total_seconds())
             self.conn.send(b'\r\nGot It!')
-        except socket.error as e:
+        except OSError as e:
             print('Error %s' % e)
             if content:
                 print('partial result')
@@ -137,7 +137,7 @@ class AuthRequest(Simple):
             conn.send(b'\r\n')
             conn.send(msg)
             print('sent authorization request')
-        except socket.error:
+        except OSError:
             print('error in connection')
             traceback.print_exc()
         finally:

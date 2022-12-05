@@ -81,7 +81,7 @@ class RegConfig:
     def __getitem__(self, key):
         try:
             value, type = winreg.QueryValueEx(self._get_key(), key)
-        except WindowsError:
+        except OSError:
             raise KeyError(key)
         return value
 
