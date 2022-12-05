@@ -1,3 +1,9 @@
+v9.1.0
+======
+
+Allow a ``ShelvedCookieJar`` to be created in the current directory
+by default.
+
 v9.0.1
 ======
 

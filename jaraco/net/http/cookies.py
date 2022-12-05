@@ -64,7 +64,7 @@ class ShelvedCookieJar(http.cookiejar.CookieJar):
         self._cookies = self.shelf = shelf
 
     @classmethod
-    def create(cls, root, name='cookies.json', **kwargs):
+    def create(cls, root: pathlib.Path = pathlib.Path(), name='cookies.json', **kwargs):
         return cls(Shelf(root / name), **kwargs)
 
     def set_cookie(self, cookie):
