@@ -73,7 +73,7 @@ def get_interfaces():
     ifc.length = 1024
     ifc.req = ctypes.cast(buf, p_ifreq)
     ioctl(s.fileno(), SIOCGIFCONF, ctypes.byref(ifc))
-    n_records = ifc.length / ctypes.sizeof(ifreq)
+    n_records = ifc.length // ctypes.sizeof(ifreq)
     for index in range(n_records):
         rec = ifc.req[index]
         yield str(rec.name)
@@ -82,7 +82,7 @@ def get_interfaces():
 def get_hardware_addresses(if_names):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     for name in if_names:
-        ifr = ifreq(name)
+        ifr = ifreq(name.encode())
         res = ioctl(s.fileno(), SIOCGIFFLAGS, ctypes.byref(ifr))
         if res != 0:
             continue
@@ -97,7 +97,7 @@ def get_hardware_addresses(if_names):
 def get_ip_addresses(if_names):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     for name in if_names:
-        ifr = ifreq(name)
+        ifr = ifreq(name.encode())
         res = ioctl(s.fileno(), SIOCGIFADDR, ctypes.byref(ifr))
         if res != 0:
             continue
