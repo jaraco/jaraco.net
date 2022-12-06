@@ -8,8 +8,6 @@ True
 
 import sys
 import importlib
-import contextlib
 
 
-with contextlib.suppress(ImportError):
-    Manager = importlib.import_module(f'.{sys.platform}', __package__).Manager
+Manager = importlib.import_module(f'.{sys.platform}', __package__).Manager
