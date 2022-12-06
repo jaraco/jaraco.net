@@ -15,7 +15,7 @@ def pywin32_missing():
 
 collect_ignore = (
     [
-        'jaraco/net/devices/linux2.py',
+        'jaraco/net/devices/linux.py',
         'jaraco/net/devices/win32.py',
     ]
     + [
