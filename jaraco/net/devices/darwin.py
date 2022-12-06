@@ -1,21 +1,24 @@
-import ifparser
+import subprocess
+import operator
+
+import ifconfigparser
 
 from .base import BaseManager
 
 
 def if_config():
-    cfg = subprocess.check_output(['ifconfig'])
-    return ifparser.Ifcfg(cfg)
+    cfg = subprocess.check_output(['ifconfig'], text=True)
+    return ifconfigparser.IfconfigParser(cfg)
 
 
 class Manager(BaseManager):
     def get_host_mac_addresses(self):
-        return map(operator.attrgetter('hwaddr'), self._get_ifaces())
+        return self._iface_values('mac_addr')
 
     def get_host_ip_addresses(self):
-        return map(operator.attrgetter('ip'), self._get_ifaces())
+        return self._iface_values('ipv4_addr')
 
     @staticmethod
-    def _get_ifaces():
-        cfg = if_config()
-        return map(cfg.get_interface, cfg.interfaces)
+    def _iface_values(key):
+        ifaces = if_config().get_interfaces().values()
+        return filter(None, map(operator.attrgetter(key), ifaces))
