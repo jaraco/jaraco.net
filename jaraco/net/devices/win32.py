@@ -4,11 +4,6 @@ from ctypes.wintypes import DWORD, BYTE, WCHAR
 
 from .base import BaseManager
 
-try:
-    memoryview
-except NameError:
-    memoryview = buffer
-
 # select constants
 # error.h
 NO_ERROR = 0
