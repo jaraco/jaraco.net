@@ -154,7 +154,8 @@ class AddressTable(AllocatingTable):
 class Manager(BaseManager):
     def get_host_mac_addresses(self):
         for entry in InterfaceTable().entries:
-            yield entry.physical_address
+            if entry.physical_address:
+                yield entry.physical_address
 
     def get_host_ip_addresses(self):
         for entry in AddressTable().entries:
