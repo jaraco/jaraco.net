@@ -11,7 +11,6 @@ import os
 import re
 import logging
 import abc
-import socket
 import select
 import urllib
 import socketserver
