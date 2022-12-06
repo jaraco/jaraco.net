@@ -17,6 +17,7 @@ collect_ignore = (
     [
         'jaraco/net/devices/linux.py',
         'jaraco/net/devices/win32.py',
+        'jaraco/net/devices/darwin.py',
     ]
     + [
         'jaraco/net/devices/__init__.py',
