@@ -7,9 +7,9 @@ True
 """
 
 import sys
+import importlib
+import contextlib
 
-try:
-    __mod = __import__(__name__ + '.' + sys.platform, fromlist=['Manager'])
-    Manager = __mod.Manager
-except ImportError:
-    from .base import BaseManager as Manager  # noqa
+
+with contextlib.suppress(ImportError):
+    Manager = importlib.import_module(f'.{sys.platform}', __package__).Manager
