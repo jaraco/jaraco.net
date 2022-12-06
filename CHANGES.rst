@@ -1,3 +1,8 @@
+v9.2.0
+======
+
+#4: Added support for macOS to ``jaraco.net.devices``.
+
 v9.1.0
 ======
 
