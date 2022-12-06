@@ -1,6 +1,5 @@
 import sys
 import importlib
-import platform
 
 from jaraco.context import ExceptionTrap
 
@@ -19,10 +18,6 @@ collect_ignore = (
         'jaraco/net/devices/win32.py',
         'jaraco/net/devices/darwin.py',
     ]
-    + [
-        'jaraco/net/devices/__init__.py',
-    ]
-    * (platform.system() == 'Darwin')
     + [
         # modules only import on Windows
         'jaraco/net/dns.py',
