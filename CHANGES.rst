@@ -1,3 +1,8 @@
+v9.3.0
+======
+
+Prefer ``email`` to deprecated ``cgi`` module.
+
 v9.2.0
 ======
 

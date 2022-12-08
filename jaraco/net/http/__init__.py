@@ -7,7 +7,6 @@ import os
 import re
 import datetime
 import argparse
-import cgi
 import urllib
 import email.utils
 import http.client as http_client
@@ -92,9 +91,8 @@ def get_content_disposition_filename(url):
             res = urllib.request.urlopen(req)
         except urllib.error.URLError:
             return
-    header = res.headers.get('content-disposition', '')
-    value, params = cgi.parse_header(header)
-    return params.get('filename')
+    header = res.headers.get('content-disposition')
+    return header and header.params.get('filename')
 
 
 def get_url_filename(url):
