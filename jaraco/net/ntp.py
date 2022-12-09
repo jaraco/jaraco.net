@@ -13,21 +13,12 @@ log = logging.getLogger(__name__)
 TIME1970 = 0x83AA7E80
 
 
-_flaky = jaraco.functools.retry(
-    retries=2,
-    trap=socket.timeout,
-)
-"""
-ntp.query is flaky (by design), so be resilient to it during tests.
-"""
-
-
 def query(server, force_ipv6=False):
     """
     Return current time from NTP server as a Unix timestamp
 
     >>> import time
-    >>> res = _flaky(query)('us.pool.ntp.org')
+    >>> res = query('pool.ntp.org')
     >>> type(res)
     <class 'int'>
     >>> res > time.time() - 5

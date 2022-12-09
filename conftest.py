@@ -1,6 +1,9 @@
 import sys
 import importlib
+import socket
 
+import pytest
+import jaraco.functools
 from jaraco.context import ExceptionTrap
 
 
@@ -30,3 +33,20 @@ collect_ignore = (
     ]
     * (sys.version_info > (3, 11))
 )
+
+
+@pytest.fixture(autouse=True)
+def retry_ntp_query(request, monkeypatch):
+    """
+    ntp.query is flaky (by design), so be resilient during tests.
+    """
+    if not request.node.name.endswith('net.ntp.query'):
+        return
+
+    from jaraco.net import ntp
+
+    retry = jaraco.functools.retry(
+        retries=2,
+        trap=socket.timeout,
+    )
+    monkeypatch.setattr(ntp, 'query', retry(ntp.query))
