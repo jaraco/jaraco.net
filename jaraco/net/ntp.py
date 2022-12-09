@@ -27,7 +27,7 @@ def query(server, force_ipv6=False):
     timeout = 3
     ntp_port = 123
 
-    family = socket.AF_INET6 if force_ipv6 else 0
+    family = socket.AF_INET6 if force_ipv6 else socket.AF_UNSPEC
     sock_type = socket.SOCK_DGRAM
 
     infos = socket.getaddrinfo(server, ntp_port, family, sock_type)
