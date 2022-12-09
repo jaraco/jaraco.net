@@ -50,7 +50,9 @@ def query(server, force_ipv6=False):
 
     data = b'\x1b' + 47 * b'\x00'
     client.sendto(data, sockaddr)
-    data, address = client.recvfrom(1024)
+    with client:
+        data, address = client.recvfrom(1024)
+
     if not data:
         return
 
