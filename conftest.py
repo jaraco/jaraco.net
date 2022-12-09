@@ -46,7 +46,7 @@ def retry_ntp_query(request, monkeypatch):
     from jaraco.net import ntp
 
     retry = jaraco.functools.retry(
-        retries=2,
+        retries=4,
         trap=socket.timeout,
     )
     monkeypatch.setattr(ntp, 'query', retry(ntp.query))
