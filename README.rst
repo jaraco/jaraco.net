@@ -14,7 +14,7 @@
 .. image:: https://readthedocs.org/projects/jaraconet/badge/?version=latest
    :target: https://jaraconet.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://img.shields.io/badge/skeleton-2022-informational
+.. image:: https://img.shields.io/badge/skeleton-2023-informational
    :target: https://blog.jaraco.com/skeleton
 
 ``jaraco.net`` provides miscellaneous utility functions used across
