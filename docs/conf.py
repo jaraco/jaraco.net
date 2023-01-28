@@ -31,6 +31,12 @@ link_files = {
 # Be strict about any broken references
 nitpicky = True
 
+nitpick_ignore = [
+    ('py:class', 'cherrypy.process.plugins.SimplePlugin'),
+    ('py:class', 'jaraco.classes.meta.LeafClassesMeta'),
+    ('py:class', '_io.BytesIO'),
+]
+
 # Include Python intersphinx mapping to prevent failures
 # jaraco/skeleton#51
 extensions += ['sphinx.ext.intersphinx']
