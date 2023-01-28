@@ -29,10 +29,10 @@ class Shelf(collections.abc.MutableMapping):
             self._load()
 
     def _load(self):
-        self.store = jsonpickle.decode(self.filename.read_text())
+        self.store = jsonpickle.decode(self.filename.read_text(encoding='utf-8'))
 
     def _save(self):
-        self.filename.write_text(jsonpickle.encode(self.store))
+        self.filename.write_text(jsonpickle.encode(self.store), encoding='utf-8')
 
     def __getitem__(self, *args, **kwargs):
         return self.store.__getitem__(*args, **kwargs)

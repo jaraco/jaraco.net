@@ -7,7 +7,7 @@ from .base import BaseManager
 
 
 def if_config():
-    cfg = subprocess.check_output(['ifconfig'], text=True)
+    cfg = subprocess.check_output(['ifconfig'], text=True, encoding='utf-8')
     return ifconfigparser.IfconfigParser(cfg)
 
 
