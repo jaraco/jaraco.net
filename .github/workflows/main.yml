@@ -58,10 +58,6 @@ jobs:
           platform: ubuntu-latest
         - python: pypy3.9
           platform: ubuntu-latest
-        exclude:
-        # jaraco/jaraco.net#5
-        - python: 3.12
-          platform: ubuntu-latest
     runs-on: ${{ matrix.platform }}
     continue-on-error: ${{ matrix.python == '3.12' }}
     steps:
