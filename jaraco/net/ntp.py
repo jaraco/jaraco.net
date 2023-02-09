@@ -10,8 +10,6 @@ import jaraco.functools
 
 log = logging.getLogger(__name__)
 
-TIME1970 = 0x83AA7E80
-
 
 def query(server, force_ipv6=False):
     """
@@ -48,8 +46,9 @@ def query(server, force_ipv6=False):
         return
 
     log.info(f'Response received from: {address}')
-    t = struct.unpack('!12I', data)[10]
-    return t - TIME1970
+    base = datetime.datetime.fromtimestamp(struct.unpack('!12I', data)[10])
+    result = base - datetime.timedelta(seconds=0x83AA7E80)
+    return int(result.timestamp())
 
 
 def handle_command_line():
