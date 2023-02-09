@@ -110,7 +110,6 @@ def staticdirindex(  # noqa: C901
         return False
 
     if stat.S_ISDIR(st.st_mode):
-
         # Set the Last-Modified response header, so that
         # modified-since validation code can work.
         response.headers['Last-Modified'] = http.HTTPDate(st.st_mtime)

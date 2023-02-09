@@ -30,7 +30,6 @@ def htmldir(section="", dir="", path="", hdr=True, **kwargs):
     path = path.rstrip(r"\/")
     fh += '<h3>Directory listing for: <a href="' + url + '">' + url + '</a></h3><hr>\n'
     for dpath, ddirs, dfiles in os.walk(path):
-
         for dn in sorted(ddirs):
             fdn = os.path.join(dpath, dn)
             dmtime = os.path.getmtime(fdn)
