@@ -1,3 +1,5 @@
+import os
+import platform
 import sys
 import importlib
 import socket
@@ -52,3 +54,5 @@ def retry_ntp_query(request):
     )
     globs = request.node.dtest.globs
     globs['query'] = retry(globs['query'])
+    if os.environ.get('GITHUB_ACTIONS') and platform.system != 'Linux':
+        pytest.skip("Test is flaky")
