@@ -21,7 +21,7 @@ def query(server, force_ipv6=False):
     >>> res = query('pool.ntp.org')
     >>> type(res)
     <class 'int'>
-    >>> res > time.time() - 5
+    >>> time.time() - 5 < res < time.time() + 5
     True
     """
     timeout = 3
