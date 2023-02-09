@@ -38,18 +38,17 @@ collect_ignore = (
 
 
 @pytest.fixture(autouse=True)
-def retry_ntp_query(request, monkeypatch):
+def retry_ntp_query(request):
     """
     ntp.query is flaky (by design), so be resilient during tests.
     """
     if not request.node.name.endswith('net.ntp.query'):
         return
 
-    from jaraco.net import ntp
-
     retry = jaraco.functools.retry(
         retries=4,
         trap=socket.timeout,
         cleanup=functools.partial(time.sleep, 4),
     )
-    monkeypatch.setattr(ntp, 'query', retry(ntp.query))
+    globs = request.node.dtest.globs
+    globs['query'] = retry(globs['query'])
