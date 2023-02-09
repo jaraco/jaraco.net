@@ -1,6 +1,8 @@
 import sys
 import importlib
 import socket
+import functools
+import time
 
 import pytest
 import jaraco.functools
@@ -48,5 +50,6 @@ def retry_ntp_query(request, monkeypatch):
     retry = jaraco.functools.retry(
         retries=4,
         trap=socket.timeout,
+        cleanup=functools.partial(time.sleep, 1),
     )
     monkeypatch.setattr(ntp, 'query', retry(ntp.query))
