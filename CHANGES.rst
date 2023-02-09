@@ -1,3 +1,8 @@
+v9.3.1
+======
+
+Fix ``EncodingWarnings``.
+
 v9.3.0
 ======
 
