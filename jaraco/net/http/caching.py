@@ -3,13 +3,12 @@ urllib2 HTTP caching support
 inspired by http://code.activestate.com/recipes/491261/
 """
 
+import email.utils
 import pickle
 import datetime
 import logging
 import io
 from urllib import request
-
-import email.utils as email_utils
 
 log = logging.getLogger(__name__)
 
@@ -305,13 +304,15 @@ def get_endpoint_headers(headers):
     return set(headers.keys()) - set(intermediate_headers)
 
 
+def _make_aware(dt):
+    """
+    email.utils will create naive datetimes for -0000; make them aware.
+    """
+    return dt.replace(tzinfo=dt.tzinfo or datetime.UTC)
+
+
 def datetime_from_email(str):
-    parsed = email_utils.parsedate_tz(str)
-    if not parsed:
-        raise ValueError("Unrecognized date %s" % str)
-    offset = datetime.timedelta(seconds=parsed[-1] or 0)
-    naive_date = datetime.datetime(*parsed[:6], tzinfo=datetime.UTC)
-    return naive_date - offset
+    return _make_aware(email.utils.parsedate_to_datetime(str))
 
 
 def quick_test():
