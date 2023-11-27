@@ -100,7 +100,7 @@ def wait_for_host(host):
             break
         except OSError:
             pass
-    return datetime.datetime.utcnow()
+    return datetime.datetime.now(datetime.UTC)
 
 
 def monitor_cmd():

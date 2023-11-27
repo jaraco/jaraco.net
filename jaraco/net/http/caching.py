@@ -225,7 +225,7 @@ class CachedResponse(io.BytesIO):
     def age(self):
         "Return the age of this response, guaranteed >= 0"
         date = datetime_from_email(self.headers['date'])
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.UTC)
         zero = datetime.timedelta()
         return max(zero, now - date)
 
@@ -242,7 +242,7 @@ class CachedResponse(io.BytesIO):
         if 'expires' in cc:
             try:
                 expires = datetime_from_email(self.headers['expires'])
-                now = datetime.datetime.utcnow()
+                now = datetime.datetime.now(datetime.UTC)
                 if expires < now:
                     return False
             except ValueError:
@@ -310,7 +310,7 @@ def datetime_from_email(str):
     if not parsed:
         raise ValueError("Unrecognized date %s" % str)
     offset = datetime.timedelta(seconds=parsed[-1] or 0)
-    naive_date = datetime.datetime(*parsed[:6])
+    naive_date = datetime.datetime(*parsed[:6], tzinfo=datetime.UTC)
     return naive_date - offset
 
 
