@@ -1,13 +1,14 @@
-import types
-import sys
 import logging
-from urllib import parse, request
+import sys
+import types
+import urllib.parse
+import urllib.request
 
 
 log = logging.getLogger(__name__)
 
 
-class HeadRequest(request.Request):
+class HeadRequest(urllib.request.Request):
     def get_method(self):
         return 'HEAD'
 
@@ -15,7 +16,7 @@ class HeadRequest(request.Request):
 class URLLoader(str):
     def load_module(self, fullname):
         url = self + fullname + '.py'
-        resp = request.urlopen(url)
+        resp = urllib.request.urlopen(url)
         co = compile(resp.read(), fullname, 'exec')
         module = sys.modules.setdefault(fullname, types.ModuleType(fullname))
         module.__file__ = url
@@ -37,7 +38,7 @@ class URLImporter(str):
             return
         req = HeadRequest(self + fullname + '.py')
         try:
-            request.urlopen(req)
+            urllib.request.urlopen(req)
             log.debug("Found at %s", self)
             return URLLoader(self)
         except Exception:
@@ -53,7 +54,7 @@ class URLImporter(str):
 
     @classmethod
     def handles(cls, path):
-        path_p = parse.urlparse(path)
+        path_p = urllib.parse.urlparse(path)
         if path_p.scheme in ('http', 'https'):
             return cls(path)
         raise ImportError(path)
