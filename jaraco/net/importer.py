@@ -1,3 +1,4 @@
+import importlib.machinery
 import logging
 import sys
 import types
@@ -31,6 +32,18 @@ class URLImporter(str):
     """
 
     # interface.Provides(python_importer)
+
+    def find_spec(self, fullname, path, target=None):
+        if not self.endswith('/'):
+            return
+
+        req = HeadRequest(self + fullname + '.py')
+        try:
+            urllib.request.urlopen(req)
+            log.debug("Found at %s", self)
+            return importlib.machinery.ModuleSpec(fullname, loader=URLLoader(self))
+        except Exception:
+            pass
 
     def find_module(self, fullname, path=None):
         log.debug("Finding %s in %s", fullname, self)
