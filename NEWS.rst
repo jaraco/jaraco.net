@@ -1,3 +1,13 @@
+v9.4.0
+======
+
+Features
+--------
+
+- Removed functionality and deprecated compat module.
+- Require Python 3.8 or later.
+
+
 v9.3.1
 ======
 
