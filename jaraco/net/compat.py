@@ -11,7 +11,7 @@ import sys
 import platform
 import socket
 
-from jaraco.functools import call_aside
+from jaraco.functools import invoke
 
 
 constants = dict(
@@ -263,7 +263,7 @@ constants.update(
 )
 
 
-@call_aside
+@invoke
 def patch():
     if platform.system() != 'Windows':
         return
