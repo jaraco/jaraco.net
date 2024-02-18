@@ -35,6 +35,11 @@ collect_ignore = (
         'jaraco/net/icmp.py',
     ]
     * (sys.version_info < (3, 10))
+    + [
+        # ping is not working on Linux
+        'jaraco/net/icmp.py',
+    ]
+    * (platform.system() == "Linux")
 )
 
 
