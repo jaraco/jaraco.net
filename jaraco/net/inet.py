@@ -105,9 +105,7 @@ class PortListener(threading.Thread):
             s.listen(1)
             while 1:
                 conn, addr = s.accept()
-                self.output.write(
-                    'Received connection on {self.port} from {addr}.\n'.format(**vars())
-                )
+                self.output.write(f'Received connection on {self.port} from {addr}.\n')
                 conn.close()
         except OSError as e:
             if e[0] == 10048:
@@ -132,7 +130,7 @@ class PortRangeListener:
 def ping_host(host):
     try:
         icmp.ping(host)
-        msg = "{host} is online"
+        msg = f"{host} is online"
     except OSError:
-        msg = "Either {host} is offline or ping request has been " "blocked."
-    print(msg.format(**vars()))
+        msg = f"Either {host} is offline or ping request has been blocked."
+    print(msg)

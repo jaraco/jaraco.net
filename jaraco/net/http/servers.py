@@ -10,7 +10,7 @@ import traceback
 
 class Simple:
     def __init__(self, host, port, timeout, response_delay, outfile):
-        self.__dict__.update(vars())
+        self.__dict__.update(locals())
         del self.self
 
     @classmethod

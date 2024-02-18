@@ -13,7 +13,7 @@ class ContentTypeReporter:
     def index(self, file=None):
         if not file:
             return form
-        return "Content type is {file.content_type}".format(**vars())
+        return f"Content type is {file.content_type}"
 
     @classmethod
     def run(cls):

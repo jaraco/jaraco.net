@@ -44,10 +44,10 @@ class Forwarder:
     def relay_message(self):
         try:
             mesg, requester = self.socket.recvfrom(2**16)
-            print('received %(mesg)r from %(requester)s' % vars())
+            print('received', mesg, 'from', requester)
             self.dest.sendto(mesg, self.dest_addr)
             resp, src = self.dest.recvfrom(2**16)
-            print('response %(resp)r' % vars())
+            print('response', resp)
             self.socket.sendto(resp, requester)
         except socket.timeout:
             pass
@@ -69,7 +69,7 @@ class RegConfig:
             if '%' in value:
                 return winreg.REG_EXPAND_SZ
             return winreg.REG_SZ
-        raise ValueError('Unable to infer type for {value}'.format(**vars()))
+        raise ValueError(f'Unable to infer type for {value}')
 
     def __setitem__(self, key, value):
         keytype = self.infer_key_type(value)

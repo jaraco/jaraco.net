@@ -85,7 +85,7 @@ def ping(dest_addr, timeout=2):
     header = packet[20:28]
     type, code, checksum, recv_id, sequence = struct.unpack('bbHHh', header)
     if recv_id != id:
-        raise OSError('transmission failure ({recv_id} != {id})'.format(**vars()))
+        raise OSError(f'transmission failure ({recv_id} != {id})')
     return delay
 
 
