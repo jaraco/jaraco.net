@@ -1,3 +1,12 @@
+v10.2.0
+=======
+
+Features
+--------
+
+- Added ping-isp utility to auto-detect the ISP first hop.
+
+
 v10.1.0
 =======
 
