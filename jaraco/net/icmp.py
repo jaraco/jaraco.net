@@ -7,6 +7,7 @@ import operator
 import random
 import datetime
 import functools
+import platform
 
 from tempora.timing import Stopwatch
 
@@ -32,6 +33,9 @@ def calculate_checksum(bytes):
     return (~sum) & 0xFFFF
 
 
+echo_header_structure = '!2b3H'
+
+
 def pack_echo_header(id, data, sequence=1):
     r"""
     Assemble an ICMP echo header
@@ -46,9 +50,22 @@ def pack_echo_header(id, data, sequence=1):
     ICMP_ECHO_REQUEST = 8
     code = 0
     sequence = 1
-    tmp_header = struct.pack('bbHHh', ICMP_ECHO_REQUEST, code, 0, id, sequence)
+    tmp_header = struct.pack(
+        echo_header_structure, ICMP_ECHO_REQUEST, code, 0, id, sequence
+    )
     checksum = calculate_checksum(tmp_header + data)
-    return struct.pack('bbHHh', ICMP_ECHO_REQUEST, code, checksum, id, sequence)
+    return struct.pack(
+        echo_header_structure, ICMP_ECHO_REQUEST, code, checksum, id, sequence
+    )
+
+
+def _repair(packet):
+    """
+    On Linux, when unprivileged (using SOCK_DGRAM), the ICMP response
+    header is already processed by the socket module, so pad the
+    packet with the size of that header for compatibility.
+    """
+    return b'\x00' * 20 * (platform.system() == "Linux") + packet
 
 
 def ping(dest_addr, timeout=2):
@@ -82,8 +99,10 @@ def ping(dest_addr, timeout=2):
         raise socket.timeout('timed out')
 
     packet, addr = icmp_socket.recvfrom(1024)
-    header = packet[20:28]
-    type, code, checksum, recv_id, sequence = struct.unpack('bbHHh', header)
+    header = _repair(packet)[20:28]
+    type, code, checksum, recv_id, sequence = struct.unpack(
+        echo_header_structure, header
+    )
     if recv_id != id:
         raise OSError(f'transmission failure ({recv_id} != {id})')
     return delay
