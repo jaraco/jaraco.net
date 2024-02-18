@@ -224,7 +224,7 @@ class CachedResponse(io.BytesIO):
     def age(self):
         "Return the age of this response, guaranteed >= 0"
         date = datetime_from_email(self.headers['date'])
-        now = datetime.datetime.now(datetime.UTC)
+        now = datetime.datetime.now(datetime.timezone.utc)
         zero = datetime.timedelta()
         return max(zero, now - date)
 
@@ -241,7 +241,7 @@ class CachedResponse(io.BytesIO):
         if 'expires' in cc:
             try:
                 expires = datetime_from_email(self.headers['expires'])
-                now = datetime.datetime.now(datetime.UTC)
+                now = datetime.datetime.now(datetime.timezone.utc)
                 if expires < now:
                     return False
             except ValueError:
@@ -308,7 +308,7 @@ def _make_aware(dt):
     """
     email.utils will create naive datetimes for -0000; make them aware.
     """
-    return dt.replace(tzinfo=dt.tzinfo or datetime.UTC)
+    return dt.replace(tzinfo=dt.tzinfo or datetime.timezone.utc)
 
 
 def datetime_from_email(str):
