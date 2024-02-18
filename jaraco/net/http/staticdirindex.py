@@ -19,7 +19,7 @@ def staticdirindex(  # noqa: C901
     index="",
     indexlistermatch="",
     indexlister=None,
-    **kwargs
+    **kwargs,
 ):
     """Serve a directory index listing for a dir.
 

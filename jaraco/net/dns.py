@@ -104,6 +104,7 @@ class ForwardingService(win32serviceutil.ServiceFramework):
     log_dir: The desired location of the stdout and stderr log files.
     DEFAULT: %system%\LogFiles\%(_svc_display_name_)s
     """
+
     _svc_name_ = 'dns_forward'
     "The name of the service"
     _svc_display_name_ = 'DNS Forwarding Service'
