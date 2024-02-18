@@ -66,7 +66,7 @@ def ping(dest_addr, timeout=2):
         socket.timeout: timed out
     """
     icmp_proto = socket.getprotobyname('icmp')
-    icmp_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp_proto)
+    icmp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, icmp_proto)
     icmp_port = 1
     id = random.randint(0, 2**16 - 1)
     data = struct.pack("d", time.clock()) + b'Q' * 192
