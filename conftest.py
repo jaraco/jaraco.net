@@ -19,14 +19,23 @@ def pywin32_missing():
     importlib.import_module('win32service')
 
 
-collect_ignore = [
-    'jaraco/net/devices/linux.py',
-    'jaraco/net/devices/win32.py',
-    'jaraco/net/devices/darwin.py',
-] + [
-    # modules only import on Windows
-    'jaraco/net/dns.py',
-] * pywin32_missing()
+collect_ignore = (
+    [
+        'jaraco/net/devices/linux.py',
+        'jaraco/net/devices/win32.py',
+        'jaraco/net/devices/darwin.py',
+    ]
+    + [
+        # modules only import on Windows
+        'jaraco/net/dns.py',
+    ]
+    * pywin32_missing()
+    + [
+        # ping test has different exception on older Pythons
+        'jaraco/net/icmp.py',
+    ]
+    * (sys.version_info < (3, 10))
+)
 
 
 @pytest.fixture(autouse=True)
