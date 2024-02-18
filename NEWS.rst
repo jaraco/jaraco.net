@@ -1,3 +1,18 @@
+v10.0.0
+=======
+
+Bugfixes
+--------
+
+- Use perf_counter instead of deprecated/removed clock.
+
+
+Deprecations and Removals
+-------------------------
+
+- Removed whois bridge service.
+
+
 v9.4.0
 ======
 

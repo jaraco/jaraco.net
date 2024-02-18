@@ -1,1 +1,0 @@
-Use perf_counter instead of deprecated/removed clock.
