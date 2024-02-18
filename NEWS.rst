@@ -1,3 +1,12 @@
+v10.1.0
+=======
+
+Features
+--------
+
+- Replaced native icmp implementation with icmplib. (#6)
+
+
 v10.0.0
 =======
 
