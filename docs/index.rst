@@ -81,11 +81,6 @@ Welcome to |project| documentation!
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: jaraco.net.whois
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 .. automodule:: jaraco.net.devices
     :members:
     :undoc-members:
