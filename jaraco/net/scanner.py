@@ -118,7 +118,7 @@ def get_hosts(host_spec):
     ['192.168.0.1']
 
     One may also specify named hosts
-    >>> '2600:1f18:111:8a0a:61fa:e3e6:ce25:5a31' in _gha(get_hosts('www.jaraco.com'))
+    >>> '2600:1f18:111:8a0a:8e85:a76:c8b6:5674' in _gha(get_hosts('www.jaraco.com'))
     True
     """
     _map = {
