@@ -88,6 +88,8 @@ type = [
 	"pytest-mypy",
 
 	# local
+	"types-httplib2",
+	"types-pywin32",
 ]
 
 stats-server = [
@@ -128,7 +130,3 @@ exclude = [
 
 
 [tool.setuptools_scm]
-
-
-[tool.pytest-enabler.mypy]
-# Disabled due to jaraco/skeleton#143
