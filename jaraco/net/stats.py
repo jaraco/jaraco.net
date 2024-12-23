@@ -12,7 +12,7 @@ import dateutil.parser
 class PingResult:
     def __init__(self, text):
         pattern = re.compile(
-            'time: (?P<time>.*), host: (?P<host>.*), ' 'res: (?P<result>.*)\n'
+            'time: (?P<time>.*), host: (?P<host>.*), res: (?P<result>.*)\n'
         )
         res = pattern.match(text).groupdict()
         res['time'] = dateutil.parser.parse(res['time'])

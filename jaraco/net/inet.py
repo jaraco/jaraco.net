@@ -110,7 +110,7 @@ class PortListener(threading.Thread):
         except OSError as e:
             if e[0] == 10048:
                 self.output.write(
-                    'Cannot listen on port %d: Address ' 'already in use.\n' % self.port
+                    'Cannot listen on port %d: Address already in use.\n' % self.port
                 )
             else:
                 raise
