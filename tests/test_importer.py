@@ -27,7 +27,7 @@ def test_importer():
         importer.URLImporter.install()
         sys.path.append('http://dl.dropbox.com/u/54081/modules/')
         try:
-            import tester
+            import tester  # type: ignore[import-not-found] # Online module
 
             assert tester.echo(True, x=3) == ((True,), dict(x=3))
         finally:
