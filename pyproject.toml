@@ -55,8 +55,8 @@ test = [
 	"types-python-dateutil",
 	"types-requests",
 	"importlib_resources",
-	"requests-mock",
 	"pyparsing",
+	"pytest-responses",
 ]
 
 doc = [
