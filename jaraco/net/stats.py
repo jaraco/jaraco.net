@@ -1,12 +1,12 @@
-import re
-import datetime
-import itertools
 import argparse
+import datetime
 import importlib
+import itertools
+import re
 import textwrap
 
-from more_itertools import recipes
 import dateutil.parser
+from more_itertools import recipes
 
 
 class PingResult:
@@ -146,7 +146,7 @@ class Server:
             .encode('utf-8')
         )
 
-    index.exposed = True  # type: ignore
+    index.exposed = True  # type: ignore[attr-defined]
 
     def get_images(self):
         reader = Reader('ping-results.txt')

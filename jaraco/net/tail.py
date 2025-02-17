@@ -62,7 +62,7 @@ class TailTracker(cherrypy.process.plugins.SimplePlugin, list):
         self.bus.log("Done closing tails")
 
     # need this to be called before server stop (25)
-    stop.priority = 20  # type: ignore
+    stop.priority = 20  # type: ignore[attr-defined]
 
     def __hash__(self):
         return hash(id(self))
