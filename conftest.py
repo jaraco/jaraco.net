@@ -19,6 +19,28 @@ def pywin32_missing():
     importlib.import_module('win32service')
 
 
+def old_ping_exception():
+    """
+    Ping test has different exception on older Pythons.
+    """
+    return sys.version_info < (3, 10)
+
+
+def broken_actions_runner():
+    """
+    Is unprivileged ICMP unavailable?
+
+    Since Dec 2024, GitHub Actions runners no longer seem
+    to be able to allow unprivileged ICMP.
+
+    actions/runner-images#11614
+    """
+    return bool(os.environ.get('GITHUB_ACTIONS')) and (
+        # Unfortunately, `os.environ['RUNNER_OS']` doesn't work
+        platform.system() == 'Linux'
+    )
+
+
 collect_ignore = (
     [
         'jaraco/net/devices/linux.py',
@@ -31,10 +53,9 @@ collect_ignore = (
     ]
     * pywin32_missing()
     + [
-        # ping test has different exception on older Pythons
         'jaraco/net/icmp.py',
     ]
-    * (sys.version_info < (3, 10))
+    * (old_ping_exception() or broken_actions_runner())
 )
 
 
