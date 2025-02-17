@@ -34,12 +34,6 @@ link_files = {
 nitpicky = True
 nitpick_ignore: list[tuple[str, str]] = []
 
-nitpick_ignore = [
-    ('py:class', 'cherrypy.process.plugins.SimplePlugin'),
-    ('py:class', 'jaraco.classes.meta.LeafClassesMeta'),
-    ('py:class', '_io.BytesIO'),
-]
-
 # Include Python intersphinx mapping to prevent failures
 # jaraco/skeleton#51
 extensions += ['sphinx.ext.intersphinx']
@@ -60,3 +54,9 @@ extlinks = {
 extensions += ['sphinx.ext.extlinks']
 
 # local
+nitpick_ignore += [
+    ('py:class', 'cherrypy.process.plugins.SimplePlugin'),
+    ('py:class', 'jaraco.classes.meta.LeafClassesMeta'),
+    ('py:class', '_io.BytesIO'),
+    ('py:class', 'pathlib._local.Path'),
+]
