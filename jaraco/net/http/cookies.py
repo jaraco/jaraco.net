@@ -25,14 +25,20 @@ class Shelf(collections.abc.MutableMapping):
     def __init__(self, filename):
         self.filename = pathlib.Path(filename)
         self.store = dict()
+        # ensure stricter, non-YAML backend is selected (jsonpickle/jsonpickle#550)
+        self.backend = jsonpickle.backend.JSONBackend(fallthrough=False)
         with contextlib.suppress(Exception):
             self._load()
 
     def _load(self):
-        self.store = jsonpickle.decode(self.filename.read_text(encoding='utf-8'))
+        self.store = jsonpickle.decode(
+            self.filename.read_text(encoding='utf-8'), backend=self.backend
+        )
 
     def _save(self):
-        self.filename.write_text(jsonpickle.encode(self.store), encoding='utf-8')
+        self.filename.write_text(
+            jsonpickle.encode(self.store, backend=self.backend), encoding='utf-8'
+        )
 
     def __getitem__(self, *args, **kwargs):
         return self.store.__getitem__(*args, **kwargs)
