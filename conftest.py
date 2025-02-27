@@ -1,15 +1,15 @@
+import functools
+import importlib
 import os
 import platform
-import sys
-import importlib
 import socket
-import functools
+import sys
 import time
 
 import pytest
+
 import jaraco.functools
 from jaraco.context import ExceptionTrap
-
 
 missing = ExceptionTrap(ImportError).raises
 

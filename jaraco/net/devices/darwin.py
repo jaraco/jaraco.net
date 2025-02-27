@@ -1,5 +1,5 @@
-import subprocess
 import operator
+import subprocess
 
 import ifconfigparser
 

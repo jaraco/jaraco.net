@@ -4,15 +4,15 @@ scanner.py
 TCP port scanning utility
 """
 
-import operator
-import re
-import struct
-import socket
+import argparse
 import itertools
 import logging.handlers
-import argparse
+import operator
 import os
 import platform
+import re
+import socket
+import struct
 
 import jaraco.logging
 from jaraco.collections import Everything

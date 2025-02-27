@@ -1,6 +1,6 @@
 import ctypes
 import struct
-from ctypes.wintypes import DWORD, BYTE, WCHAR
+from ctypes.wintypes import BYTE, DWORD, WCHAR
 
 from .base import BaseManager
 

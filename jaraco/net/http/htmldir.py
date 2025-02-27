@@ -1,7 +1,8 @@
 # from http://tools.cherrypy.org/wiki/staticdirindex
+import datetime
 import os
 import os.path
-import datetime
+
 import cherrypy
 
 

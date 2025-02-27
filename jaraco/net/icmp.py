@@ -1,7 +1,7 @@
-import sys
-import socket
-import time
 import datetime
+import socket
+import sys
+import time
 
 import icmplib
 

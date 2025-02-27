@@ -3,11 +3,11 @@ urllib2 HTTP caching support
 inspired by http://code.activestate.com/recipes/491261/
 """
 
-import email.utils
-import pickle
 import datetime
-import logging
+import email.utils
 import io
+import logging
+import pickle
 from urllib import request
 
 log = logging.getLogger(__name__)

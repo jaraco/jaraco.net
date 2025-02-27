@@ -1,12 +1,12 @@
 #!python
 
 import os
-import sys
 import socket
+import sys
 import winreg
 
-import win32serviceutil
 import win32service
+import win32serviceutil
 
 port = socket.getservbyname('domain')
 

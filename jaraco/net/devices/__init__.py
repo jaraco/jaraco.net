@@ -6,8 +6,7 @@ True
 True
 """
 
-import sys
 import importlib
-
+import sys
 
 Manager = importlib.import_module(f'.{sys.platform}', __package__).Manager

@@ -1,10 +1,10 @@
+import argparse
+import datetime
+import functools
+import re
 import socket
 import sys
-import re
 import time
-import datetime
-import argparse
-import functools
 import traceback
 
 

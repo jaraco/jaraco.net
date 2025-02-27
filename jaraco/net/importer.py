@@ -5,7 +5,6 @@ import types
 import urllib.parse
 import urllib.request
 
-
 log = logging.getLogger(__name__)
 
 

@@ -2,22 +2,22 @@
 Routines for handling RSS feeds
 """
 
+import argparse
+import datetime
 import itertools
-import subprocess
+import logging
+import mimetypes
+import operator
 import os
 import re
-import operator
-import datetime
+import subprocess
 import sys
-import mimetypes
-import logging
-import argparse
 
 import feedparser
-import jaraco.logging
-from pathvalidate import sanitize_filename
 from dateutil import parser as date_parser
+from pathvalidate import sanitize_filename
 
+import jaraco.logging
 from jaraco.net.http import get_url
 
 log = logging.getLogger(__name__)

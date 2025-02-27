@@ -2,8 +2,8 @@
 dnsbl: DNS blocklist support
 """
 
-import socket
 import argparse
+import socket
 
 
 class BlocklistHit:

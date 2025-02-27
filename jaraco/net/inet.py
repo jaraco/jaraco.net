@@ -9,14 +9,13 @@ Objects:
     PortRangeListener: listens on a range of ports
 """
 
-import threading
+import functools
+import logging
+import operator
 import socket
 import sys
-import operator
+import threading
 import time
-import logging
-import functools
-from typing import List
 
 from more_itertools.recipes import consume
 
@@ -38,7 +37,7 @@ class PortScanner:
 
 
 class ScanThread(threading.Thread):
-    all_testers: List[threading.Thread] = []
+    all_testers: list[threading.Thread] = []
 
     def __init__(self, address):
         threading.Thread.__init__(self)

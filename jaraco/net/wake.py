@@ -1,5 +1,5 @@
-import struct
 import socket
+import struct
 
 
 def wake_on_lan(self, addr='00:00:00:00:00:00'):

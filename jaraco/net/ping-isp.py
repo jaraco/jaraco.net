@@ -1,7 +1,7 @@
+import functools
+import importlib
 import itertools
 import socket
-import importlib
-import functools
 
 import autocommand
 import icmplib

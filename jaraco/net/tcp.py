@@ -1,5 +1,5 @@
-import socket
 import argparse
+import socket
 
 
 def get_connect_options():

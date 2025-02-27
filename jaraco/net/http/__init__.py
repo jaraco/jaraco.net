@@ -2,16 +2,17 @@
 HTTP routines
 """
 
+import argparse
+import datetime
+import email.utils
+import http.client as http_client
 import logging
 import os
 import re
-import datetime
-import argparse
 import urllib
-import email.utils
-import http.client as http_client
 
 import path
+
 import jaraco.text
 
 log = logging.getLogger(__name__)

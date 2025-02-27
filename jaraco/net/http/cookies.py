@@ -1,7 +1,7 @@
-import pathlib
 import collections
-import http.cookiejar
 import contextlib
+import http.cookiejar
+import pathlib
 
 import jsonpickle
 

@@ -1,12 +1,12 @@
-import socket
-import struct
-import logging
 import argparse
 import datetime
+import logging
+import socket
+import struct
 
-from jaraco.text import trim
-import jaraco.logging
 import jaraco.functools
+import jaraco.logging
+from jaraco.text import trim
 
 log = logging.getLogger(__name__)
 

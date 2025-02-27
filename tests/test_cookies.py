@@ -1,7 +1,7 @@
-import requests
 import pytest
+import requests
 
-from jaraco.net.http.cookies import ShelvedCookieJar, Shelf
+from jaraco.net.http.cookies import Shelf, ShelvedCookieJar
 
 
 @pytest.fixture
