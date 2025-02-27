@@ -26,21 +26,6 @@ def old_ping_exception():
     return sys.version_info < (3, 10)
 
 
-def broken_actions_runner():
-    """
-    Is unprivileged ICMP unavailable?
-
-    Since Dec 2024, GitHub Actions runners no longer seem
-    to be able to allow unprivileged ICMP.
-
-    actions/runner-images#11614
-    """
-    return bool(os.environ.get('GITHUB_ACTIONS')) and (
-        # Unfortunately, `os.environ['RUNNER_OS']` doesn't work
-        platform.system() == 'Linux'
-    )
-
-
 collect_ignore = (
     [
         'jaraco/net/devices/linux.py',
@@ -55,7 +40,7 @@ collect_ignore = (
     + [
         'jaraco/net/icmp.py',
     ]
-    * (old_ping_exception() or broken_actions_runner())
+    * old_ping_exception()
 )
 
 
