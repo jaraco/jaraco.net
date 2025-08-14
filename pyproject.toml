@@ -127,10 +127,8 @@ whois-bridge-service = "jaraco.net.whois_svc:Service.handle_command_line"
 # wget = jaraco.net.http:wget
 
 [tool.setuptools.packages.find]
-exclude = [
-	"sandbox",
-	"pinger",
-	"ubuntu",
+include = [
+	"jaraco*",
 ]
 
 
