@@ -117,7 +117,9 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
     if mod_time and fname.exists():
         stat = fname.lstat()
         previous_size = stat.st_size
-        previous_mod_time = datetime.datetime.utcfromtimestamp(stat.st_mtime)
+        previous_mod_time = datetime.datetime.fromtimestamp(
+            stat.st_mtime, datetime.timezone.utc
+        )
         log.debug('Local  last mod %s', previous_mod_time)
         log.debug('Remote last mod %s', mod_time)
         log.debug('Local  size %d', previous_size)
