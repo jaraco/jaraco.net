@@ -48,9 +48,6 @@ class Query(dict):
             query = map(unquoteSequence, itemPairs)
         if not isinstance(query, dict):
             query = dict(query)
-        if not isinstance(query, dict):
-            msg = "Can't construct a %s from %s"
-            raise ValueError(msg % (self.__class__, query))
         self.update(query)
 
     def __repr__(self):
