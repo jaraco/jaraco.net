@@ -71,7 +71,8 @@ class ScanThread(threading.Thread):
 
     @staticmethod
     def wait_for_testers_to_finish():
-        map(lambda x: x.join(), ScanThread.all_testers)
+        for tester in ScanThread.all_testers:
+            tester.join()
 
 
 def portscan_hosts(hosts, *args, **kargs):
