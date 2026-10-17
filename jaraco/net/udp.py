@@ -19,7 +19,7 @@ class EchoServer:
         host = ''
         port = args.port
         infos = socket.getaddrinfo(host, port)
-        (family, socktype, proto, canonname, sockaddr) = infos[0]
+        (family, _socktype, _proto, _canonname, _sockaddr) = infos[0]
         s = socket.socket(family, socket.SOCK_DGRAM)
         s.settimeout(1)
         s.bind(('', args.port))
@@ -27,7 +27,7 @@ class EchoServer:
             try:
                 res, addr = s.recvfrom(1024)
                 print(res, addr)
-            except socket.timeout:
+            except TimeoutError:
                 pass
             except KeyboardInterrupt:
                 break
@@ -41,20 +41,20 @@ class Sender:
     def send_message(self):
         host, port = self.args.connect.split(':')
         infos = socket.getaddrinfo(host, port)
-        (family, socktype, proto, canonname, sockaddr) = infos[0]
+        (family, _socktype, _proto, _canonname, sockaddr) = infos[0]
         self.sockaddr = sockaddr
-        s = socket(family, socket.SOCK_DGRAM)
+        s = socket.socket(family, socket.SOCK_DGRAM)
         s.connect(sockaddr)
-        s.send(self.args.message)
+        s.send(self.args.message.encode())
         s.close()
 
     @staticmethod
     def _get_args():
         parser = argparse.ArgumentParser()
-        parser.add_option(
+        parser.add_argument(
             "-m", "--message", help="send this message", default="message!"
         )
-        parser.add_option(
+        parser.add_argument(
             '-c', '--connect', help="host:port to connect to", default="localhost:9999"
         )
         return parser.parse_args()

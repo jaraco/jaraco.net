@@ -46,10 +46,10 @@ class Forwarder:
             mesg, requester = self.socket.recvfrom(2**16)
             print('received', mesg, 'from', requester)
             self.dest.sendto(mesg, self.dest_addr)
-            resp, src = self.dest.recvfrom(2**16)
+            resp, _src = self.dest.recvfrom(2**16)
             print('response', resp)
             self.socket.sendto(resp, requester)
-        except socket.timeout:
+        except TimeoutError:
             pass
 
 
@@ -80,7 +80,7 @@ class RegConfig:
 
     def __getitem__(self, key):
         try:
-            value, type = winreg.QueryValueEx(self._get_key(), key)
+            value, _type = winreg.QueryValueEx(self._get_key(), key)
         except OSError:
             raise KeyError(key)
         return value
@@ -137,8 +137,12 @@ class ForwardingService(win32serviceutil.ServiceFramework):
         "redirect output to avoid crashing the service"
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
-        sys.stdout = open(os.path.join(ForwardingService.log_dir, 'stdout.log'), 'a')
-        sys.stderr = open(os.path.join(ForwardingService.log_dir, 'stderr.log'), 'a')
+        sys.stdout = open(  # noqa: SIM115 # replaces stdout for the service's lifetime
+            os.path.join(ForwardingService.log_dir, 'stdout.log'), 'a'
+        )
+        sys.stderr = open(  # noqa: SIM115 # replaces stderr for the service's lifetime
+            os.path.join(ForwardingService.log_dir, 'stderr.log'), 'a'
+        )
 
     @classmethod
     def handle_command_line(cls):

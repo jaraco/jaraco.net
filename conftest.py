@@ -6,12 +6,11 @@ import socket
 import sys
 import time
 
-import pytest
-
 import jaraco.functools
+import pytest
 from jaraco.context import ExceptionTrap
 
-missing = ExceptionTrap(ImportError).raises
+missing = ExceptionTrap((ImportError,)).raises
 
 
 @missing

@@ -31,7 +31,7 @@ def query(server, force_ipv6=False):
     infos = socket.getaddrinfo(server, ntp_port, family, sock_type)
 
     log.debug(infos)
-    family, socktype, proto, canonname, sockaddr = infos[0]
+    family, _socktype, proto, _canonname, sockaddr = infos[0]
 
     log.info(f'Requesting time from {sockaddr}')
     client = socket.socket(family=family, type=sock_type, proto=proto)
@@ -65,7 +65,7 @@ def handle_command_line():
     jaraco.logging.setup(args)
     logging.root.handlers[0].setFormatter(logging.Formatter("%(message)s"))
     val = query(args.server, args.ipv6)
-    dt = datetime.datetime.fromtimestamp(val)  # noqa
+    dt = datetime.datetime.fromtimestamp(val)
     log.info(f'\tTime={dt}')
 
 

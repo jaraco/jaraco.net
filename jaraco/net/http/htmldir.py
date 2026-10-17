@@ -16,17 +16,14 @@ def htmldir(section="", dir="", path="", hdr=True, **kwargs):
 
     # preamble
     if hdr:
-        fh += (
-            """<html>
+        fh += f"""<html>
 <head>
-<title>Directory listing for: %s</title>
+<title>Directory listing for: {url}</title>
 <meta name="Author" content="Glenn Linderman">
 <style type="text/css">@import url("/style.css");</style>
 </head>
 <body>
 """
-            % url
-        )
 
     path = path.rstrip(r"\/")
     fh += '<h3>Directory listing for: <a href="' + url + '">' + url + '</a></h3><hr>\n'
@@ -49,13 +46,8 @@ def htmldir(section="", dir="", path="", hdr=True, **kwargs):
             siz = os.path.getsize(fn)
             fmtime = os.path.getmtime(fn)
             ftim = datetime.datetime.fromtimestamp(fmtime).isoformat('-')
-            fh += """<a href="{}" title="mod: {}  size: {}">{}</a><br>
-""".format(
-                fil,
-                ftim,
-                str(siz),
-                fil,
-            )
+            fh += f"""<a href="{fil}" title="mod: {ftim}  size: {siz}">{fil}</a><br>
+"""
 
     # postamble
     if hdr:

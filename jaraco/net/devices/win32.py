@@ -103,7 +103,7 @@ class AllocatingTable:
         length = DWORD()
         res = self.method(None, ctypes.byref(length), False)
         if res != ERROR_INSUFFICIENT_BUFFER:
-            raise RuntimeError("Error getting table length (%d)" % res)
+            raise RuntimeError(f"Error getting table length ({res:d})")
         return length.value
 
     def get_table(self):
@@ -117,7 +117,7 @@ class AllocatingTable:
             ctypes.byref(buffer), ctypes.byref(returned_buffer_length), False
         )
         if res != NO_ERROR:
-            raise RuntimeError("Error retrieving table (%d)" % res)
+            raise RuntimeError(f"Error retrieving table ({res:d})")
         pointer_type = ctypes.POINTER(self.structure)
         return ctypes.cast(buffer, pointer_type).contents
 

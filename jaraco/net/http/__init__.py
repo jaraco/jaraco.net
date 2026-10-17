@@ -11,9 +11,8 @@ import os
 import re
 import urllib
 
-import path
-
 import jaraco.text
+import path
 
 log = logging.getLogger(__name__)
 
@@ -48,9 +47,6 @@ class Query(dict):
             query = map(unquoteSequence, itemPairs)
         if not isinstance(query, dict):
             query = dict(query)
-        if not isinstance(query, dict):
-            msg = "Can't construct a %s from %s"
-            raise ValueError(msg % (self.__class__, query))
         self.update(query)
 
     def __repr__(self):
@@ -117,13 +113,15 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
     if mod_time and fname.exists():
         stat = fname.lstat()
         previous_size = stat.st_size
-        previous_mod_time = datetime.datetime.utcfromtimestamp(stat.st_mtime)
+        previous_mod_time = datetime.datetime.fromtimestamp(
+            stat.st_mtime, datetime.timezone.utc
+        )
         log.debug('Local  last mod %s', previous_mod_time)
         log.debug('Remote last mod %s', mod_time)
         log.debug('Local  size %d', previous_size)
         log.debug('Remote size %d', content_length)
         if not replace_newer and not touch_older:
-            raise RuntimeError("%s exists" % fname)
+            raise RuntimeError(f"{fname} exists")
         current = (
             replace_newer
             and previous_mod_time >= mod_time
@@ -142,9 +140,9 @@ def get_url(url, dest=None, replace_newer=False, touch_older=True):
             fname.mtime = mod_time
             return
     log.info('Downloading %s (last mod %s)', url, str(mod_time))
-    with fname.open('wb') as dest:
+    with fname.open('wb') as out:
         for line in src:
-            dest.write(line)
+            out.write(line)
     if mod_time:
         fname.mtime = mod_time
     return fname

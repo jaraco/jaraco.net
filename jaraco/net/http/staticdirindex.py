@@ -2,7 +2,7 @@
 import os
 import re
 import stat
-import urllib
+import urllib.parse
 
 import cherrypy
 from cherrypy.lib import cptools
@@ -78,7 +78,7 @@ def staticdirindex(  # noqa: C901
         section = "/"
     section = section.rstrip(r"\/")
     branch = cherrypy.request.path_info[len(section) + 1 :]
-    branch = urllib.unquote(branch.lstrip(r"\/"))
+    branch = urllib.parse.unquote(branch.lstrip(r"\/"))
 
     # If branch is "", filename will end in a slash
     filename = os.path.join(dir, branch)
@@ -102,7 +102,7 @@ def staticdirindex(  # noqa: C901
     # variety of paths). If using tools.static, you can make your relative
     # paths become absolute by supplying a value for "tools.static.root".
     if not os.path.isabs(path):
-        raise ValueError("'%s' is not an absolute path." % path)
+        raise ValueError(f"'{path}' is not an absolute path.")
 
     try:
         st = os.stat(path)

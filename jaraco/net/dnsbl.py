@@ -4,6 +4,7 @@ dnsbl: DNS blocklist support
 
 import argparse
 import socket
+from typing import ClassVar
 
 
 class BlocklistHit:
@@ -25,7 +26,7 @@ class Service(str):
     Service.get_services to get Services for a commonly-used set of domains.
     """
 
-    service_domains = [
+    service_domains: ClassVar = [
         'dnsbl.jaraco.com',
         'zen.spamhaus.org',
         'ips.backscatterer.org',
@@ -40,7 +41,7 @@ class Service(str):
     def lookup(self, host):
         ip = socket.gethostbyname(host)
         rev_ip = self.reverse_ip(ip)
-        key = '.'.join((rev_ip, self))
+        key = f"{rev_ip}.{self}"
         try:
             res = socket.gethostbyname(key)
             print(host, 'listed with', self, 'as', res)

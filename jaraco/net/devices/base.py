@@ -19,7 +19,7 @@ class BaseManager:
         """
         Convert a hardware address to a string.
         """
-        return ':'.join('%02x' % ord(byte) for byte in addr)
+        return ':'.join(f'{ord(byte):02x}' for byte in addr)
 
     @staticmethod
     def ip_address_to_string(addr):
@@ -27,7 +27,7 @@ class BaseManager:
         Convert an IPv4 address into a string.
         """
         assert len(addr) == 4, "Only IPv4 addresses are supported at this time"
-        return '.'.join('%d' % ord(byte) for byte in addr)
+        return '.'.join(f'{ord(byte):d}' for byte in addr)
 
     def get_host_mac_address_strings(self):
         """
@@ -40,7 +40,7 @@ class BaseManager:
         """
         Get the MAC addresses for the host.
         """
-        raise NotImplementedError("Not implemented on platform %s" % sys.platform)
+        raise NotImplementedError(f"Not implemented on platform {sys.platform}")
 
     def get_host_ip_address_strings(self):
         """
@@ -54,4 +54,4 @@ class BaseManager:
         """
         Get the IP addresses of the host.
         """
-        raise NotImplementedError("Not implemented on platform %s" % sys.platform)
+        raise NotImplementedError(f"Not implemented on platform {sys.platform}")

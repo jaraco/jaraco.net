@@ -8,7 +8,7 @@ class TailedFile:
     interval = 0.1
 
     def __init__(self, filename):
-        self.file = open(filename)
+        self.file = open(filename)  # noqa: SIM115 # tailed indefinitely
 
     def next(self):
         # while hasattr(self, 'file'):
