@@ -66,7 +66,7 @@ class Simple:
             time.sleep(self.response_delay.total_seconds())
             self.conn.send(b'\r\nGot It!')
         except OSError as e:
-            print('Error %s' % e)
+            print(f'Error {e}')
             if content:
                 print('partial result')
                 print(repr(content), file=self.outfile)
@@ -75,7 +75,9 @@ class Simple:
 
     @staticmethod
     def get_content_length(request):
-        match = re.search(r'^Content-Length:\s+(\d+)\s*$', request, re.I | re.MULTILINE)
+        match = re.search(
+            r'^Content-Length:\s+(\d+)\s*$', request, re.IGNORECASE | re.MULTILINE
+        )
         if match:
             return int(match.group(1))
         print('no content length found', file=sys.stderr)
@@ -110,7 +112,7 @@ class AuthRequest(Simple):
             self.conn, addr = s.accept()
             print(f'Accepted connection from {addr}')
 
-            if not self.check_auth_response(self.conn) == 'retry':
+            if self.check_auth_response(self.conn) != 'retry':
                 break
 
     serve = serve_until_auth
@@ -121,7 +123,9 @@ class AuthRequest(Simple):
             headers, content = self.get_headers(conn)
             content_len = self.get_content_length(headers) or 0
             content = self.get_content(self.conn, content, content_len)
-            user_pat = re.compile(r'^Authorization:\s+(.*)\s*$', re.I | re.MULTILINE)
+            user_pat = re.compile(
+                r'^Authorization:\s+(.*)\s*$', re.IGNORECASE | re.MULTILINE
+            )
             matched_header = user_pat.search(headers)
             if matched_header:
                 conn.send(b'HTTP/1.0 200 OK\r\n')

@@ -21,7 +21,7 @@ class URLLoader(str):
         module = sys.modules.setdefault(fullname, types.ModuleType(fullname))
         module.__file__ = url
         module.__loader__ = self
-        exec(co, module.__dict__)
+        exec(co, module.__dict__)  # noqa: S102 # executing the fetched module is the point
         return sys.modules[fullname]
 
 
@@ -41,7 +41,7 @@ class URLImporter(str):
             urllib.request.urlopen(req)
             log.debug("Found at %s", self)
             return importlib.machinery.ModuleSpec(fullname, loader=URLLoader(self))
-        except Exception:
+        except Exception:  # noqa: BLE001, S110 # any failure means not found here
             pass
 
     def find_module(self, fullname, path=None):
@@ -53,7 +53,7 @@ class URLImporter(str):
             urllib.request.urlopen(req)
             log.debug("Found at %s", self)
             return URLLoader(self)
-        except Exception:
+        except Exception:  # noqa: BLE001, S110 # any failure means not found here
             pass
 
     @classmethod

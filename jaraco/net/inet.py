@@ -17,6 +17,7 @@ import socket
 import sys
 import threading
 import time
+from typing import ClassVar
 
 from more_itertools.recipes import consume
 
@@ -38,7 +39,7 @@ class PortScanner:
 
 
 class ScanThread(threading.Thread):
-    all_testers: list[threading.Thread] = []
+    all_testers: ClassVar[list[threading.Thread]] = []
 
     def __init__(self, address):
         threading.Thread.__init__(self)
@@ -77,7 +78,7 @@ class ScanThread(threading.Thread):
 
 
 def portscan_hosts(hosts, *args, **kargs):
-    consume(map(lambda h: portscan(h, *args, **kargs), hosts))
+    consume(portscan(h, *args, **kargs) for h in hosts)
 
 
 def portscan(host, ports=range(1024), frequency=20):
@@ -111,7 +112,7 @@ class PortListener(threading.Thread):
         except OSError as e:
             if e.errno in (errno.EADDRINUSE, getattr(errno, 'WSAEADDRINUSE', None)):
                 self.output.write(
-                    'Cannot listen on port %d: Address already in use.\n' % self.port
+                    f'Cannot listen on port {self.port:d}: Address already in use.\n'
                 )
             else:
                 raise

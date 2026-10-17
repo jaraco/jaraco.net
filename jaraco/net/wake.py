@@ -4,7 +4,7 @@ import struct
 
 def wake_on_lan(self, addr='00:00:00:00:00:00'):
     "Wake up a computer on the network"
-    bytes = map(lambda bs: int(bs, 16), addr.split(':'))
+    bytes = (int(bs, 16) for bs in addr.split(':'))
     binary_addr = struct.pack('BBBBBB', *bytes)
     magic_packet = b'\xff' * 6 + binary_addr * 16
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

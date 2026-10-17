@@ -13,7 +13,7 @@ def get_connect_options():
 def test_connect():
     args = get_connect_options()
     addr = args.host, args.port
-    family, socktype, proto, canonname, sockaddr = socket.getaddrinfo(*addr)[0]
+    family, socktype, proto, _canonname, sockaddr = socket.getaddrinfo(*addr)[0]
     sock = socket.socket(family, socktype, proto)
     try:
         sock.connect(sockaddr)

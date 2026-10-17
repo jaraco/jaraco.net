@@ -1,5 +1,4 @@
 import datetime
-import socket
 import sys
 import time
 
@@ -22,7 +21,7 @@ def ping(dest_addr, timeout=2):
     """
     host = icmplib.ping(dest_addr, count=1, timeout=timeout, privileged=False)
     if not host.is_alive:
-        raise socket.timeout('timed out')
+        raise TimeoutError('timed out')
     return datetime.timedelta(host.rtts[0])
 
 
@@ -52,7 +51,7 @@ def monitor_hosts(hosts):
         for host in hosts:
             try:
                 delay = ping(host)
-            except socket.timeout:
+            except TimeoutError:
                 delay = None
             except OSError as exc:
                 delay = str(exc)
@@ -63,9 +62,7 @@ def monitor_hosts(hosts):
 def save_result(host, delay):
     with open('ping-results.txt', 'a') as res:
         ts = datetime.datetime.now()
-        msg = 'time: {ts}, host: {host}, res: {delay}'.format(
-            ts=ts, host=host, delay=delay
-        )
+        msg = f'time: {ts}, host: {host}, res: {delay}'
         print(msg, file=res)
 
 

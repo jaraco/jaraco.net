@@ -132,14 +132,12 @@ class CacheHandler(request.BaseHandler):
         already_cached = getattr(response, 'cached', False)
         if already_cached:
             return False
-        if 'range' in response.headers:
-            # we don't support caching ranged requests
-            return False
-        return True
+        # we don't support caching ranged requests
+        return 'range' not in response.headers
 
     @staticmethod
     def _defrag_uri(uri):
-        main, sep, frag = uri.partition('#')
+        main, _sep, _frag = uri.partition('#')
         return main
 
     @staticmethod
@@ -165,7 +163,7 @@ class CacheHandler(request.BaseHandler):
             >>> parse_part('No-Cache')
             ('no-cache', None)
             """
-            name, sep, val = map(str.lower, map(str.strip, part.partition('=')))
+            name, _sep, val = map(str.lower, map(str.strip, part.partition('=')))
             return name, (val or None)
 
         cc_header = headers.get('cache-control', '')

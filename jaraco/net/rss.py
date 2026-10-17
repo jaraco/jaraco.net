@@ -14,17 +14,17 @@ import subprocess
 import sys
 
 import feedparser
+import jaraco.logging
 from dateutil import parser as date_parser
 from pathvalidate import sanitize_filename
 
-import jaraco.logging
 from jaraco.net.http import get_url
 
 log = logging.getLogger(__name__)
 
 
 def parse_filter(filter_string):
-    filter_pattern = re.compile('(?:(before|after) )?([0-9-]+)$', re.I)
+    filter_pattern = re.compile('(?:(before|after) )?([0-9-]+)$', re.IGNORECASE)
     match = filter_pattern.match(filter_string)
     sign, date_string = match.groups()
     op = dict(before=operator.le, after=operator.ge).get(sign, operator.eq)

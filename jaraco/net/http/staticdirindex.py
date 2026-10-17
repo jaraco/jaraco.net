@@ -102,7 +102,7 @@ def staticdirindex(  # noqa: C901
     # variety of paths). If using tools.static, you can make your relative
     # paths become absolute by supplying a value for "tools.static.root".
     if not os.path.isabs(path):
-        raise ValueError("'%s' is not an absolute path." % path)
+        raise ValueError(f"'{path}' is not an absolute path.")
 
     try:
         st = os.stat(path)

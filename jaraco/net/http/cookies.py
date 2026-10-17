@@ -24,7 +24,7 @@ class Shelf(collections.abc.MutableMapping):
 
     def __init__(self, filename):
         self.filename = pathlib.Path(filename)
-        self.store = dict()
+        self.store = {}
         # ensure stricter, non-YAML backend is selected (jsonpickle/jsonpickle#550)
         self.backend = jsonpickle.backend.JSONBackend(fallthrough=False)
         with contextlib.suppress(Exception):

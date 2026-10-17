@@ -52,7 +52,7 @@ class PingResult:
 class Reader:
     def __init__(self, filename):
         self.filename = filename
-        self.file = open(filename)
+        self.file = open(filename)  # noqa: SIM115 # closed in __del__
 
     def get_stats(self):
         return map(PingResult, self.file)
@@ -130,7 +130,8 @@ class Server:
 
     def index(self):
         return (
-            textwrap.dedent(
+            textwrap
+            .dedent(
                 """
                 <!DOCTYPE html>
                 <html>

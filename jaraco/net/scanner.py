@@ -57,21 +57,18 @@ def _get_mask_host(host_spec, matcher):
     base = addr & mask
     addrs = range(1 << bits)
     result = map(operator.or_, addrs, itertools.repeat(base))
-    result = map(lambda a: struct.pack('!L', a), result)
+    result = (struct.pack('!L', a) for a in result)
     return map(socket.inet_ntoa, result)
 
 
 def _get_range_host(host_spec, matcher):
-    """"""
     # matcher = matcher.next()
     rng = list(map(int, matcher.groups()))
     rng[1] += 1
     rng = range(*rng)
     beg = host_spec[: matcher.start()]
     end = host_spec[matcher.end() :]
-    addrs = itertools.chain.from_iterable(
-        map(lambda n: get_hosts(beg + str(n) + end), rng)
-    )
+    addrs = itertools.chain.from_iterable(get_hosts(beg + str(n) + end) for n in rng)
     return addrs
 
 
@@ -128,12 +125,11 @@ def get_hosts(host_spec):
         r'(\d+\.){3}\d+$': ('match', lambda spec, match: [spec]),
         r'((\d+\.){3}\d+)-((\d+\.){3}\d+)$': ('match', _get_ip_range_host),
     }
-    for pattern in _map:
-        test, func = _map[pattern]
+    for pattern, (test, func) in _map.items():
         matcher = getattr(re, test)(pattern, host_spec)
         if matcher:
             return func(host_spec, matcher)
-    raise ValueError("Could not recognize host spec %s" % host_spec)
+    raise ValueError(f"Could not recognize host spec {host_spec}")
 
 
 def scan():
