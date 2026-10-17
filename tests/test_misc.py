@@ -95,3 +95,35 @@ def test_tcp_connect(monkeypatch, capsys):
     monkeypatch.setattr(sys, 'argv', ['connect', '-h', '127.0.0.1', '-p', '80'])
     tcp.test_connect()
     assert 'Successfully connected to 127.0.0.1 on port 80' in capsys.readouterr().out
+
+
+def test_ntp_query(monkeypatch):
+    seconds = 0x83AA7E80 + 86400
+    reply = bytes(40) + seconds.to_bytes(4, 'big') + bytes(4)
+
+    class FakeSocket:
+        def __init__(self, **kwargs):
+            pass
+
+        def settimeout(self, timeout):
+            pass
+
+        def sendto(self, data, addr):
+            pass
+
+        def recvfrom(self, size):
+            return reply, ('192.0.2.1', 123)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            pass
+
+    addr_info = [(socket.AF_INET, socket.SOCK_DGRAM, 17, '', ('192.0.2.1', 123))]
+    monkeypatch.setattr(socket, 'getaddrinfo', lambda *args: addr_info)
+    monkeypatch.setattr(socket, 'socket', FakeSocket)
+    expected = datetime.datetime.fromtimestamp(86400 + 0x83AA7E80) - datetime.timedelta(
+        seconds=0x83AA7E80
+    )
+    assert ntp.query('pool.ntp.org') == int(expected.timestamp())
