@@ -29,3 +29,10 @@ def test_port_listener_address_in_use(monkeypatch):
     listener.output = io.StringIO()
     listener.run()
     assert 'Cannot listen on port 8080' in listener.output.getvalue()
+
+
+def test_portscan_hosts(monkeypatch):
+    scanned = []
+    monkeypatch.setattr(inet, 'portscan', lambda host, *args: scanned.append(host))
+    inet.portscan_hosts(['a', 'b'], range(1))
+    assert scanned == ['a', 'b']
