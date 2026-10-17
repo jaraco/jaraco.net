@@ -96,7 +96,7 @@ class PortListener(threading.Thread):
     def __init__(self, port):
         threading.Thread.__init__(self)
         self.port = port
-        self.setDaemon(1)
+        self.daemon = True
         self.output = sys.stdout
 
     def run(self):
