@@ -9,6 +9,7 @@ Objects:
     PortRangeListener: listens on a range of ports
 """
 
+import errno
 import functools
 import logging
 import operator
@@ -108,7 +109,7 @@ class PortListener(threading.Thread):
                 self.output.write(f'Received connection on {self.port} from {addr}.\n')
                 conn.close()
         except OSError as e:
-            if e[0] == 10048:
+            if e.errno in (errno.EADDRINUSE, getattr(errno, 'WSAEADDRINUSE', None)):
                 self.output.write(
                     'Cannot listen on port %d: Address already in use.\n' % self.port
                 )
