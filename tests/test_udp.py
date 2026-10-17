@@ -47,4 +47,6 @@ def test_echo_server(monkeypatch):
     monkeypatch.setattr(FakeSocket, 'errors', [TimeoutError(), KeyboardInterrupt()])
     monkeypatch.setattr(socket, 'socket', FakeSocket)
     monkeypatch.setattr('sys.argv', ['echo', '-p', '9999'])
+    addr_info = [(socket.AF_INET, socket.SOCK_DGRAM, 0, '', ('0.0.0.0', 9999))]
+    monkeypatch.setattr(socket, 'getaddrinfo', lambda host, port: addr_info)
     udp.EchoServer()
