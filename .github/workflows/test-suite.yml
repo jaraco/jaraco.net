@@ -47,6 +47,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y libxml2-dev libxslt-dev
+      - name: Enable unprivileged ping sockets
+        # actions/runner-images#11614
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          echo 'net.ipv4.ping_group_range = 0 2147483647' | sudo tee -a /etc/sysctl.conf
+          sudo sysctl -p
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
