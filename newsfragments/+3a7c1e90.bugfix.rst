@@ -1,0 +1,1 @@
+Fixed wake_on_lan to send the magic packet as bytes.
